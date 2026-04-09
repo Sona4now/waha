@@ -16,6 +16,8 @@ const BASE_TABS = [
 
 const SINAI_TAB = { key: "sites", label: "المواقع الاستشفائية" };
 const SAFAGA_TAB = { key: "elements", label: "العناصر العلاجية" };
+const SIWA_TAB = { key: "siwa-sites", label: "مواقع الاستشفاء" };
+const FAYOUM_TAB = { key: "fayoum-sites", label: "المواقع الطبيعية" };
 
 /* ─── Sinai Therapeutic Sites Data ─── */
 interface TherapeuticSite {
@@ -284,6 +286,297 @@ const SAFAGA_CENTERS = [
   { name: "لوتس باي", desc: "ملوحة عالية — برامج علاجية بالمياه", icon: "💧" },
 ];
 
+/* ─── Siwa Therapeutic Sites Data ─── */
+const SIWA_SITES: TherapeuticSite[] = [
+  {
+    id: "ain-birizi",
+    name: "العين بريزي",
+    subtitle: "الطمي المعدني",
+    icon: "♨️",
+    color: "#92400e",
+    sections: [
+      {
+        title: "الخصائص",
+        icon: "💧",
+        content: [
+          "مياه كبريتية دافئة + طمي طبيعي غني بالمعادن والحديد.",
+          "الفوائد العلاجية: علاج أمراض الجلد وتحسين نضارة البشرة.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "النوع", value: "كبريتية", icon: "♨️" },
+      { label: "الطمي", value: "غني بالحديد", icon: "🧱" },
+      { label: "العلاج", value: "أمراض الجلد", icon: "🩺" },
+      { label: "البشرة", value: "نضارة", icon: "✨" },
+    ],
+  },
+  {
+    id: "bir-wahid",
+    name: "بئر واحد",
+    subtitle: "العين الساخنة والباردة — التبادل الحراري",
+    icon: "🌡️",
+    color: "#dc2626",
+    sections: [
+      {
+        title: "الخصائص",
+        icon: "💧",
+        content: [
+          "العين الساخنة: مياه كبريتية حرارية حتى 70°م — استرخاء العضلات وعلاج الروماتيزم.",
+          "العين الباردة: بحيرة واسعة للسباحة والاسترخاء النفسي.",
+          "التكامل: الانتقال بين الساخنة والباردة يحدث صدمة حرارية تنشط الدورة الدموية.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "الحرارة", value: "70°م", icon: "🌡️" },
+      { label: "التكامل", value: "ساخن + بارد", icon: "🔄" },
+      { label: "العلاج", value: "روماتيزم", icon: "🦴" },
+      { label: "التأثير", value: "تنشيط الدورة", icon: "❤️" },
+    ],
+  },
+  {
+    id: "ain-cleopatra",
+    name: "عين كليوباترا",
+    subtitle: "عين جوبا — ثقافية واستجمامية",
+    icon: "👑",
+    color: "#7c3aed",
+    sections: [
+      {
+        title: "الخصائص",
+        icon: "💧",
+        content: [
+          "مياه معدنية وكبريتية مع تباين حراري — باردة صيفاً ودافئة شتاءً.",
+          "قرب معبد آمون — ربط الاستشفاء بالقيمة التاريخية.",
+          "كانت العروس تستحم فيها قبل الفرح — تقاليد محلية عريقة.",
+          "بتساعد على ري النخيل والزيتون القريبة.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "الحرارة", value: "ثابتة", icon: "🌡️" },
+      { label: "التاريخ", value: "معبد آمون", icon: "🏛️" },
+      { label: "الاستخدام", value: "سباحة", icon: "🏊" },
+      { label: "الطبيعة", value: "معدنية", icon: "⚗️" },
+    ],
+  },
+  {
+    id: "salt-lakes",
+    name: "بحيرات الملح",
+    subtitle: "Thalassotherapy & Halotherapy",
+    icon: "🧂",
+    color: "#0284c7",
+    sections: [
+      {
+        title: "الخصائص",
+        icon: "💧",
+        content: [
+          "الملوحة تصل لحد 99% — تحتوي على 84 عنصر معدني.",
+          "العناصر: المغنيسيوم، البوتاسيوم، الكالسيوم.",
+          "الأمراض: الجلدية (صدفية، إكزيما)، آلام المفاصل، تنشيط الدورة الدموية.",
+          "العلاج بالطفو: يقلل الضغط على العمود الفقري والمفاصل ويعيد توازن الأملاح.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "الملوحة", value: "99%", icon: "🧂" },
+      { label: "العناصر", value: "84 معدن", icon: "⚗️" },
+      { label: "العلاج", value: "بالطفو", icon: "🏊" },
+      { label: "الأمراض", value: "جلدية + مفاصل", icon: "🩺" },
+    ],
+  },
+  {
+    id: "salt-cave",
+    name: "كهف الملح",
+    subtitle: "العلاج التنفسي",
+    icon: "🫁",
+    color: "#065f46",
+    sections: [
+      {
+        title: "الخصائص",
+        icon: "💨",
+        content: [
+          "جزيئات يود وملح صخري — علاج الربو وحساسية الصدر والجيوب الأنفية.",
+          "يساعد على توازن الغدة الدرقية.",
+          "جلسات زمنية محددة (≈45 دقيقة) مع استرخاء نفسي.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "المدة", value: "45 دقيقة", icon: "⏱️" },
+      { label: "العلاج", value: "تنفسي", icon: "🫁" },
+      { label: "المكونات", value: "يود + ملح", icon: "🧂" },
+      { label: "الغدة", value: "الدرقية", icon: "⚕️" },
+    ],
+  },
+  {
+    id: "dakrour",
+    name: "حمامات الرمال — جبل الدكرور",
+    subtitle: "العلاج بالدفن في الرمال",
+    icon: "🏜️",
+    color: "#b45309",
+    sections: [
+      {
+        title: "الخصائص",
+        icon: "🏖️",
+        content: [
+          "دفن جسم المريض في الرمال الساخنة 10-15 دقيقة.",
+          "الفوائد: علاج الروماتويد، آلام الظهر والغضاريف والنقرس.",
+          "جبل الدكرور يحتفظ بالحرارة مع نشاط إشعاعي منخفض — مثالي للعلاج بالرمل.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "المدة", value: "10-15 دقيقة", icon: "⏱️" },
+      { label: "العلاج", value: "روماتويد", icon: "🦴" },
+      { label: "الطريقة", value: "دفن بالرمل", icon: "🏜️" },
+      { label: "الإشعاع", value: "منخفض", icon: "☢️" },
+    ],
+  },
+];
+
+const SIWA_QUICK_STATS = [
+  { label: "عدد العيون", value: "200", icon: "💧" },
+  { label: "عدد الآبار", value: "1,000", icon: "🕳️" },
+  { label: "إنتاج المياه", value: "190,000 م³/يوم", icon: "🌊" },
+  { label: "مساحة المحمية", value: "7,800 كم²", icon: "🌿" },
+  { label: "أنواع النباتات", value: "154 نوع", icon: "🌱" },
+  { label: "عدد النخيل", value: "300,000", icon: "🌴" },
+];
+
+/* ─── Fayoum Sites Data ─── */
+const FAYOUM_SITES: TherapeuticSite[] = [
+  {
+    id: "wadi-hitan",
+    name: "وادي الحيتان",
+    subtitle: "تراث عالمي — محمية وادي الريان",
+    icon: "🐋",
+    color: "#92400e",
+    sections: [
+      {
+        title: "الأهمية العالمية",
+        icon: "🌍",
+        content: [
+          "سجلته اليونسكو في قائمة التراث العالمي عام 2005 — أول موقع طبيعي مصري.",
+          "متحف جيولوجي مفتوح — أكثر من 400 حفرية و205 هيكل عظمي كامل.",
+          "ساعد العلماء على تتبع تطور الحيتان من ثدييات برية لكائنات بحرية.",
+        ],
+      },
+      {
+        title: "التنوع البيولوجي",
+        icon: "🦌",
+        content: [
+          "غزال أبيض ومصري، ثعالب الصحراء، ذئاب، صقر شاهين والصقر الحر.",
+          "تضاريس متنوعة: سلاسل جبلية صخرية وتلال رملية — مثالية للرصد الفلكي.",
+          "الهواء الجاف يساعد مصابي حساسية الرئة والأمراض التنفسية والروماتيزم.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "التسجيل", value: "يونسكو 2005", icon: "🏆" },
+      { label: "الحفريات", value: "400+", icon: "🦴" },
+      { label: "الهياكل", value: "205", icon: "🐋" },
+      { label: "البيئة", value: "صحراوية", icon: "🏜️" },
+    ],
+  },
+  {
+    id: "uyun-rayan",
+    name: "عيون الريان",
+    subtitle: "محمية وادي الريان — ينابيع كبريتية",
+    icon: "♨️",
+    color: "#065f46",
+    sections: [
+      {
+        title: "الينابيع الكبريتية",
+        icon: "💧",
+        content: [
+          "4 ينابيع كبريتية دافئة طبيعية تنبع عبر الصخور.",
+          "غنية بكبريتيد الهيدروجين والمغنيسيوم والكالسيوم.",
+          "محاطة بغابات نخيل ومراعي خضراء وأكثر من 100 نوع طيور.",
+        ],
+      },
+      {
+        title: "الأمراض المعالَجة",
+        icon: "🩺",
+        content: [
+          "الروماتيزم وآلام الظهر والرقبة والمفاصل والانزلاق الغضروفي.",
+          "حالات الجلد المزمنة: التهابات، جفاف الجلد، والصدفية.",
+          "جلسات علاج طبيعي موسعة لاستفادة العضلات من الاحماء والتوسع الوعائي.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "العيون", value: "4 ينابيع", icon: "♨️" },
+      { label: "المعادن", value: "كبريتيد + كالسيوم", icon: "⚗️" },
+      { label: "الطيور", value: "100+ نوع", icon: "🦅" },
+      { label: "العلاج", value: "مفاصل + جلد", icon: "🩺" },
+    ],
+  },
+  {
+    id: "magic-lake",
+    name: "البحيرة المسحورة",
+    subtitle: "محمية وادي الريان — استشفاء نفسي",
+    icon: "🌈",
+    color: "#7c3aed",
+    sections: [
+      {
+        title: "الخصائص",
+        icon: "✨",
+        content: [
+          "بحيرة هادئة بعمق 35 متراً — تتغير ألوان مائها كل ساعة حسب زاوية الشمس.",
+          "جبل الدوارة المحيط يحتوي على حُفر طبيعية تسمى \"حفر الملاك\".",
+          "منتجع طبيعي مثالي للاسترخاء والتأمل والمشي والتزحلق.",
+        ],
+      },
+      {
+        title: "الاستشفاء",
+        icon: "🧘",
+        content: [
+          "مزار مناسب لمن يعانون التوتر اليومي أو مشاكل جلدية بسيطة.",
+          "صفاء الجو الصحراوي يجذب الباحثين عن الاسترخاء النفسي.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "العمق", value: "35 متر", icon: "📏" },
+      { label: "الظاهرة", value: "تغيّر الألوان", icon: "🌈" },
+      { label: "النوع", value: "استرخاء نفسي", icon: "🧘" },
+      { label: "الأنشطة", value: "تأمل + مشي", icon: "🚶" },
+    ],
+  },
+  {
+    id: "tunis-village",
+    name: "قرية تونس",
+    subtitle: "السياحة البيئية والعلاج التقليدي",
+    icon: "🏺",
+    color: "#b45309",
+    sections: [
+      {
+        title: "البيئة",
+        icon: "🌿",
+        content: [
+          "أراضٍ زراعية خضراء ومنازل من طين الأسواني ونخيل يظللون الطرقات.",
+          "نموذج للقرية السياحية المندمجة مع الطبيعة — ورش فخار يدوية تقليدية.",
+        ],
+      },
+      {
+        title: "الاستشفاء",
+        icon: "🩺",
+        content: [
+          "تخفيف التوتر الذهني وتحسين المناعة بفضل الهواء وأشعة الشمس.",
+          "ممارسات علاجية تقليدية: الحجامة والتدليك الطبيعي لعلاج آلام الظهر والرقبة والعمود الفقري.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "الطابع", value: "قرية بيئية", icon: "🏡" },
+      { label: "الحرف", value: "فخار يدوي", icon: "🏺" },
+      { label: "العلاج", value: "حجامة + تدليك", icon: "💆" },
+      { label: "الهواء", value: "نقي", icon: "🌬️" },
+    ],
+  },
+];
+
 export default function DestinationDetailPage() {
   const params = useParams();
   const id = params?.id as string;
@@ -340,9 +633,17 @@ export default function DestinationDetailPage() {
       ? [...BASE_TABS, SINAI_TAB]
       : id === "safaga"
         ? [...BASE_TABS, SAFAGA_TAB]
-        : BASE_TABS;
+        : id === "siwa"
+          ? [...BASE_TABS, SIWA_TAB]
+          : id === "fayoum"
+            ? [...BASE_TABS, FAYOUM_TAB]
+            : BASE_TABS;
   const [activeSiteId, setActiveSiteId] = useState(SINAI_SITES[0].id);
   const activeSinaiSite = SINAI_SITES.find((s) => s.id === activeSiteId)!;
+  const [activeSiwaId, setActiveSiwaId] = useState(SIWA_SITES[0].id);
+  const activeSiwaSite = SIWA_SITES.find((s) => s.id === activeSiwaId)!;
+  const [activeFayoumId, setActiveFayoumId] = useState(FAYOUM_SITES[0].id);
+  const activeFayoumSite = FAYOUM_SITES.find((s) => s.id === activeFayoumId)!;
 
   const relatedDestinations = DESTINATIONS.filter((d) => d.id !== dest.id).slice(0, 3);
 
@@ -853,6 +1154,153 @@ export default function DestinationDetailPage() {
                           <p>• التخلص من التوتر (Mental Detox)</p>
                         </div>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Siwa Therapeutic Sites Tab */}
+                {activeTab === "siwa-sites" && (
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2" style={{ color: "#12394d", fontFamily: "var(--font-display)" }}>
+                      مواقع الاستشفاء في سيوة
+                    </h2>
+                    <p className="text-sm text-[#7b7c7d] mb-6">
+                      واحة سيوة — 18 متر تحت مستوى البحر — تجمع بين الموارد المائية والتكوينات الجيولوجية والتراث الثقافي
+                    </p>
+
+                    {/* Quick Stats */}
+                    <div className="grid grid-cols-3 md:grid-cols-6 gap-2 mb-8">
+                      {SIWA_QUICK_STATS.map((s) => (
+                        <div key={s.label} className="bg-[#f5f8fa] rounded-lg p-3 text-center border border-gray-100">
+                          <span className="text-lg block">{s.icon}</span>
+                          <div className="text-sm font-bold text-[#12394d]">{s.value}</div>
+                          <div className="text-[9px] text-[#7b7c7d]">{s.label}</div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Site Selector */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {SIWA_SITES.map((site) => (
+                        <button
+                          key={site.id}
+                          onClick={() => setActiveSiwaId(site.id)}
+                          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all border-2 ${
+                            activeSiwaId === site.id ? "text-white shadow-md" : "bg-white"
+                          }`}
+                          style={{
+                            borderColor: activeSiwaId === site.id ? site.color : "#e5e7eb",
+                            backgroundColor: activeSiwaId === site.id ? site.color : undefined,
+                            color: activeSiwaId === site.id ? "#fff" : "#12394d",
+                          }}
+                        >
+                          <span>{site.icon}</span>
+                          {site.name}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Active Site */}
+                    <div key={activeSiwaSite.id}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="text-2xl">{activeSiwaSite.icon}</span>
+                        <div>
+                          <h3 className="font-bold font-display text-lg" style={{ color: activeSiwaSite.color }}>{activeSiwaSite.name}</h3>
+                          <p className="text-xs text-[#7b7c7d]">{activeSiwaSite.subtitle}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-5">
+                        {activeSiwaSite.quickFacts.map((f) => (
+                          <div key={f.label} className="bg-gray-50 rounded-lg p-3 text-center border border-gray-100">
+                            <span className="text-lg block">{f.icon}</span>
+                            <div className="text-sm font-bold text-[#12394d]">{f.value}</div>
+                            <div className="text-[9px] text-[#7b7c7d]">{f.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                      {activeSiwaSite.sections.map((sec) => (
+                        <div key={sec.title} className="rounded-xl border border-gray-100 bg-gray-50 p-5 mb-3">
+                          <h4 className="font-bold font-display text-base mb-3 flex items-center gap-2" style={{ color: activeSiwaSite.color }}>
+                            <span>{sec.icon}</span>{sec.title}
+                          </h4>
+                          <div className="space-y-2">
+                            {sec.content.map((t, i) => (
+                              <div key={i} className="flex gap-2">
+                                <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: activeSiwaSite.color }} />
+                                <p className="text-sm text-[#12394d]/80 leading-relaxed">{t}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Fayoum Sites Tab */}
+                {activeTab === "fayoum-sites" && (
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2" style={{ color: "#12394d", fontFamily: "var(--font-display)" }}>
+                      المواقع الطبيعية في الفيوم
+                    </h2>
+                    <p className="text-sm text-[#7b7c7d] mb-6">
+                      ميزة جغرافية استراتيجية — قريبة من القاهرة مع تنوع بيئي فريد يجمع بين العلاج والسياحة البيئية
+                    </p>
+
+                    {/* Site Selector */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {FAYOUM_SITES.map((site) => (
+                        <button
+                          key={site.id}
+                          onClick={() => setActiveFayoumId(site.id)}
+                          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all border-2 ${
+                            activeFayoumId === site.id ? "text-white shadow-md" : "bg-white"
+                          }`}
+                          style={{
+                            borderColor: activeFayoumId === site.id ? site.color : "#e5e7eb",
+                            backgroundColor: activeFayoumId === site.id ? site.color : undefined,
+                            color: activeFayoumId === site.id ? "#fff" : "#12394d",
+                          }}
+                        >
+                          <span>{site.icon}</span>
+                          {site.name}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Active Site */}
+                    <div key={activeFayoumSite.id}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="text-2xl">{activeFayoumSite.icon}</span>
+                        <div>
+                          <h3 className="font-bold font-display text-lg" style={{ color: activeFayoumSite.color }}>{activeFayoumSite.name}</h3>
+                          <p className="text-xs text-[#7b7c7d]">{activeFayoumSite.subtitle}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-5">
+                        {activeFayoumSite.quickFacts.map((f) => (
+                          <div key={f.label} className="bg-gray-50 rounded-lg p-3 text-center border border-gray-100">
+                            <span className="text-lg block">{f.icon}</span>
+                            <div className="text-sm font-bold text-[#12394d]">{f.value}</div>
+                            <div className="text-[9px] text-[#7b7c7d]">{f.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                      {activeFayoumSite.sections.map((sec) => (
+                        <div key={sec.title} className="rounded-xl border border-gray-100 bg-gray-50 p-5 mb-3">
+                          <h4 className="font-bold font-display text-base mb-3 flex items-center gap-2" style={{ color: activeFayoumSite.color }}>
+                            <span>{sec.icon}</span>{sec.title}
+                          </h4>
+                          <div className="space-y-2">
+                            {sec.content.map((t, i) => (
+                              <div key={i} className="flex gap-2">
+                                <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: activeFayoumSite.color }} />
+                                <p className="text-sm text-[#12394d]/80 leading-relaxed">{t}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
