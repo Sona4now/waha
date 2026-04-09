@@ -50,7 +50,10 @@
       "Bash(npx tsc:*)",
       "Bash(/usr/local/bin/git init:*)",
       "Bash(/usr/local/bin/git add:*)",
-      "Bash(/usr/local/bin/git status:*)"
+      "Bash(/usr/local/bin/git status:*)",
+      "Bash(/usr/local/bin/git config:*)",
+      "Bash(/usr/local/bin/git commit:*)",
+      "Bash(/usr/local/bin/git push:*)"
     ]
   }
 }
