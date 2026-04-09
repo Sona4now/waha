@@ -18,6 +18,7 @@ const SINAI_TAB = { key: "sites", label: "المواقع الاستشفائية"
 const SAFAGA_TAB = { key: "elements", label: "العناصر العلاجية" };
 const SIWA_TAB = { key: "siwa-sites", label: "مواقع الاستشفاء" };
 const FAYOUM_TAB = { key: "fayoum-sites", label: "المواقع الطبيعية" };
+const BAHARIYA_TAB = { key: "bahariya-sites", label: "مواقع الاستشفاء" };
 
 /* ─── Sinai Therapeutic Sites Data ─── */
 interface TherapeuticSite {
@@ -577,6 +578,231 @@ const FAYOUM_SITES: TherapeuticSite[] = [
   },
 ];
 
+/* ─── Bahariya Oases Sites Data ─── */
+const BAHARIYA_SITES: TherapeuticSite[] = [
+  {
+    id: "white-desert",
+    name: "الصحراء البيضاء",
+    subtitle: "محمية طبيعية — تكوينات جيرية وطباشيرية",
+    icon: "🏜️",
+    color: "#7b7c7d",
+    sections: [
+      {
+        title: "الطبيعة",
+        icon: "🌍",
+        content: [
+          "محمية طبيعية فريدة بتكوينات حجرية منحوتة بفعل الرياح على مدى ملايين السنين — تشبه مناظر كونية.",
+          "أنشطة: مشي، تخييم، مراقبة الطبيعة، والتصوير الفوتوغرافي.",
+        ],
+      },
+      {
+        title: "الاستشفاء النفسي",
+        icon: "🧘",
+        content: [
+          "الانغماس في البيئة يحفز الشعور بالرهبة (Sense of Awe) — يقلل التوتر والإجهاد النفسي.",
+          "يدعم الوعي اللحظي (Mindfulness) وإزالة السموم الرقمية (Digital Detox).",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "النوع", value: "محمية طبيعية", icon: "🌿" },
+      { label: "التكوينات", value: "جيرية + طباشيرية", icon: "🪨" },
+      { label: "الأنشطة", value: "تخييم + مشي", icon: "⛺" },
+      { label: "العلاج", value: "نفسي", icon: "🧘" },
+    ],
+  },
+  {
+    id: "black-desert",
+    name: "الصحراء السوداء",
+    subtitle: "تضاريس بركانية — بازلت وكوارتز",
+    icon: "🌑",
+    color: "#1e293b",
+    sections: [
+      {
+        title: "الطبيعة",
+        icon: "🌋",
+        content: [
+          "تضاريس بركانية مميزة بصخور البازلت والكوارتز مع تلال وجبال وتنوع جيولوجي واضح.",
+        ],
+      },
+      {
+        title: "الاستشفاء",
+        icon: "🧘",
+        content: [
+          "تقليل الضغط العقلي وتعزيز التركيز الذهني والاسترخاء النفسي.",
+          "البيئة النقية تتيح الابتعاد عن التلوث والضوضاء — تدعم التعافي من الاحتراق النفسي والإجهاد المزمن.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "الصخور", value: "بازلت + كوارتز", icon: "🪨" },
+      { label: "التأثير", value: "تقليل الضغط", icon: "🧠" },
+      { label: "البيئة", value: "نقية وهادئة", icon: "🌬️" },
+      { label: "العلاج", value: "احتراق نفسي", icon: "🔥" },
+    ],
+  },
+  {
+    id: "crystal-mountain",
+    name: "جبل الكريستال",
+    subtitle: "متحف طبيعي مفتوح — بلورات كوارتز",
+    icon: "💎",
+    color: "#7c3aed",
+    sections: [
+      {
+        title: "الخصائص",
+        icon: "✨",
+        content: [
+          "بلورات شفافة من الكوارتز تكشف عن تراكم الرواسب المعدنية والملحية على مدار ملايين السنين.",
+          "التأمل في البلورات النادرة يساهم في إعادة التوازن النفسي والعقلي بعد فترات الإجهاد.",
+          "يعزز الشعور بالاتصال بالبيئة (Grounding).",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "النوع", value: "كوارتز شفاف", icon: "💎" },
+      { label: "العمر", value: "ملايين السنين", icon: "⏳" },
+      { label: "العلاج", value: "توازن نفسي", icon: "⚖️" },
+      { label: "التقنية", value: "Grounding", icon: "🌍" },
+    ],
+  },
+  {
+    id: "gara-cave",
+    name: "كهف الجارة",
+    subtitle: "تشكيلات صخرية ورسومات العصر الحجري",
+    icon: "🕳️",
+    color: "#92400e",
+    sections: [
+      {
+        title: "الخصائص",
+        icon: "🪨",
+        content: [
+          "تشكيلات صخرية هابطة وصاعدة تشبه الشلالات الحجرية.",
+          "رسومات صخرية تعود للعصر الحجري الحديث.",
+        ],
+      },
+      {
+        title: "الاستشفاء",
+        icon: "🧘",
+        content: [
+          "تعزيز التركيز الذهني الكامل والانفصال عن الواقع اليومي.",
+          "تحفيز الإثارة المعرفية والجمالية — يدعم التعافي من الاحتراق النفسي.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "التاريخ", value: "العصر الحجري", icon: "🏛️" },
+      { label: "التشكيلات", value: "هابطة + صاعدة", icon: "🪨" },
+      { label: "العلاج", value: "تركيز ذهني", icon: "🧠" },
+      { label: "التأثير", value: "إثارة معرفية", icon: "💡" },
+    ],
+  },
+  {
+    id: "bir-sigam",
+    name: "بئر سيجام",
+    subtitle: "مياه كبريتية ساخنة ≈45°م",
+    icon: "♨️",
+    color: "#dc2626",
+    sections: [
+      {
+        title: "الخصائص العلاجية",
+        icon: "💧",
+        content: [
+          "مياه كبريتية ساخنة (≈45°م) لعلاج الروماتيزم والتهاب المفاصل ومشاكل الجهاز الهضمي.",
+          "يسهم في الاسترخاء النفسي وتقليل التوتر مع تأثير إيجابي على توازن ميكروبات الأمعاء.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "الحرارة", value: "45°م", icon: "🌡️" },
+      { label: "العلاج", value: "روماتيزم", icon: "🦴" },
+      { label: "الهضم", value: "ميكروبيوم", icon: "🦠" },
+      { label: "النفسي", value: "استرخاء", icon: "🧘" },
+    ],
+  },
+  {
+    id: "sphinx-rock",
+    name: "صخرة أبو الهول",
+    subtitle: "تشكيل جيولوجي نادر — أيقونة الصحراء",
+    icon: "🗿",
+    color: "#b45309",
+    sections: [
+      {
+        title: "الاستشفاء",
+        icon: "🧠",
+        content: [
+          "المسار المؤدي للصخرة يتطلب مجهوداً بدنياً (Effort) يتبعه مكافأة بصرية قوية (Reward).",
+          "\"حلقة التحدي والمكافأة\" تساعد في تخفيف الاحتراق النفسي وإعادة توجيه الطاقة السلبية.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "النوع", value: "تشكيل جيولوجي", icon: "🪨" },
+      { label: "النحت", value: "عوامل التعرية", icon: "🌬️" },
+      { label: "التقنية", value: "Effort-Reward", icon: "🎯" },
+      { label: "العلاج", value: "احتراق نفسي", icon: "🔥" },
+    ],
+  },
+  {
+    id: "palm-farms",
+    name: "مزارع النخيل والنظام الغذائي",
+    subtitle: "التطهير الغذائي — Nutritional Detox",
+    icon: "🌴",
+    color: "#065f46",
+    sections: [
+      {
+        title: "الغذاء العلاجي",
+        icon: "🍽️",
+        content: [
+          "التمور والزيتون وزيت الزيتون والعسل الصحراوي — غذاء طبيعي يدعم الميكروبيوم ويقلل الالتهابات.",
+          "التطهير الغذائي (Nutritional Detox): استبدال الأطعمة المصنعة بمكونات طبيعية.",
+          "الخبز البدوي (خبز التنور): خالٍ من الخميرة الصناعية — مناسب لمرضى القولون وحساسية الخميرة.",
+          "الأعشاب المحلية: الشيح، الحسك، اليانسون الصحراوي — تدعم الاسترخاء والهضم وتهدئة الجهاز العصبي.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "الغذاء", value: "تمور + زيتون", icon: "🫒" },
+      { label: "الخبز", value: "بدوي طبيعي", icon: "🍞" },
+      { label: "الأعشاب", value: "شيح + يانسون", icon: "🌿" },
+      { label: "العلاج", value: "Detox غذائي", icon: "♻️" },
+    ],
+  },
+  {
+    id: "wadi-hiz",
+    name: "وادي الحيز",
+    subtitle: "قيمة بيئية وأثرية — أقدم كنيسة في الصحراء",
+    icon: "⛪",
+    color: "#1d5770",
+    sections: [
+      {
+        title: "الخصائص",
+        icon: "🏛️",
+        content: [
+          "جنوب الواحة بحوالي 40-45 كم — منطقة ذات قيمة بيئية وأثرية عالية.",
+          "يتميز بوجود أقدم كنيسة في الصحراء الغربية.",
+          "من أغنى مناطق زراعة: التمر السيوي والزيتون والرمان.",
+        ],
+      },
+      {
+        title: "الاستشفاء",
+        icon: "🧘",
+        content: [
+          "بيئة مثالية للتمارين الخفيفة (تنفس – استطالة).",
+          "يمنع الإرهاق الناتج عن الانتقال بين البيئات (Set-Jet Lag).",
+          "علاج آلام المفاصل وآلام الظهر والإرهاق العصبي.",
+          "الأعشاب الطبية: شيح، كركديه، نعناع بري، حلف بر، سدر.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "المسافة", value: "40-45 كم", icon: "🛣️" },
+      { label: "الأثر", value: "أقدم كنيسة", icon: "⛪" },
+      { label: "العلاج", value: "مفاصل + أعصاب", icon: "🦴" },
+      { label: "الزراعة", value: "تمر + زيتون", icon: "🌴" },
+    ],
+  },
+];
+
 export default function DestinationDetailPage() {
   const params = useParams();
   const id = params?.id as string;
@@ -637,13 +863,17 @@ export default function DestinationDetailPage() {
           ? [...BASE_TABS, SIWA_TAB]
           : id === "fayoum"
             ? [...BASE_TABS, FAYOUM_TAB]
-            : BASE_TABS;
+            : id === "bahariya"
+              ? [...BASE_TABS, BAHARIYA_TAB]
+              : BASE_TABS;
   const [activeSiteId, setActiveSiteId] = useState(SINAI_SITES[0].id);
   const activeSinaiSite = SINAI_SITES.find((s) => s.id === activeSiteId)!;
   const [activeSiwaId, setActiveSiwaId] = useState(SIWA_SITES[0].id);
   const activeSiwaSite = SIWA_SITES.find((s) => s.id === activeSiwaId)!;
   const [activeFayoumId, setActiveFayoumId] = useState(FAYOUM_SITES[0].id);
   const activeFayoumSite = FAYOUM_SITES.find((s) => s.id === activeFayoumId)!;
+  const [activeBahariyaId, setActiveBahariyaId] = useState(BAHARIYA_SITES[0].id);
+  const activeBahariyaSite = BAHARIYA_SITES.find((s) => s.id === activeBahariyaId)!;
 
   const relatedDestinations = DESTINATIONS.filter((d) => d.id !== dest.id).slice(0, 3);
 
@@ -1295,6 +1525,74 @@ export default function DestinationDetailPage() {
                             {sec.content.map((t, i) => (
                               <div key={i} className="flex gap-2">
                                 <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: activeFayoumSite.color }} />
+                                <p className="text-sm text-[#12394d]/80 leading-relaxed">{t}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Bahariya Sites Tab */}
+                {activeTab === "bahariya-sites" && (
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2" style={{ color: "#12394d", fontFamily: "var(--font-display)" }}>
+                      مواقع الاستشفاء في الواحات البحرية
+                    </h2>
+                    <p className="text-sm text-[#7b7c7d] mb-6">
+                      صحراء بيضاء وسوداء، ينابيع حارة، كهوف، جبال كريستال، ونظام غذائي علاجي
+                    </p>
+
+                    {/* Site Selector */}
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {BAHARIYA_SITES.map((site) => (
+                        <button
+                          key={site.id}
+                          onClick={() => setActiveBahariyaId(site.id)}
+                          className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all border-2 ${
+                            activeBahariyaId === site.id ? "text-white shadow-md" : "bg-white"
+                          }`}
+                          style={{
+                            borderColor: activeBahariyaId === site.id ? site.color : "#e5e7eb",
+                            backgroundColor: activeBahariyaId === site.id ? site.color : undefined,
+                            color: activeBahariyaId === site.id ? "#fff" : "#12394d",
+                          }}
+                        >
+                          <span>{site.icon}</span>
+                          {site.name}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Active Site */}
+                    <div key={activeBahariyaSite.id}>
+                      <div className="flex items-center gap-2 mb-4">
+                        <span className="text-2xl">{activeBahariyaSite.icon}</span>
+                        <div>
+                          <h3 className="font-bold font-display text-lg" style={{ color: activeBahariyaSite.color }}>{activeBahariyaSite.name}</h3>
+                          <p className="text-xs text-[#7b7c7d]">{activeBahariyaSite.subtitle}</p>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-5">
+                        {activeBahariyaSite.quickFacts.map((f) => (
+                          <div key={f.label} className="bg-gray-50 rounded-lg p-3 text-center border border-gray-100">
+                            <span className="text-lg block">{f.icon}</span>
+                            <div className="text-sm font-bold text-[#12394d]">{f.value}</div>
+                            <div className="text-[9px] text-[#7b7c7d]">{f.label}</div>
+                          </div>
+                        ))}
+                      </div>
+                      {activeBahariyaSite.sections.map((sec) => (
+                        <div key={sec.title} className="rounded-xl border border-gray-100 bg-gray-50 p-5 mb-3">
+                          <h4 className="font-bold font-display text-base mb-3 flex items-center gap-2" style={{ color: activeBahariyaSite.color }}>
+                            <span>{sec.icon}</span>{sec.title}
+                          </h4>
+                          <div className="space-y-2">
+                            {sec.content.map((t, i) => (
+                              <div key={i} className="flex gap-2">
+                                <span className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: activeBahariyaSite.color }} />
                                 <p className="text-sm text-[#12394d]/80 leading-relaxed">{t}</p>
                               </div>
                             ))}
