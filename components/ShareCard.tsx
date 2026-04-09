@@ -1,0 +1,182 @@
+"use client";
+
+import { motion } from "framer-motion";
+import { useRef, useState } from "react";
+import { Destination } from "@/data/destinations";
+
+interface Props {
+  destination: Destination;
+  answers: { need?: string; environment?: string; journeyStyle?: string };
+  onClose: () => void;
+}
+
+const NEED_LABELS: Record<string, string> = {
+  body: "راحة جسدية",
+  mind: "صفاء نفسي",
+  relax: "استرخاء",
+};
+
+const ENV_LABELS: Record<string, string> = {
+  sea: "البحر",
+  desert: "الصحراء",
+  mountains: "الجبال",
+  oasis: "الواحات",
+};
+
+const STYLE_LABELS: Record<string, string> = {
+  calm: "هادئة",
+  exploratory: "استكشافية",
+  deep: "عميقة",
+};
+
+export default function ShareCard({ destination, answers, onClose }: Props) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [copied, setCopied] = useState(false);
+
+  async function handleShare() {
+    const text = `🌿 وجهتي الاستشفائية: ${destination.name}\n"${destination.poem}"\n\nاكتشف وجهتك على واحة — السياحة الاستشفائية في مصر`;
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: `واحة — ${destination.name}`,
+          text,
+        });
+      } catch {
+        // User cancelled
+      }
+    } else {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        transition={{ type: "spring", stiffness: 200, damping: 25 }}
+        className="w-full max-w-sm"
+      >
+        {/* Card */}
+        <div
+          ref={cardRef}
+          className="relative overflow-hidden rounded-3xl bg-[#0a1118] border border-white/10"
+        >
+          {/* Background image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-30"
+            style={{ backgroundImage: `url('${destination.panorama}')` }}
+          />
+          <div
+            className="absolute inset-0"
+            style={{
+              background: `linear-gradient(180deg, ${destination.color}44 0%, #0a111899 50%, #0a1118 100%)`,
+            }}
+          />
+
+          {/* Content */}
+          <div className="relative z-10 p-8 flex flex-col items-center gap-5 text-center">
+            {/* Logo */}
+            <img
+              src="/logo.png"
+              alt="واحة"
+              className="w-14 h-14 rounded-full bg-white/90 p-0.5"
+            />
+
+            {/* Title */}
+            <div>
+              <p className="text-[#91b149]/70 text-xs tracking-widest mb-2">
+                وجهتك الاستشفائية
+              </p>
+              <h2 className="font-display text-3xl font-bold text-white">
+                {destination.name}
+              </h2>
+              <p className="text-white/50 text-sm mt-1 font-display">
+                {destination.subtitle}
+              </p>
+            </div>
+
+            {/* Poem */}
+            <p className="text-white/35 text-sm italic">
+              &ldquo;{destination.poem}&rdquo;
+            </p>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2 justify-center" dir="rtl">
+              {answers.need && (
+                <span className="px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-white/50 text-xs">
+                  {NEED_LABELS[answers.need]}
+                </span>
+              )}
+              {answers.environment && (
+                <span className="px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-white/50 text-xs">
+                  {ENV_LABELS[answers.environment]}
+                </span>
+              )}
+              {answers.journeyStyle && (
+                <span className="px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-white/50 text-xs">
+                  رحلة {STYLE_LABELS[answers.journeyStyle]}
+                </span>
+              )}
+            </div>
+
+            {/* Divider */}
+            <div className="w-12 h-px bg-[#91b149]/20" />
+
+            {/* Brand */}
+            <p className="text-white/15 text-[0.6rem] tracking-[0.3em] uppercase">
+              واحة · السياحة الاستشفائية
+            </p>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex gap-3 mt-4">
+          <button
+            onClick={handleShare}
+            className="flex-1 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-sm rounded-full transition-all duration-300 flex items-center justify-center gap-2"
+          >
+            {copied ? (
+              "تم النسخ ✓"
+            ) : (
+              <>
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <circle cx="18" cy="5" r="3" />
+                  <circle cx="6" cy="12" r="3" />
+                  <circle cx="18" cy="19" r="3" />
+                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
+                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
+                </svg>
+                مشاركة النتيجة
+              </>
+            )}
+          </button>
+          <button
+            onClick={onClose}
+            className="py-3.5 px-6 border border-white/20 hover:border-white/40 text-white/60 hover:text-white/80 text-sm rounded-full transition-all duration-300"
+          >
+            إغلاق
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}

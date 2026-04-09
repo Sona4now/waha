@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>واحة — ابدأ رحلة الشفاء</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal:       #1d5770;
+      --navy:       #12394d;
+      --gold:       #91b149;
+      --green:      #91b149;
+      --dark-green: #6a8435;
+      --white:      #FFFFFF;
+    }
+    html, body {
+      height: 100%; width: 100%;
+      overflow: hidden;
+      font-family: 'Cairo', sans-serif;
+      background: #000;
+      color: var(--white);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ---- Backgrounds ---- */
+    .bg-layer {
+      position: fixed; inset: 0;
+      background-size: cover;
+      background-position: center;
+      transition: opacity 1.4s ease;
+      opacity: 0;
+    }
+    .bg-layer.active { opacity: 1; }
+    .bg-overlay {
+      position: fixed; inset: 0;
+      background: linear-gradient(160deg, rgba(29,87,112,0.85) 0%, rgba(0,0,0,0.5) 60%, rgba(0,0,0,0.68) 100%);
+      z-index: 1;
+    }
+
+    /* ---- Step dots ---- */
+    .step-dots {
+      position: fixed;
+      top: 22px; left: 50%; transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    .step-dots.visible { opacity: 1; }
+    .step-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.35);
+      transition: all 0.4s ease;
+    }
+    .step-dot.active {
+      background: var(--teal);
+      border-color: var(--teal);
+      transform: scale(1.4);
+      box-shadow: 0 0 12px rgba(42,172,170,0.75);
+    }
+    .step-dot.done {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+    .step-line {
+      width: 36px; height: 2px;
+      background: rgba(255,255,255,0.2);
+      transition: background 0.4s ease;
+    }
+    .step-line.done { background: var(--teal); }
+
+    /* ---- Back button ---- */
+    .back-btn {
+      font-family: 'Cairo', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 7px 16px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-bottom: 28px;
+      align-self: flex-start;
+    }
+    .back-btn:hover { color: var(--white); background: rgba(255,255,255,0.14); }
+
+    /* ---- Trust badge ---- */
+    .trust-badge {
+      display: inline-block;
+      background: rgba(42,172,170,0.2);
+      border: 1px solid rgba(42,172,170,0.5);
+      border-radius: 50px;
+      padding: 8px 18px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 20px;
+      max-width: 560px;
+      line-height: 1.5;
+    }
+
+    /* ---- Top bar ---- */
+    .top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 1.55rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .logo-mark img {
+      height: 40px; width: 40px;
+      object-fit: contain;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.25);
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(4px);
+    }
+    .logo-mark .w1 { color: var(--white); }
+    .logo-mark .w2 { color: var(--gold); }
+    .skip-btn {
+      font-family: 'Cairo', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.55);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      padding: 7px 16px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .skip-btn:hover { color: var(--white); background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.3); }
+
+    /* ---- Phases ---- */
+    .phase {
+      position: fixed; inset: 0;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 80px 24px 40px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s ease;
+    }
+    .phase.active { opacity: 1; pointer-events: all; }
+
+    /* ---- Phase 0: Entry ---- */
+    .entry-subtitle {
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--teal);
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      opacity: 0;
+      transform: translateY(-12px);
+      transition: all 0.7s ease 0.3s;
+    }
+    .entry-title {
+      font-family: 'Reem Kufi', sans-serif;
+      font-size: clamp(2rem, 5.5vw, 4rem);
+      font-weight: 700;
+      text-align: center;
+      line-height: 1.35;
+      max-width: 760px;
+      color: var(--white);
+      margin-bottom: 16px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.9s ease 0.5s;
+    }
+    .entry-desc {
+      font-size: clamp(0.95rem, 2vw, 1.2rem);
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      max-width: 520px;
+      margin-bottom: 44px;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: all 0.8s ease 0.8s;
+    }
+    .entry-btn {
+      font-family: 'Cairo', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #000;
+      background: var(--gold);
+      border: none;
+      padding: 16px 52px;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 6px 28px rgba(245,163,36,0.45);
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.8s ease 1.1s, transform 0.8s ease 1.1s, background 0.3s, box-shadow 0.3s, scale 0.2s;
+    }
+    .entry-btn:hover { background: #e09420; box-shadow: 0 8px 36px rgba(245,163,36,0.6); scale: 1.03; }
+
+    .phase.active .entry-subtitle,
+    .phase.active .entry-title,
+    .phase.active .entry-desc,
+    .phase.active .entry-btn {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ---- Question phases ---- */
+    .q-step {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--teal);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+    .q-text {
+      font-family: 'Reem Kufi', sans-serif;
+      font-size: clamp(1.6rem, 4vw, 3rem);
+      font-weight: 600;
+      text-align: center;
+      color: var(--white);
+      margin-bottom: 44px;
+      max-width: 640px;
+      line-height: 1.3;
+    }
+    .options-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      justify-content: center;
+      max-width: 700px;
+      width: 100%;
+    }
+    .opt-btn {
+      font-family: 'Cairo', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.88);
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.2);
+      padding: 16px 32px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      backdrop-filter: blur(8px);
+      min-width: 140px;
+      text-align: center;
+      flex: 1;
+      max-width: 200px;
+    }
+    .opt-btn:hover {
+      background: rgba(42,172,170,0.25);
+      border-color: var(--teal);
+      color: var(--white);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .opt-btn.selected {
+      background: var(--teal);
+      border-color: var(--teal);
+      color: var(--white);
+      box-shadow: 0 4px 20px rgba(42,172,170,0.5);
+    }
+
+    /* ---- Processing ---- */
+    .processing-wrap { text-align: center; }
+    .proc-ring {
+      position: relative;
+      width: 80px; height: 80px;
+      margin: 0 auto 32px;
+    }
+    .proc-ring::before, .proc-ring::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      border: 2px solid transparent;
+    }
+    .proc-ring::before {
+      inset: 0;
+      border-top-color: var(--teal);
+      animation: spin 1.2s linear infinite;
+    }
+    .proc-ring::after {
+      inset: 10px;
+      border-top-color: var(--gold);
+      animation: spin 0.8s linear infinite reverse;
+    }
+    .proc-dot {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      width: 16px; height: 16px;
+      background: var(--teal);
+      border-radius: 50%;
+      animation: pulse 1.2s ease infinite;
+    }
+    .proc-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .proc-sub { font-size: 0.9rem; color: rgba(255,255,255,0.5); }
+
+    /* ---- Result ---- */
+    .result-wrap {
+      text-align: center;
+      max-width: 680px;
+      width: 100%;
+    }
+    .result-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--gold);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .result-title {
+      font-family: 'Reem Kufi', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+    .result-subtitle {
+      font-size: 1.05rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 36px;
+      max-width: 440px;
+      margin-inline: auto;
+    }
+    .result-btns {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .btn-cta {
+      font-family: 'Cairo', sans-serif;
+      font-size: 1rem;
+      font-weight: 800;
+      padding: 14px 36px;
+      border-radius: 50px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+    .btn-cta-primary {
+      background: var(--teal);
+      color: var(--white);
+      box-shadow: 0 4px 20px rgba(42,172,170,0.4);
+    }
+    .btn-cta-primary:hover { background: #239291; transform: translateY(-2px); box-shadow: 0 6px 26px rgba(42,172,170,0.55); }
+    .btn-cta-outline {
+      background: transparent;
+      color: var(--white);
+      border-color: rgba(255,255,255,0.4);
+    }
+    .btn-cta-outline:hover { background: rgba(255,255,255,0.1); border-color: var(--white); transform: translateY(-2px); }
+
+    /* ---- Animations ---- */
+    @keyframes spin  { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%,100% { opacity: 0.7; transform: translate(-50%,-50%) scale(1); } 50% { opacity: 1; transform: translate(-50%,-50%) scale(1.3); } }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    .fade-up { animation: fadeUp 0.7s ease forwards; }
+    .d1 { animation-delay: 0.1s; opacity: 0; }
+    .d2 { animation-delay: 0.3s; opacity: 0; }
+    .d3 { animation-delay: 0.5s; opacity: 0; }
+    .d4 { animation-delay: 0.7s; opacity: 0; }
+
+    @media (max-width: 600px) {
+      .opt-btn { max-width: 100%; flex: 0 0 calc(50% - 7px); min-width: 120px; font-size: 0.95rem; padding: 14px 18px; }
+      .entry-title { font-size: 1.8rem; }
+      .q-text { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background layers -->
+  <div id="bg0" class="bg-layer active" style="background-image:url('https://images.unsplash.com/photo-1568322445389-f64ac2515020?w=1920&q=80')"></div>
+  <div id="bg1" class="bg-layer" style="background-image:url('https://images.unsplash.com/photo-1444703686981-a3abbc4d4fe3?w=1920&q=80')"></div>
+  <div id="bg2" class="bg-layer" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80')"></div>
+  <div id="bg3" class="bg-layer" style="background-image:url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=1920&q=80')"></div>
+  <div id="bg4" class="bg-layer"></div><!-- dynamic: result bg -->
+
+  <div class="bg-overlay"></div>
+
+  <!-- Step dots -->
+  <div class="step-dots" id="step-dots">
+    <div class="step-dot" id="dot-1"></div>
+    <div class="step-line" id="line-12"></div>
+    <div class="step-dot" id="dot-2"></div>
+    <div class="step-line" id="line-23"></div>
+    <div class="step-dot" id="dot-3"></div>
+  </div>
+
+  <!-- Top bar -->
+  <div class="top-bar">
+    <div class="logo-mark">
+      <img src="logo.png" alt="واحة" onerror="this.style.display='none'">
+      <span><span class="w1">وا</span><span class="w2">حة</span></span>
+    </div>
+    <button class="skip-btn" onclick="skipToSite()">
+      <span>تخطي التجربة</span>
+      <span>←</span>
+    </button>
+  </div>
+
+  <!-- ============================================================
+       PHASE 0: Entry
+       ============================================================ -->
+  <div class="phase active" id="phase-0">
+    <p class="entry-subtitle">السياحة الاستشفائية · مصر</p>
+    <h1 class="entry-title">هل شعرت يوماً أن جسدك يحتاج أكثر من دواء؟</h1>
+    <p class="entry-desc">واحة تساعدك على اكتشاف المكان الصح — حيث تبدأ رحلة شفائك الحقيقية.</p>
+    <button class="entry-btn" onclick="goToPhase(1)">ابدأ الرحلة ←</button>
+  </div>
+
+  <!-- ============================================================
+       PHASE 1: Q1 — ما الذي يزعجك؟
+       ============================================================ -->
+  <div class="phase" id="phase-1">
+    <button class="back-btn fade-up d1" onclick="goToPhase(0)">← رجوع</button>
+    <p class="q-step fade-up d1">السؤال ١ من ٣</p>
+    <h2 class="q-text fade-up d2">ما الذي يزعجك؟</h2>
+    <div class="options-grid fade-up d3">
+      <button class="opt-btn" onclick="selectAnswer('ailment','مفاصل',this)">ألم مفاصل</button>
+      <button class="opt-btn" onclick="selectAnswer('ailment','جلد',this)">مشاكل جلد</button>
+      <button class="opt-btn" onclick="selectAnswer('ailment','توتر',this)">توتر وإجهاد</button>
+      <button class="opt-btn" onclick="selectAnswer('ailment','تنفس',this)">مشاكل تنفس</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PHASE 2: Q2 — ما البيئة المفضلة؟
+       ============================================================ -->
+  <div class="phase" id="phase-2">
+    <button class="back-btn fade-up d1" onclick="goBack()">← رجوع</button>
+    <p class="q-step fade-up d1">السؤال ٢ من ٣</p>
+    <h2 class="q-text fade-up d2">ما البيئة التي تريحك؟</h2>
+    <div class="options-grid fade-up d3">
+      <button class="opt-btn" onclick="selectAnswer('environment','بحر',this);setBg('bg2')">بحر</button>
+      <button class="opt-btn" onclick="selectAnswer('environment','صحراء',this);setBg('bg3')">صحراء</button>
+      <button class="opt-btn" onclick="selectAnswer('environment','واحة',this);setCustomBg('https://images.unsplash.com/photo-1602702832547-8a8b2ddbf63a?w=1920&q=80')">واحة</button>
+      <button class="opt-btn" onclick="selectAnswer('environment','جبال',this);setCustomBg('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80')">جبال</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PHASE 3: Q3 — مدة الرحلة
+       ============================================================ -->
+  <div class="phase" id="phase-3">
+    <button class="back-btn fade-up d1" onclick="goBack()">← رجوع</button>
+    <p class="q-step fade-up d1">السؤال ٣ من ٣</p>
+    <h2 class="q-text fade-up d2">كم مدة رحلتك المثالية؟</h2>
+    <div class="options-grid fade-up d3">
+      <button class="opt-btn" onclick="selectAnswer('duration','يومين',this)">يومين</button>
+      <button class="opt-btn" onclick="selectAnswer('duration','أسبوع',this)">أسبوع</button>
+      <button class="opt-btn" onclick="selectAnswer('duration','أكثر',this)">أكثر من أسبوع</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PHASE 4: Processing
+       ============================================================ -->
+  <div class="phase" id="phase-4">
+    <div class="processing-wrap">
+      <div class="proc-ring">
+        <div class="proc-dot"></div>
+      </div>
+      <p class="proc-text">نرسم لك رحلتك...</p>
+      <p class="proc-sub">نحلل احتياجاتك لاختيار الوجهة المثالية</p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       PHASE 5: Result
+       ============================================================ -->
+  <div class="phase" id="phase-5">
+    <div class="result-wrap">
+      <p class="result-label fade-up d1">✦ وجهتك المثالية</p>
+      <h1 class="result-title fade-up d2" id="result-name">سفاجا</h1>
+      <div class="trust-badge fade-up d3" id="result-trust" style="display:none;"></div>
+      <p class="result-subtitle fade-up d3" id="result-desc">مياهها تعرف ما تحتاجه قبل أن تسأل.</p>
+      <div class="result-btns fade-up d4">
+        <button class="btn-cta btn-cta-primary" id="result-explore-btn" onclick="">ابدأ رحلتك ←</button>
+        <button class="btn-cta btn-cta-outline" onclick="window.location.href='home.html'">استكشف الموقع</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script>
+    /* ====================================================
+       State
+       ==================================================== */
+    const answers = { ailment: null, environment: null, duration: null };
+    let currentPhase = 0;
+
+    const bgMap = {
+      'bg0': document.getElementById('bg0'),
+      'bg1': document.getElementById('bg1'),
+      'bg2': document.getElementById('bg2'),
+      'bg3': document.getElementById('bg3'),
+      'bg4': document.getElementById('bg4'),
+    };
+
+    /* ====================================================
+       Step dots
+       ==================================================== */
+    function updateDots(phase) {
+      const dots = document.getElementById('step-dots');
+      dots.classList.toggle('visible', phase >= 1 && phase <= 3);
+      for (let i = 1; i <= 3; i++) {
+        const d = document.getElementById(`dot-${i}`);
+        d.classList.remove('active', 'done');
+        if (i < phase) d.classList.add('done');
+        else if (i === phase) d.classList.add('active');
+      }
+      document.getElementById('line-12').classList.toggle('done', phase >= 2);
+      document.getElementById('line-23').classList.toggle('done', phase >= 3);
+    }
+
+    /* ====================================================
+       Navigation
+       ==================================================== */
+    function goToPhase(n) {
+      const old = document.getElementById(`phase-${currentPhase}`);
+      const next = document.getElementById(`phase-${n}`);
+      if (!next) return;
+      old.classList.remove('active');
+      next.classList.add('active');
+      currentPhase = n;
+      updateDots(n);
+
+      // Trigger fade-up re-animation
+      next.querySelectorAll('.fade-up').forEach(el => {
+        el.style.animation = 'none';
+        el.offsetHeight; // reflow
+        el.style.animation = '';
+      });
+    }
+
+    function goBack() {
+      const prev = currentPhase - 1;
+      if (prev < 0) return;
+      const keyToClear = { 2: 'environment', 3: 'duration' };
+      if (keyToClear[currentPhase]) answers[keyToClear[currentPhase]] = null;
+      // Reset selected state in current phase
+      document.getElementById(`phase-${currentPhase}`).querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+      goToPhase(prev);
+    }
+
+    /* ====================================================
+       Background transitions
+       ==================================================== */
+    let activeBg = 'bg0';
+    function setBg(id) {
+      if (id === activeBg) return;
+      bgMap[activeBg].classList.remove('active');
+      bgMap[id].classList.add('active');
+      activeBg = id;
+    }
+    function setCustomBg(url) {
+      bgMap['bg4'].style.backgroundImage = `url('${url}')`;
+      setBg('bg4');
+    }
+
+    /* ====================================================
+       Answer selection
+       ==================================================== */
+    function selectAnswer(key, value, btn) {
+      answers[key] = value;
+      // Highlight selected
+      btn.closest('.options-grid').querySelectorAll('.opt-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      // Advance after short delay
+      setTimeout(() => {
+        if (key === 'ailment')      { setBg('bg1'); goToPhase(2); }
+        else if (key === 'environment') { goToPhase(3); }
+        else if (key === 'duration')  { showProcessing(); }
+      }, 380);
+    }
+
+    /* ====================================================
+       Processing → Result
+       ==================================================== */
+    function showProcessing() {
+      goToPhase(4);
+      setTimeout(showResult, 2200);
+    }
+
+    function showResult() {
+      const dest = getRecommendation(answers.ailment, answers.environment);
+
+      // Update result background
+      setCustomBg(dest.heroBg);
+
+      // Fill result UI
+      document.getElementById('result-name').textContent = dest.name;
+      document.getElementById('result-desc').textContent = dest.longDescription.slice(0, 120) + '...';
+      const trustEl = document.getElementById('result-trust');
+      if (dest.trustSignal) { trustEl.textContent = dest.trustSignal; trustEl.style.display = 'inline-block'; }
+      else { trustEl.style.display = 'none'; }
+      document.getElementById('result-explore-btn').onclick = () => {
+        saveAndGo(dest.id);
+      };
+
+      // Save to localStorage
+      try {
+        localStorage.setItem('waaha_recommendation', JSON.stringify({
+          destinationId: dest.id,
+          ailment:       answers.ailment,
+          environment:   answers.environment,
+          duration:      answers.duration,
+          timestamp:     Date.now(),
+        }));
+      } catch(e) {}
+
+      goToPhase(5);
+    }
+
+    function saveAndGo(destId) {
+      document.body.style.transition = 'opacity 0.4s ease';
+      document.body.style.opacity = '0';
+      setTimeout(() => { window.location.href = `destination.html?id=${destId}`; }, 380);
+    }
+
+    function skipToSite() {
+      document.body.style.transition = 'opacity 0.35s ease';
+      document.body.style.opacity = '0';
+      setTimeout(() => { window.location.href = 'home.html'; }, 320);
+    }
+
+    /* Page in */
+    document.body.style.opacity = '0';
+    requestAnimationFrame(() => {
+      document.body.style.transition = 'opacity 0.6s ease';
+      requestAnimationFrame(() => { document.body.style.opacity = '1'; });
+    });
+  </script>
+</body>
+</html>
