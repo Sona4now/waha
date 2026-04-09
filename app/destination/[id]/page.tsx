@@ -15,6 +15,7 @@ const BASE_TABS = [
 ];
 
 const SINAI_TAB = { key: "sites", label: "المواقع الاستشفائية" };
+const SAFAGA_TAB = { key: "elements", label: "العناصر العلاجية" };
 
 /* ─── Sinai Therapeutic Sites Data ─── */
 interface TherapeuticSite {
@@ -197,6 +198,92 @@ const SINAI_SITES: TherapeuticSite[] = [
   },
 ];
 
+/* ─── Safaga Therapeutic Elements Data ─── */
+interface SafagaElement {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  content: string[];
+}
+
+const SAFAGA_ELEMENTS: SafagaElement[] = [
+  {
+    id: "geography",
+    name: "الموقع الجغرافي",
+    icon: "🏔️",
+    color: "#0e7490",
+    content: [
+      "سفاجا محاطة بسلاسل جبال شاهقة تعمل كسياج طبيعي — تمنع الرياح والأتربة والملوثات.",
+      "الهواء هناك جاف، نقي جداً، وخالي من الشوائب.",
+      "صفاء الجو بيسمح للأشعة فوق البنفسجية توصل بتركيز أعلى وثابت.",
+      "العلاج الشمسي (Heliotherapy) في سفاجا أقوى من أماكن ساحلية فيها رطوبة عالية أو ضباب ملحي.",
+    ],
+  },
+  {
+    id: "sun",
+    name: "الشمس",
+    icon: "☀️",
+    color: "#d97706",
+    content: [
+      "سفاجا بتتميز بكثافة أشعة فوق بنفسجية من نوع UVA و UVB — دور مهم في علاج الصدفية.",
+      "الشمس بتساعد الجسم يكوّن فيتامين D3 اللي بينظم جهاز المناعة.",
+      "أفضل أوقات التعرض: وقت الشروق ووقت الغروب (أشعة طويلة الموجة، أقل ضرراً).",
+      "سفاجا فيها سطوع شمسي شبه دائم طول السنة.",
+    ],
+  },
+  {
+    id: "sea",
+    name: "مياه البحر",
+    icon: "🌊",
+    color: "#0284c7",
+    content: [
+      "الخليج مليان جزر وشعاب مرجانية — التيار ضعيف وحركة المياه هادية.",
+      "نسبة الملوحة بتوصل لحوالي 35% — رقم عالي جداً.",
+      "الجسم بيطفو بسهولة، الضغط على المفاصل بيقل، والإحساس بالألم بيخف.",
+      "الدورة الدموية بتتحسن والدم بيوصل للأطراف والجلد بشكل أحسن.",
+      "نسبة عنصر السترونشيوم في مياه سفاجا منخفضة — أحد تفسيرات فعاليتها في علاج الصدفية.",
+    ],
+  },
+  {
+    id: "sand",
+    name: "الرمال السوداء",
+    icon: "🏖️",
+    color: "#44403c",
+    content: [
+      "الرمال السوداء غنية بالمعادن وفيها عناصر مشعة طبيعية بنسب آمنة.",
+      "العلاج بيتم عن طريق دفن الجسم في الرمال الساخنة لمدة 15 - 30 دقيقة.",
+      "الحرارة بتساعد على توسيع الأوعية الدموية، تنشيط الدورة الدموية، تقليل الالتهاب، وتخفيف الألم.",
+      "مفيد جداً في حالات الروماتويد، التهاب المفاصل، وآلام العظام.",
+    ],
+  },
+];
+
+const SAFAGA_DISEASES = [
+  {
+    name: "الصدفية",
+    icon: "🩺",
+    description: "مرض جلدي سببه خلل في جهاز المناعة — مش معدي ومش مرتبط بالأكل.",
+    treatment: "التعرض للشمس مرتين يومياً + نزول البحر بانتظام لمدة أسبوعين لشهر.",
+    improvement: "50%",
+    warning: "الكورتيزون مش مسموح أثناء العلاج البيئي.",
+  },
+  {
+    name: "الروماتويد",
+    icon: "🦴",
+    description: "مرض مناعي بيهاجم المفاصل وبيسبب ألم وتورم وتشوه أحياناً.",
+    treatment: "الدفن في الرمال الساخنة + جلسات منتظمة لمدة أسبوعين لشهر.",
+    improvement: "70-75%",
+    warning: "غير مناسب لمرضى القلب والسكر والضغط.",
+  },
+];
+
+const SAFAGA_CENTERS = [
+  { name: "مينا فيل", desc: "رمال سوداء غنية بالمعادن — علاج المفاصل + غوص", icon: "🏨" },
+  { name: "خليج أبو سوما", desc: "رمال ناعمة ومياه صافية — العلاج البحري", icon: "🏖️" },
+  { name: "لوتس باي", desc: "ملوحة عالية — برامج علاجية بالمياه", icon: "💧" },
+];
+
 export default function DestinationDetailPage() {
   const params = useParams();
   const id = params?.id as string;
@@ -248,7 +335,12 @@ export default function DestinationDetailPage() {
     );
   }
 
-  const TABS = id === "sinai" ? [...BASE_TABS, SINAI_TAB] : BASE_TABS;
+  const TABS =
+    id === "sinai"
+      ? [...BASE_TABS, SINAI_TAB]
+      : id === "safaga"
+        ? [...BASE_TABS, SAFAGA_TAB]
+        : BASE_TABS;
   const [activeSiteId, setActiveSiteId] = useState(SINAI_SITES[0].id);
   const activeSinaiSite = SINAI_SITES.find((s) => s.id === activeSiteId)!;
 
@@ -634,6 +726,133 @@ export default function DestinationDetailPage() {
                           </ul>
                         </div>
                       )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Safaga Therapeutic Elements Tab */}
+                {activeTab === "elements" && (
+                  <div>
+                    <h2
+                      className="text-2xl font-bold mb-2"
+                      style={{ color: "#12394d", fontFamily: "var(--font-display)" }}
+                    >
+                      العناصر العلاجية في سفاجا
+                    </h2>
+                    <p className="text-sm text-[#7b7c7d] mb-8">
+                      تفاعل طبيعي فريد بين الموقع والشمس والبحر والرمال يخلق منظومة علاجية متكاملة
+                    </p>
+
+                    {/* 4 Elements Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
+                      {SAFAGA_ELEMENTS.map((el) => (
+                        <div
+                          key={el.id}
+                          className="rounded-xl border border-gray-100 bg-gray-50 p-5 hover:shadow-md transition-shadow"
+                        >
+                          <h4
+                            className="font-bold font-display text-base mb-3 flex items-center gap-2"
+                            style={{ color: el.color }}
+                          >
+                            <span className="text-xl">{el.icon}</span>
+                            {el.name}
+                          </h4>
+                          <div className="space-y-2">
+                            {el.content.map((text, i) => (
+                              <div key={i} className="flex gap-2">
+                                <span
+                                  className="mt-2 w-1.5 h-1.5 rounded-full flex-shrink-0"
+                                  style={{ background: el.color }}
+                                />
+                                <p className="text-sm text-[#12394d]/80 leading-relaxed">{text}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Diseases Section */}
+                    <h3
+                      className="text-xl font-bold mb-5 flex items-center gap-2"
+                      style={{ color: "#12394d", fontFamily: "var(--font-display)" }}
+                    >
+                      🏥 الأمراض والعلاج بالتفصيل
+                    </h3>
+                    <div className="space-y-4 mb-10">
+                      {SAFAGA_DISEASES.map((disease) => (
+                        <div
+                          key={disease.name}
+                          className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
+                        >
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="text-2xl">{disease.icon}</span>
+                            <h4 className="font-bold font-display text-lg text-[#12394d]">
+                              {disease.name}
+                            </h4>
+                            <span className="mr-auto px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
+                              نسبة التحسن: {disease.improvement}
+                            </span>
+                          </div>
+                          <p className="text-sm text-[#7b7c7d] mb-3">{disease.description}</p>
+                          <div className="bg-[#f5f8fa] rounded-lg p-3 mb-3">
+                            <p className="text-sm text-[#12394d]">
+                              <span className="font-bold text-[#1d5770]">نظام العلاج:</span> {disease.treatment}
+                            </p>
+                          </div>
+                          <div className="bg-red-50 rounded-lg p-3">
+                            <p className="text-xs text-red-600 flex items-center gap-1.5">
+                              <span>⚠️</span> {disease.warning}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Treatment Centers */}
+                    <h3
+                      className="text-xl font-bold mb-5 flex items-center gap-2"
+                      style={{ color: "#12394d", fontFamily: "var(--font-display)" }}
+                    >
+                      🏨 أشهر أماكن الاستشفاء
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
+                      {SAFAGA_CENTERS.map((center) => (
+                        <div
+                          key={center.name}
+                          className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm text-center"
+                        >
+                          <span className="text-3xl block mb-2">{center.icon}</span>
+                          <h4 className="font-bold text-[#12394d] mb-1">{center.name}</h4>
+                          <p className="text-xs text-[#7b7c7d]">{center.desc}</p>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Best Time & Mental Health */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-5 border border-amber-200">
+                        <h4 className="font-bold font-display text-base text-amber-700 mb-3 flex items-center gap-2">
+                          📅 أنسب وقت للعلاج
+                        </h4>
+                        <p className="text-2xl font-bold text-[#12394d] mb-2">شهر 5 لشهر 9</p>
+                        <div className="space-y-1 text-sm text-[#7b7c7d]">
+                          <p>• الشمس مستقرة</p>
+                          <p>• الجو جاف</p>
+                          <p>• نسبة الرطوبة قليلة</p>
+                        </div>
+                      </div>
+                      <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-5 border border-teal-200">
+                        <h4 className="font-bold font-display text-base text-teal-700 mb-3 flex items-center gap-2">
+                          🧘 الاستشفاء النفسي
+                        </h4>
+                        <p className="text-sm text-[#7b7c7d] mb-2">الهدوء هناك بيساعد على:</p>
+                        <div className="space-y-1 text-sm text-[#12394d]">
+                          <p>• التأمل</p>
+                          <p>• تمارين التنفس</p>
+                          <p>• التخلص من التوتر (Mental Detox)</p>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
