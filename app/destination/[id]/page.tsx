@@ -5,6 +5,9 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import SiteLayout from "@/components/site/SiteLayout";
+import FAQ, { getFAQForDestination } from "@/components/site/FAQ";
+import { CompareButton } from "@/components/site/ComparisonTray";
+import QuickActions from "@/components/site/QuickActions";
 import { DESTINATIONS, getDestById } from "@/data/siteData";
 
 const BASE_TABS = [
@@ -1606,9 +1609,12 @@ export default function DestinationDetailPage() {
             </div>
 
             {/* Sidebar */}
-            <aside className="w-full lg:w-80 flex-shrink-0">
+            <aside className="w-full lg:w-80 flex-shrink-0 space-y-4 lg:sticky lg:top-24 self-start">
+              {/* Quick Actions */}
+              <QuickActions destination={dest} />
+
               <div
-                className="rounded-2xl p-6 sticky top-24 text-white"
+                className="rounded-2xl p-6 text-white"
                 style={{ backgroundColor: "#12394d" }}
               >
                 <h3
@@ -1673,9 +1679,19 @@ export default function DestinationDetailPage() {
           </div>
         </section>
 
+        {/* FAQ Section */}
+        <section className="py-16 bg-[#f5f8fa] dark:bg-[#0a151f]">
+          <div className="max-w-4xl mx-auto px-4">
+            <FAQ
+              items={getFAQForDestination(dest.id)}
+              title={`أسئلة شائعة عن ${dest.name}`}
+            />
+          </div>
+        </section>
+
         {/* Related Destinations */}
         <section
-          className="py-16"
+          className="py-16 dark:bg-[#0d1b2a]"
           style={{ backgroundColor: "#f8faf5" }}
         >
           <div className="max-w-6xl mx-auto px-4">

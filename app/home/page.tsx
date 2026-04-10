@@ -68,11 +68,14 @@ export default function HomePage() {
 
   return (
     <SiteLayout>
-      {/* Hero */}
+      {/* Hero — personalized if recommendation exists */}
       <section className="relative min-h-screen flex items-center overflow-hidden bg-[#12394d]">
         <Image
-          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80"
-          alt="البحر الأحمر"
+          src={
+            recDest?.heroBg ||
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80"
+          }
+          alt={recDest?.name || "البحر الأحمر"}
           fill
           priority
           sizes="100vw"
@@ -82,55 +85,87 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-gradient-to-bl from-[#1b4f72]/90 via-[#1b4f72]/55 to-black/20" />
         <div className="relative z-10 max-w-[1280px] mx-auto px-6 pt-[72px] text-white">
-          <div className="inline-flex items-center gap-2 bg-white/[0.13] backdrop-blur-sm text-white text-[0.82rem] font-bold px-4 py-1.5 rounded-full border border-white/[0.22] mb-5">
-            السياحة الاستشفائية الطبيعية
-          </div>
-          <h1 className="text-4xl md:text-6xl font-black mb-5 font-display leading-tight max-w-[680px]">
-            استكشف رحلة شفائك في قلب مصر
-          </h1>
-          <p className="text-white/80 text-lg mb-8 max-w-[520px] leading-relaxed">
-            طبيعة مصر تمتلك سراً قديماً. مياه تعالج، هواء يجدد، وصمت يشفي.
-            اكتشف الوجهة التي تناسب جسدك وروحك.
-          </p>
-          <div className="flex gap-3.5 flex-wrap">
-            <Link
-              href="/"
-              className="px-8 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold rounded-full transition-all duration-300 no-underline text-sm"
-            >
-              ابدأ رحلتك
-            </Link>
-            <Link
-              href="/destinations"
-              className="px-8 py-3.5 bg-white/[0.13] hover:bg-white/[0.22] backdrop-blur-sm text-white font-bold rounded-full border border-white/[0.22] transition-all duration-300 no-underline text-sm"
-            >
-              استكشف الأماكن
-            </Link>
-          </div>
+          {recDest ? (
+            <>
+              <div className="inline-flex items-center gap-2 bg-[#91b149]/20 backdrop-blur-sm text-[#91b149] text-[0.82rem] font-bold px-4 py-1.5 rounded-full border border-[#91b149]/40 mb-5">
+                <span className="w-2 h-2 rounded-full bg-[#91b149] animate-pulse" />
+                وجهتك المقترحة بناءً على إجاباتك
+              </div>
+              <h1 className="text-4xl md:text-6xl font-black mb-3 font-display leading-tight max-w-[680px]">
+                رحلتك تبدأ من
+                <span className="text-[#91b149] mr-3">{recDest.name}</span>
+              </h1>
+              <p className="text-white/60 text-base mb-2 font-display italic max-w-[520px]">
+                &ldquo;{recDest.description}&rdquo;
+              </p>
+              <p className="text-white/80 text-lg mb-8 max-w-[520px] leading-relaxed">
+                اخترنا لك {recDest.name} لأنها تناسب احتياجاتك تماماً. استكشف
+                التفاصيل، الفوائد العلاجية، وأفضل الأوقات للسفر.
+              </p>
+              <div className="flex gap-3.5 flex-wrap">
+                <Link
+                  href={`/destination/${recDest.id}`}
+                  className="px-8 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold rounded-full transition-all duration-300 no-underline text-sm shadow-[0_8px_24px_-8px_rgba(145,177,73,0.6)] hover:shadow-[0_12px_32px_-8px_rgba(145,177,73,0.8)] hover:scale-[1.03]"
+                >
+                  اكتشف {recDest.name}
+                </Link>
+                <Link
+                  href="/destinations"
+                  className="px-8 py-3.5 bg-white/[0.13] hover:bg-white/[0.22] backdrop-blur-sm text-white font-bold rounded-full border border-white/[0.22] transition-all duration-300 no-underline text-sm"
+                >
+                  استكشف وجهات أخرى
+                </Link>
+                <Link
+                  href="/"
+                  className="px-8 py-3.5 text-white/60 hover:text-white font-bold transition-all duration-300 no-underline text-sm inline-flex items-center gap-1.5"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
+                    <path d="M3 3v5h5" />
+                  </svg>
+                  أعد التجربة
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="inline-flex items-center gap-2 bg-white/[0.13] backdrop-blur-sm text-white text-[0.82rem] font-bold px-4 py-1.5 rounded-full border border-white/[0.22] mb-5">
+                السياحة الاستشفائية الطبيعية
+              </div>
+              <h1 className="text-4xl md:text-6xl font-black mb-5 font-display leading-tight max-w-[680px]">
+                استكشف رحلة شفائك في قلب مصر
+              </h1>
+              <p className="text-white/80 text-lg mb-8 max-w-[520px] leading-relaxed">
+                طبيعة مصر تمتلك سراً قديماً. مياه تعالج، هواء يجدد، وصمت يشفي.
+                اكتشف الوجهة التي تناسب جسدك وروحك.
+              </p>
+              <div className="flex gap-3.5 flex-wrap">
+                <Link
+                  href="/"
+                  className="px-8 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold rounded-full transition-all duration-300 no-underline text-sm"
+                >
+                  ابدأ رحلتك
+                </Link>
+                <Link
+                  href="/destinations"
+                  className="px-8 py-3.5 bg-white/[0.13] hover:bg-white/[0.22] backdrop-blur-sm text-white font-bold rounded-full border border-white/[0.22] transition-all duration-300 no-underline text-sm"
+                >
+                  استكشف الأماكن
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </section>
-
-      {/* Personalized Banner */}
-      {recDest && (
-        <section className="bg-gradient-to-l from-[#e4edf2] to-[#eef3e0] py-5">
-          <div className="max-w-[1280px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">{recDest.envIcon}</span>
-              <div>
-                <p className="text-sm text-[#7b7c7d]">
-                  بناءً على إجاباتك، وجهتك المقترحة:
-                </p>
-                <p className="font-bold text-[#12394d]">{recDest.name}</p>
-              </div>
-            </div>
-            <Link
-              href={`/destination/${recDest.id}`}
-              className="px-6 py-2.5 bg-[#1d5770] hover:bg-[#174860] text-white font-bold rounded-full text-sm transition-all duration-300 no-underline"
-            >
-              اكتشف وجهتك
-            </Link>
-          </div>
-        </section>
-      )}
 
       {/* Info Cards */}
       <section className="py-20">

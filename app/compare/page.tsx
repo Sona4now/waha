@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import { DESTINATIONS } from "@/data/siteData";
@@ -13,8 +14,26 @@ const COMPARISON_ROWS = [
   { key: "features", label: "المميزات" },
 ];
 
-export default function ComparePage() {
+function ComparePageInner() {
+  const searchParams = useSearchParams();
   const [selected, setSelected] = useState<string[]>([]);
+
+  // Pre-load from ?ids= query parameter or localStorage
+  useEffect(() => {
+    const idsParam = searchParams.get("ids");
+    if (idsParam) {
+      const ids = idsParam.split(",").filter(Boolean).slice(0, 3);
+      setSelected(ids);
+      return;
+    }
+    try {
+      const saved = localStorage.getItem("waaha_comparison");
+      if (saved) {
+        const ids = JSON.parse(saved);
+        if (Array.isArray(ids)) setSelected(ids.slice(0, 3));
+      }
+    } catch {}
+  }, [searchParams]);
 
   const toggleDestination = (id: string) => {
     setSelected((prev) => {
@@ -197,5 +216,13 @@ export default function ComparePage() {
         </div>
       </section>
     </SiteLayout>
+  );
+}
+
+export default function ComparePage() {
+  return (
+    <Suspense fallback={null}>
+      <ComparePageInner />
+    </Suspense>
   );
 }

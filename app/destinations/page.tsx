@@ -4,6 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
+import { CompareButton } from "@/components/site/ComparisonTray";
+import Reveal from "@/components/site/Reveal";
 import { DESTINATIONS } from "@/data/siteData";
 
 const treatmentFilters = [
@@ -106,63 +108,59 @@ export default function DestinationsPage() {
           {/* Destinations Grid */}
           {filtered.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filtered.map((dest) => (
-                <Link
-                  key={dest.id}
-                  href={`/destination/${dest.id}`}
-                  className="group block bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
-                >
-                  {/* Card Image */}
-                  <div className="relative h-52 overflow-hidden">
-                    <img
-                      src={dest.image}
-                      alt={dest.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    {dest.environment && (
-                      <span
-                        className="absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full text-white"
-                        style={{ backgroundColor: "#91b149" }}
-                      >
-                        {dest.environment}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Card Body */}
-                  <div className="p-5">
-                    <h3
-                      className="text-xl font-bold mb-2"
-                      style={{ color: "#12394d" }}
+              {filtered.map((dest, i) => (
+                <Reveal key={dest.id} delay={i * 0.08}>
+                  <div className="relative group h-full">
+                    <CompareButton id={dest.id} />
+                    <Link
+                      href={`/destination/${dest.id}`}
+                      className="block bg-white dark:bg-[#162033] rounded-2xl overflow-hidden shadow-md hover:shadow-xl dark:hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.5)] transition-all duration-300 hover:-translate-y-1 border border-[#d0dde4] dark:border-[#1e3a5f] h-full"
                     >
-                      {dest.name}
-                    </h3>
-                    <p
-                      className="text-sm leading-relaxed mb-4 line-clamp-3"
-                      style={{ color: "#7b7c7d" }}
-                    >
-                      {dest.description}
-                    </p>
-
-                    {/* Treatments Tags */}
-                    {dest.treatments && dest.treatments.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {dest.treatments.map((treatment: string, idx: number) => (
+                      {/* Card Image */}
+                      <div className="relative h-52 overflow-hidden">
+                        <img
+                          src={dest.image}
+                          alt={dest.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        {dest.environment && (
                           <span
-                            key={idx}
-                            className="text-xs px-3 py-1 rounded-full"
-                            style={{
-                              backgroundColor: "#f0f7ed",
-                              color: "#91b149",
-                            }}
+                            className="absolute top-3 right-3 text-xs font-bold px-3 py-1 rounded-full text-white shadow-md"
+                            style={{ backgroundColor: "#91b149" }}
                           >
-                            {treatment}
+                            {dest.environment}
                           </span>
-                        ))}
+                        )}
                       </div>
-                    )}
+
+                      {/* Card Body */}
+                      <div className="p-5">
+                        <h3 className="text-xl font-bold mb-2 text-[#12394d] dark:text-white font-display">
+                          {dest.name}
+                        </h3>
+                        <p className="text-sm leading-relaxed mb-4 line-clamp-3 text-[#7b7c7d] dark:text-white/60">
+                          {dest.description}
+                        </p>
+
+                        {/* Treatments Tags */}
+                        {dest.treatments && dest.treatments.length > 0 && (
+                          <div className="flex flex-wrap gap-2">
+                            {dest.treatments.map(
+                              (treatment: string, idx: number) => (
+                                <span
+                                  key={idx}
+                                  className="text-xs px-3 py-1 rounded-full bg-[#f0f7ed] dark:bg-[#91b149]/15 text-[#91b149]"
+                                >
+                                  {treatment}
+                                </span>
+                              )
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </Link>
                   </div>
-                </Link>
+                </Reveal>
               ))}
             </div>
           ) : (

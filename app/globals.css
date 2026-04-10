@@ -81,6 +81,15 @@
 }
 
 /* ---- Keyframes ---- */
+@keyframes shimmer {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
 @keyframes kenBurns {
   0% {
     transform: scale(1) translate(0, 0);
