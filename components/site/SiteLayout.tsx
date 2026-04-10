@@ -7,6 +7,7 @@ import BottomNav from "./BottomNav";
 import SearchCommand from "./SearchCommand";
 import ComparisonTray from "./ComparisonTray";
 import SmartWelcome from "./SmartWelcome";
+import ToastContainer from "./Toast";
 
 export default function SiteLayout({
   children,
@@ -26,6 +27,7 @@ export default function SiteLayout({
       <SearchCommand />
       <ComparisonTray />
       <SmartWelcome />
+      <ToastContainer />
     </div>
   );
 }

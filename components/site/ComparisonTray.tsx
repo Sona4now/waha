@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
+import { showToast } from "./Toast";
 
 const STORAGE_KEY = "waaha_comparison";
 const MAX_ITEMS = 3;
@@ -41,8 +42,15 @@ export function useComparison() {
   const add = useCallback(
     (id: string) => {
       if (ids.includes(id)) return;
-      if (ids.length >= MAX_ITEMS) return;
+      if (ids.length >= MAX_ITEMS) {
+        showToast("الحد الأقصى 3 وجهات للمقارنة", "warning");
+        return;
+      }
+      const dest = DESTINATIONS.find((d) => d.id === id);
       persist([...ids, id]);
+      if (dest) {
+        showToast(`تمت إضافة ${dest.name} للمقارنة ✓`, "success");
+      }
     },
     [ids, persist]
   );

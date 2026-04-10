@@ -6,6 +6,7 @@ import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import { CompareButton } from "@/components/site/ComparisonTray";
 import Reveal from "@/components/site/Reveal";
+import EmptyState from "@/components/site/EmptyState";
 import { DESTINATIONS } from "@/data/siteData";
 
 const treatmentFilters = [
@@ -164,29 +165,22 @@ export default function DestinationsPage() {
               ))}
             </div>
           ) : (
-            /* Empty State */
-            <div className="text-center py-20">
-              <div className="text-6xl mb-4">🔍</div>
-              <h3
-                className="text-2xl font-bold mb-2"
-                style={{ color: "#12394d" }}
-              >
-                لا توجد نتائج
-              </h3>
-              <p style={{ color: "#7b7c7d" }}>
-                جرّب تغيير معايير البحث للعثور على وجهات مناسبة
-              </p>
-              <button
-                onClick={() => {
-                  setActiveTreatment("الكل");
-                  setActiveEnvironment("الكل");
-                }}
-                className="mt-6 px-6 py-2 rounded-full text-white font-medium transition-opacity hover:opacity-90"
-                style={{ backgroundColor: "#1d5770" }}
-              >
-                إعادة ضبط الفلاتر
-              </button>
-            </div>
+            <EmptyState
+              icon="🏜️"
+              title="ما لقيناش وجهات بالمواصفات دي"
+              description="جرّب تعديل فلتر العلاج أو البيئة، أو شيل الفلاتر كلها عشان تشوف الوجهات المتاحة"
+              action={
+                <button
+                  onClick={() => {
+                    setActiveTreatment("الكل");
+                    setActiveEnvironment("الكل");
+                  }}
+                  className="px-6 py-3 rounded-full bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white font-bold text-sm hover:shadow-lg transition-all hover:scale-[1.03]"
+                >
+                  امسح الفلاتر وشوف كل الوجهات
+                </button>
+              }
+            />
           )}
         </div>
       </section>

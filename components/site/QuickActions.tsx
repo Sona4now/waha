@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { DestinationFull } from "@/data/siteData";
+import { showToast } from "./Toast";
 
 interface Props {
   destination: DestinationFull;
@@ -31,7 +32,15 @@ export default function QuickActions({ destination }: Props) {
         : [...favs, destination.id];
       localStorage.setItem(FAV_KEY, JSON.stringify(next));
       setIsFavorite(!isFavorite);
-    } catch {}
+      showToast(
+        isFavorite
+          ? `تم إزالة ${destination.name} من المفضلة`
+          : `تمت الإضافة للمفضلة ${destination.name} ❤️`,
+        isFavorite ? "info" : "success"
+      );
+    } catch {
+      showToast("حدث خطأ", "error");
+    }
   }
 
   async function handleShare() {
@@ -54,8 +63,11 @@ export default function QuickActions({ destination }: Props) {
     try {
       await navigator.clipboard.writeText(`${text}\n${url}`);
       setShowCopied(true);
+      showToast("تم نسخ الرابط للحافظة 📋", "success");
       setTimeout(() => setShowCopied(false), 2000);
-    } catch {}
+    } catch {
+      showToast("لم يتمكن من النسخ", "error");
+    }
   }
 
   function openWhatsApp() {
