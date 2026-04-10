@@ -97,10 +97,10 @@ function buildIndex(): SearchItem[] {
     },
     {
       id: "about",
-      title: "عن المشروع",
+      title: "من نحن",
       href: "/about",
       icon: "ℹ️",
-      keywords: ["about", "عن المشروع"],
+      keywords: ["about", "عن المشروع", "من نحن"],
     },
     {
       id: "contact",

@@ -13,7 +13,7 @@ const links = [
   { href: "/blog", label: "المدونة" },
   { href: "/symptoms", label: "فاحص الأعراض" },
   { href: "/compare", label: "المقارنة" },
-  { href: "/about", label: "عن المشروع" },
+  { href: "/about", label: "من نحن" },
   { href: "/contact", label: "الفريق" },
 ];
 

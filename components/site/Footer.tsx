@@ -46,7 +46,7 @@ export default function Footer() {
                 href="/about"
                 className="text-[0.88rem] text-white/60 hover:text-[#1d5770] transition-colors no-underline"
               >
-                عن المشروع
+                من نحن
               </Link>
               <Link
                 href="/blog"
