@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 const links = [
   { href: "/home", label: "الرئيسية" },
   { href: "/destinations", label: "الأماكن" },
+  { href: "/tours", label: "جولات 360°" },
   { href: "/map", label: "الخريطة" },
   { href: "/blog", label: "المدونة" },
   { href: "/compare", label: "المقارنة" },
