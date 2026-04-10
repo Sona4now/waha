@@ -1,6 +1,9 @@
 @import "tailwindcss";
 @import "leaflet/dist/leaflet.css";
 
+/* Tailwind v4 dark mode strategy: use .dark class on <html> */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* ---- Base styles (inside layer so Tailwind utilities can override) ---- */
 @layer base {
   *,

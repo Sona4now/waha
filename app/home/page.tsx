@@ -1,9 +1,15 @@
 "use client";
 
 import SiteLayout from "@/components/site/SiteLayout";
+import Reveal from "@/components/site/Reveal";
 import Link from "next/link";
+import Image from "next/image";
 import { DESTINATIONS } from "@/data/siteData";
 import { useEffect, useState, useRef } from "react";
+
+// 8x8 blurred placeholder (generic ocean tone)
+const BLUR_DATA_URL =
+  "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiMxZDU3NzAiLz48L3N2Zz4=";
 
 function Counter({ target, label }: { target: number; label: string }) {
   const [count, setCount] = useState(0);
@@ -35,7 +41,7 @@ function Counter({ target, label }: { target: number; label: string }) {
 
   return (
     <div ref={ref} className="text-center">
-      <div className="text-4xl md:text-5xl font-black text-[#1d5770] mb-2">
+      <div className="text-4xl md:text-5xl font-black text-[#1d5770] dark:text-[#91b149] mb-2">
         {count.toLocaleString("ar-EG")}+
       </div>
       <div className="text-[#7b7c7d] text-sm">{label}</div>
@@ -64,12 +70,15 @@ export default function HomePage() {
     <SiteLayout>
       {/* Hero */}
       <section className="relative min-h-screen flex items-center overflow-hidden bg-[#12394d]">
-        <div
-          className="absolute inset-0 bg-cover bg-center animate-[kenBurns_14s_ease-out_forwards]"
-          style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80')",
-          }}
+        <Image
+          src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80"
+          alt="البحر الأحمر"
+          fill
+          priority
+          sizes="100vw"
+          placeholder="blur"
+          blurDataURL={BLUR_DATA_URL}
+          className="object-cover animate-[kenBurns_14s_ease-out_forwards]"
         />
         <div className="absolute inset-0 bg-gradient-to-bl from-[#1b4f72]/90 via-[#1b4f72]/55 to-black/20" />
         <div className="relative z-10 max-w-[1280px] mx-auto px-6 pt-[72px] text-white">
@@ -126,13 +135,15 @@ export default function HomePage() {
       {/* Info Cards */}
       <section className="py-20">
         <div className="max-w-[1280px] mx-auto px-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 font-display">
-            لماذا السياحة الاستشفائية؟
-          </h2>
-          <p className="text-center text-[#7b7c7d] mb-12 max-w-lg mx-auto">
-            مصر تمتلك ثروات طبيعية فريدة تجعلها من أفضل الوجهات الاستشفائية في
-            العالم
-          </p>
+          <Reveal>
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 font-display text-[#12394d] dark:text-white">
+              لماذا السياحة الاستشفائية؟
+            </h2>
+            <p className="text-center text-[#7b7c7d] mb-12 max-w-lg mx-auto">
+              مصر تمتلك ثروات طبيعية فريدة تجعلها من أفضل الوجهات الاستشفائية في
+              العالم
+            </p>
+          </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               {
@@ -150,92 +161,101 @@ export default function HomePage() {
                 title: "هدوء وتجدد",
                 desc: "الابتعاد عن ضوضاء المدينة والتواصل مع الطبيعة يُعيد التوازن للجسد والروح.",
               },
-            ].map((card) => (
-              <div
-                key={card.title}
-                className="bg-white rounded-[20px] p-8 shadow-[0_2px_8px_rgba(29,87,112,0.07)] border border-[#d0dde4] hover:-translate-y-2 hover:shadow-[0_8px_40px_rgba(29,87,112,0.16)] transition-all duration-300"
-              >
-                <div className="text-4xl mb-4">{card.icon}</div>
-                <h3 className="text-lg font-bold mb-2 text-[#12394d]">
-                  {card.title}
-                </h3>
-                <p className="text-[0.88rem] text-[#7b7c7d] leading-relaxed">
-                  {card.desc}
-                </p>
-              </div>
+            ].map((card, i) => (
+              <Reveal key={card.title} delay={i * 0.1}>
+                <div className="bg-white dark:bg-[#162033] rounded-[20px] p-8 shadow-[0_2px_8px_rgba(29,87,112,0.07)] border border-[#d0dde4] dark:border-[#1e3a5f] hover:-translate-y-2 hover:shadow-[0_8px_40px_rgba(29,87,112,0.16)] dark:hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-300 h-full">
+                  <div className="text-4xl mb-4">{card.icon}</div>
+                  <h3 className="text-lg font-bold mb-2 text-[#12394d] dark:text-white">
+                    {card.title}
+                  </h3>
+                  <p className="text-[0.88rem] text-[#7b7c7d] dark:text-white/60 leading-relaxed">
+                    {card.desc}
+                  </p>
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
       {/* Featured Destinations */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-[#0d1b2a]">
         <div className="max-w-[1280px] mx-auto px-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 font-display">
-            وجهات استشفائية مختارة
-          </h2>
-          <p className="text-center text-[#7b7c7d] mb-12">
-            اكتشف أفضل الأماكن العلاجية في مصر
-          </p>
+          <Reveal>
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 font-display text-[#12394d] dark:text-white">
+              وجهات استشفائية مختارة
+            </h2>
+            <p className="text-center text-[#7b7c7d] mb-12">
+              اكتشف أفضل الأماكن العلاجية في مصر
+            </p>
+          </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {DESTINATIONS.slice(0, 4).map((dest) => (
-              <Link
-                key={dest.id}
-                href={`/destination/${dest.id}`}
-                className="bg-white rounded-[20px] overflow-hidden shadow-[0_2px_8px_rgba(29,87,112,0.07)] border border-[#d0dde4] hover:-translate-y-2 hover:shadow-[0_8px_40px_rgba(29,87,112,0.16)] transition-all duration-300 no-underline group"
-              >
-                <div className="overflow-hidden">
-                  <img
-                    src={dest.image}
-                    alt={dest.name}
-                    className="w-full h-[220px] object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                </div>
-                <div className="p-5">
-                  <span
-                    className={`inline-flex items-center gap-1 text-[0.75rem] font-bold px-2.5 py-1 rounded-full mb-2 ${
-                      dest.envClass === "env-sea"
-                        ? "bg-[#EBF8FF] text-[#0369a1]"
-                        : dest.envClass === "env-desert"
-                          ? "bg-[#FEF9EB] text-[#92400e]"
-                          : dest.envClass === "env-oasis"
-                            ? "bg-[#ECFDF5] text-[#065f46]"
-                            : "bg-[#F1F5F9] text-[#374151]"
-                    }`}
-                  >
-                    {dest.envIcon} {dest.environment}
-                  </span>
-                  <h3 className="text-lg font-bold text-[#12394d] mb-1.5">
-                    {dest.name}
-                  </h3>
-                  <p className="text-[0.85rem] text-[#7b7c7d] leading-relaxed line-clamp-2">
-                    {dest.description}
-                  </p>
-                </div>
-              </Link>
+            {DESTINATIONS.slice(0, 4).map((dest, i) => (
+              <Reveal key={dest.id} delay={i * 0.1}>
+                <Link
+                  href={`/destination/${dest.id}`}
+                  className="block bg-white dark:bg-[#162033] rounded-[20px] overflow-hidden shadow-[0_2px_8px_rgba(29,87,112,0.07)] border border-[#d0dde4] dark:border-[#1e3a5f] hover:-translate-y-2 hover:shadow-[0_8px_40px_rgba(29,87,112,0.16)] dark:hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-300 no-underline group h-full"
+                >
+                  <div className="relative overflow-hidden h-[220px]">
+                    <Image
+                      src={dest.image}
+                      alt={dest.name}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      placeholder="blur"
+                      blurDataURL={BLUR_DATA_URL}
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="p-5">
+                    <span
+                      className={`inline-flex items-center gap-1 text-[0.75rem] font-bold px-2.5 py-1 rounded-full mb-2 ${
+                        dest.envClass === "env-sea"
+                          ? "bg-[#EBF8FF] text-[#0369a1]"
+                          : dest.envClass === "env-desert"
+                            ? "bg-[#FEF9EB] text-[#92400e]"
+                            : dest.envClass === "env-oasis"
+                              ? "bg-[#ECFDF5] text-[#065f46]"
+                              : "bg-[#F1F5F9] text-[#374151]"
+                      }`}
+                    >
+                      {dest.envIcon} {dest.environment}
+                    </span>
+                    <h3 className="text-lg font-bold text-[#12394d] dark:text-white mb-1.5">
+                      {dest.name}
+                    </h3>
+                    <p className="text-[0.85rem] text-[#7b7c7d] dark:text-white/60 leading-relaxed line-clamp-2">
+                      {dest.description}
+                    </p>
+                  </div>
+                </Link>
+              </Reveal>
             ))}
           </div>
-          <div className="text-center mt-10">
-            <Link
-              href="/destinations"
-              className="inline-block px-8 py-3 bg-[#1d5770] hover:bg-[#174860] text-white font-bold rounded-full text-sm transition-all duration-300 no-underline"
-            >
-              عرض جميع الوجهات
-            </Link>
-          </div>
+          <Reveal delay={0.4}>
+            <div className="text-center mt-10">
+              <Link
+                href="/destinations"
+                className="inline-block px-8 py-3 bg-[#1d5770] hover:bg-[#174860] text-white font-bold rounded-full text-sm transition-all duration-300 no-underline"
+              >
+                عرض جميع الوجهات
+              </Link>
+            </div>
+          </Reveal>
         </div>
       </section>
 
       {/* Stats */}
-      <section className="py-20 bg-[#f5f8fa]">
+      <section className="py-20 bg-[#f5f8fa] dark:bg-[#0a151f]">
         <div className="max-w-[1280px] mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <Counter target={5} label="وجهات استشفائية" />
-            <Counter target={12} label="علاج طبيعي" />
-            <Counter target={4} label="بيئات مختلفة" />
-            <Counter target={365} label="يوم شمس في السنة" />
-          </div>
+          <Reveal>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+              <Counter target={5} label="وجهات استشفائية" />
+              <Counter target={12} label="علاج طبيعي" />
+              <Counter target={4} label="بيئات مختلفة" />
+              <Counter target={365} label="يوم شمس في السنة" />
+            </div>
+          </Reveal>
         </div>
       </section>
 
