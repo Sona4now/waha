@@ -2,6 +2,7 @@
 
 import SiteLayout from "@/components/site/SiteLayout";
 import Reveal from "@/components/site/Reveal";
+import MoodBoard from "@/components/site/MoodBoard";
 import Link from "next/link";
 import Image from "next/image";
 import { DESTINATIONS } from "@/data/siteData";
@@ -290,6 +291,15 @@ export default function HomePage() {
               <Counter target={4} label="بيئات مختلفة" />
               <Counter target={365} label="يوم شمس في السنة" />
             </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Mood Board */}
+      <section className="py-20">
+        <div className="max-w-4xl mx-auto px-6">
+          <Reveal>
+            <MoodBoard />
           </Reveal>
         </div>
       </section>

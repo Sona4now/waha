@@ -6,6 +6,7 @@ import ChatWidget from "./ChatWidget";
 import BottomNav from "./BottomNav";
 import SearchCommand from "./SearchCommand";
 import ComparisonTray from "./ComparisonTray";
+import SmartWelcome from "./SmartWelcome";
 
 export default function SiteLayout({
   children,
@@ -24,6 +25,7 @@ export default function SiteLayout({
       <BottomNav />
       <SearchCommand />
       <ComparisonTray />
+      <SmartWelcome />
     </div>
   );
 }
