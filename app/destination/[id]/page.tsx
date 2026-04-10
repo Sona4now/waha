@@ -8,6 +8,11 @@ import SiteLayout from "@/components/site/SiteLayout";
 import FAQ, { getFAQForDestination } from "@/components/site/FAQ";
 import { CompareButton } from "@/components/site/ComparisonTray";
 import QuickActions from "@/components/site/QuickActions";
+import Gallery, { getGalleryForDestination } from "@/components/site/Gallery";
+import DayTimeline, {
+  getDayForDestination,
+} from "@/components/site/DayTimeline";
+import WeatherWidget from "@/components/site/WeatherWidget";
 import { DESTINATIONS, getDestById } from "@/data/siteData";
 
 const BASE_TABS = [
@@ -1679,8 +1684,29 @@ export default function DestinationDetailPage() {
           </div>
         </section>
 
-        {/* FAQ Section */}
+        {/* Day in the Life */}
+        <section className="py-16 bg-gradient-to-b from-white to-[#f5f8fa] dark:from-[#0d1b2a] dark:to-[#0a151f]">
+          <div className="max-w-5xl mx-auto px-4">
+            <DayTimeline
+              steps={getDayForDestination(dest.id)}
+              destinationName={dest.name}
+            />
+          </div>
+        </section>
+
+        {/* Weather & Gallery side by side */}
         <section className="py-16 bg-[#f5f8fa] dark:bg-[#0a151f]">
+          <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6">
+            <WeatherWidget destId={dest.id} destName={dest.name} />
+            <Gallery
+              images={getGalleryForDestination(dest.id)}
+              title={`معرض صور ${dest.name}`}
+            />
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-16 bg-white dark:bg-[#0d1b2a]">
           <div className="max-w-4xl mx-auto px-4">
             <FAQ
               items={getFAQForDestination(dest.id)}
