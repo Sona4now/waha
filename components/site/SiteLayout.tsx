@@ -2,6 +2,7 @@
 
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import ChatWidget from "./ChatWidget";
 
 export default function SiteLayout({
   children,
@@ -13,6 +14,7 @@ export default function SiteLayout({
       <Navbar />
       <main>{children}</main>
       <Footer />
+      <ChatWidget />
     </div>
   );
 }

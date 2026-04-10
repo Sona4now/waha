@@ -11,7 +11,6 @@ const links = [
   { href: "/map", label: "الخريطة" },
   { href: "/blog", label: "المدونة" },
   { href: "/compare", label: "المقارنة" },
-  { href: "/ai-guide", label: "المساعد" },
   { href: "/about", label: "عن المشروع" },
   { href: "/contact", label: "الفريق" },
 ];
