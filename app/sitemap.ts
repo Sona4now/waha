@@ -33,11 +33,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
       changeFrequency: "monthly" as const,
     },
-    {
-      url: "/research",
-      priority: 0.7,
-      changeFrequency: "monthly" as const,
-    },
   ];
 
   const destinationRoutes = DESTINATIONS.map((d) => ({

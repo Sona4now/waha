@@ -88,10 +88,10 @@ export default function Footer() {
 
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center">
           <p className="text-white/30 text-[0.82rem]">
-            © 2025 واحة — مشروع أكاديمي · السياحة الاستشفائية في مصر
+            © 2026 واحة — WAHA · السياحة البيئية والاستشفاء من الطبيعة
           </p>
           <p className="text-white/20 text-[0.75rem]">
-            كلية السياحة والفنادق
+            شفاؤك من الطبيعة 🌿
           </p>
         </div>
       </div>

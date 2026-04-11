@@ -24,9 +24,9 @@ export const metadata: Metadata = {
     "عيون كبريتية",
     "رمال سوداء",
   ],
-  authors: [{ name: "واحة — مشروع أكاديمي" }],
+  authors: [{ name: "واحة — WAHA" }],
   creator: "واحة",
-  publisher: "كلية السياحة والفنادق",
+  publisher: "واحة — WAHA",
   manifest: "/manifest.json",
   openGraph: {
     type: "website",
@@ -98,9 +98,8 @@ export default function RootLayout({
                 "منصة محتوى رقمية للتوعية حول السياحة البيئية والاستشفاء من الطبيعة في مصر",
               inLanguage: "ar-EG",
               publisher: {
-                "@type": "EducationalOrganization",
-                name: "جامعة القاهرة — كلية الإعلام",
-                department: "قسم الإعلام الرقمي",
+                "@type": "Organization",
+                name: "واحة — WAHA",
               },
               potentialAction: {
                 "@type": "SearchAction",

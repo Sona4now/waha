@@ -57,7 +57,8 @@
       "Bash(/Users/youseffouad1icloud.com/.nvm/versions/node/v24.14.1/bin/npm install:*)",
       "Bash(export PATH=\"/Users/youseffouad1icloud.com/.nvm/versions/node/v24.14.1/bin:$PATH\")",
       "Bash(npm list:*)",
-      "Bash(ls /Users/youseffouad1icloud.com/Desktop/mahaaa/app/favicon*)"
+      "Bash(ls /Users/youseffouad1icloud.com/Desktop/mahaaa/app/favicon*)",
+      "Bash(export PATH=/Users/youseffouad1icloud.com/.nvm/versions/node/v24.14.1/bin:$PATH)"
     ]
   }
 }

@@ -1,49 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import Reveal from "@/components/site/Reveal";
-
-const TEAM_MEMBERS = [
-  "مالك محمد علي",
-  "أحمد محمد ربيع",
-  "إبراهيم هاني إبراهيم",
-  "نادين هيثم عبدالعزيز",
-  "مريم إبراهيم أحمد",
-  "صفاء محمد الشقنقيري",
-  "جنة أيمن محمد",
-  "مريم بهاء الدين محمد سالم",
-  "روان عاطف سعد",
-  "منة خالد أحمد",
-  "حنين عمرو عبد الرحمن",
-  "آية فتحي محمد السيد",
-  "رمزي علاء الدين عبدالله",
-  "مريم شيرين أحمد",
-  "جنا تامر عبدالخالق",
-  "زينب محمود ماهر",
-  "يوسف محمد فؤاد",
-  "عبدالرحمن محمود محمد زين",
-  "علي فهد إسماعيل",
-  "لانا عادل خليفة",
-  "آية أشرف صلاح الدين",
-  "حبيبة محمود مصطفى",
-  "نيرة حفني سلامة",
-];
-
-const SUPERVISORS = [
-  { role: "عميد الكلية", name: "أ.د وسام نصر" },
-  { role: "رئيس القسم", name: "أ.د سماح المحمدي" },
-  {
-    role: "المدير الأكاديمي لبرنامج الإعلام الرقمي",
-    name: "د. محمود خليل",
-  },
-  {
-    role: "إشراف",
-    name: "د. لميس النجار · د. هدير صلاح",
-  },
-];
 
 const AWARENESS_GOALS = [
   {
@@ -61,15 +21,14 @@ const AWARENESS_GOALS = [
   {
     icon: "💎",
     title: "إبراز قيمة الموارد الطبيعية العلاجية في مصر",
-    description:
-      "توثيق الكنوز الطبيعية المصرية في إطار بيئي وثقافي غير تجاري",
+    description: "توثيق الكنوز الطبيعية المصرية في إطار بيئي وثقافي",
   },
 ];
 
 const ENV_GOALS = [
   {
     icon: "♻️",
-    title: "تشجيع السياحة المستدامة وغير الاستهلاكية",
+    title: "تشجيع السياحة المستدامة",
     description: "نموذج سياحة صديق للبيئة يحترم الموارد الطبيعية",
   },
   {
@@ -91,24 +50,24 @@ const SITE_SECTIONS = [
     description: "تعريف بالمنصة ورؤيتها",
   },
   {
-    icon: "ℹ️",
-    title: "من نحن",
-    description: "تعريف بالمشروع كمنصة تعليمية ومشروع تخرج",
-  },
-  {
     icon: "🗺️",
     title: "الوجهات البيئية",
     description: "محتوى منظم عن الوجهات الاستشفائية في مصر",
   },
   {
-    icon: "📰",
-    title: "الأخبار والتحديثات",
-    description: "مستجدات وحملات وفعاليات متعلقة بالسياحة البيئية",
+    icon: "🎥",
+    title: "جولات 360° تفاعلية",
+    description: "استكشف المواقع الطبيعية كأنك موجود هناك",
   },
   {
-    icon: "📚",
-    title: "مكتبة المحتوى",
-    description: "أفلام وثائقية، مقاطع مرئية، ومقالات",
+    icon: "📰",
+    title: "المدونة والمقالات",
+    description: "محتوى توعوي عن السياحة البيئية والاستشفاء",
+  },
+  {
+    icon: "🤖",
+    title: "المساعد الذكي",
+    description: "اكتشف وجهتك المثالية بناءً على حالتك واحتياجاتك",
   },
   {
     icon: "🌊",
@@ -158,7 +117,7 @@ export default function AboutPage() {
           <Reveal>
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#91b149]/10 text-[#91b149] text-[10px] font-bold uppercase tracking-widest mb-6">
               <span className="w-2 h-2 rounded-full bg-[#91b149] animate-pulse" />
-              مشروع تخرج — جامعة القاهرة
+              منصة محتوى رقمية
             </div>
             <h1 className="text-4xl md:text-6xl font-black font-display text-[#12394d] dark:text-white leading-tight mb-6">
               <span className="text-[#91b149]">واحة</span> — WAHA
@@ -177,14 +136,14 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Problem Statement */}
+      {/* Vision / Why Section */}
       <section className="py-20 bg-[#f5f8fa] dark:bg-[#0a151f]">
         <div className="max-w-5xl mx-auto px-6">
           <Reveal>
             <div className="text-center mb-12">
               <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-3">
                 <span className="w-6 h-px bg-[#91b149]" />
-                المشكلة
+                رؤيتنا
                 <span className="w-6 h-px bg-[#91b149]" />
               </div>
               <h2 className="text-3xl md:text-4xl font-bold font-display text-[#12394d] dark:text-white mb-4">
@@ -201,24 +160,25 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
               {
-                icon: "😕",
-                title: "ضعف الوعي العام",
-                description: "بمفهوم السياحة العلاجية الطبيعية في مصر",
+                icon: "🌊",
+                title: "مياه كبريتية ومعدنية",
+                description: "موارد مائية فريدة بخصائص علاجية مثبتة",
               },
               {
-                icon: "📵",
-                title: "غياب محتوى متخصص",
-                description: "يشرح كيف ولماذا تؤثر البيئة على الصحة",
+                icon: "🏖️",
+                title: "رمال غنية بالمعادن",
+                description: "خاصة الرمال السوداء في سفاجا وسيوة",
               },
               {
-                icon: "🏨",
-                title: "سيطرة السياحة التقليدية",
-                description: "التي لا تسلط الضوء على القيمة العلاجية",
+                icon: "🏜️",
+                title: "بيئات صحراوية وبحرية",
+                description: "ذات تأثير إيجابي على الصحة النفسية والجسدية",
               },
               {
                 icon: "🔗",
-                title: "غياب الربط",
-                description: "بين البيئة والإنسان والثقافة المحلية",
+                title: "ربط الإنسان بالطبيعة",
+                description:
+                  "فهم العلاقة بين البيئة والثقافة المحلية والصحة",
               },
             ].map((item, i) => (
               <Reveal key={item.title} delay={i * 0.1}>
@@ -369,9 +329,9 @@ export default function AboutPage() {
                 مرجع معرفي بصري — لا منصة تجارية
               </h2>
               <p className="text-[#7b7c7d] dark:text-white/60 max-w-3xl mx-auto">
-                الموقع يهدف لإطالة عمر المحتوى خارج السوشيال ميديا، توثيقه
-                بشكل منظم وقابل للأرشفة، ودعم المصداقية الأكاديمية للمشروع،
-                وتسهيل الوصول لجمهور محلي ودولي.
+                تعتمد واحة على السرد البصري والتجريبي، دون تقديم ادعاءات طبية
+                مباشرة. هدفنا توثيق المحتوى بشكل منظم، دعم المصداقية، وتسهيل
+                الوصول لجمهور محلي ودولي.
               </p>
             </div>
           </Reveal>
@@ -394,14 +354,13 @@ export default function AboutPage() {
             ))}
           </div>
 
-          {/* Site identity badges */}
           <Reveal delay={0.4}>
             <div className="mt-10 flex flex-wrap justify-center gap-3">
               {[
-                "ثنائي اللغة · عربي / إنجليزي",
-                "تجربة تفاعلية 360° VT",
                 "محتوى غير دعائي",
+                "تجربة تفاعلية 360° VT",
                 "سرد بصري وتجريبي",
+                "توثيق منظم وقابل للأرشفة",
               ].map((badge) => (
                 <span
                   key={badge}
@@ -415,87 +374,47 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Supervisors */}
+      {/* What WAHA doesn't do */}
       <section className="py-20 bg-[#f5f8fa] dark:bg-[#0a151f]">
         <div className="max-w-4xl mx-auto px-6">
           <Reveal>
-            <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-3">
-                <span className="w-6 h-px bg-[#91b149]" />
-                الإشراف الأكاديمي
-                <span className="w-6 h-px bg-[#91b149]" />
+            <div className="bg-white dark:bg-[#162033] rounded-2xl p-8 md:p-10 border-r-4 border-[#91b149]">
+              <div className="flex items-start gap-4 mb-5">
+                <div className="w-12 h-12 rounded-full bg-[#91b149]/10 flex items-center justify-center flex-shrink-0 text-2xl">
+                  ℹ️
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold font-display text-[#12394d] dark:text-white mb-1">
+                    واحة منصة توعية — لا وكالة سياحة
+                  </h3>
+                  <p className="text-xs text-[#7b7c7d]">
+                    من المهم توضيح طبيعة المنصة
+                  </p>
+                </div>
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold font-display text-[#12394d] dark:text-white mb-2">
-                جامعة القاهرة
-              </h2>
-              <p className="text-[#7b7c7d] dark:text-white/60">
-                كلية الإعلام — قسم الإعلام الرقمي
-              </p>
+              <ul className="space-y-3 text-sm text-[#12394d]/80 dark:text-white/70">
+                {[
+                  "لا نقوم بتنظيم رحلات سياحية",
+                  "لا نقوم بحجز فنادق أو طيران",
+                  "لا نقدّم استشارات طبية مباشرة",
+                  "لا نبيع أي منتجات أو خدمات",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2">
+                    <span className="text-red-500 font-bold mt-0.5">✕</span>
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-5 pt-5 border-t border-[#d0dde4] dark:border-[#1e3a5f]">
+                <p className="text-sm text-[#12394d] dark:text-white leading-relaxed">
+                  <span className="font-bold text-[#91b149]">بدلاً من ذلك:</span>{" "}
+                  نقدّم محتوى موثّق، صور، فيديوهات، جولات 360°، ومعلومات
+                  شاملة عن الوجهات الاستشفائية الطبيعية في مصر — مع إرشادك
+                  للمراكز المعتمدة للتواصل المباشر.
+                </p>
+              </div>
             </div>
           </Reveal>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {SUPERVISORS.map((sup, i) => (
-              <Reveal key={sup.name} delay={i * 0.1}>
-                <div className="bg-white dark:bg-[#162033] rounded-2xl p-5 border border-[#d0dde4] dark:border-[#1e3a5f] flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#1d5770] to-[#0d2a39] flex items-center justify-center text-white text-xl flex-shrink-0">
-                    🎓
-                  </div>
-                  <div>
-                    <div className="text-xs text-[#7b7c7d] dark:text-white/50 mb-0.5">
-                      {sup.role}
-                    </div>
-                    <div className="font-bold font-display text-[#12394d] dark:text-white">
-                      {sup.name}
-                    </div>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section className="py-20 bg-white dark:bg-[#0d1b2a]">
-        <div className="max-w-5xl mx-auto px-6">
-          <Reveal>
-            <div className="text-center mb-12">
-              <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-3">
-                <span className="w-6 h-px bg-[#91b149]" />
-                فريق العمل
-                <span className="w-6 h-px bg-[#91b149]" />
-              </div>
-              <h2 className="text-3xl md:text-4xl font-bold font-display text-[#12394d] dark:text-white mb-2">
-                طلاب الفرقة الرابعة
-              </h2>
-              <p className="text-[#7b7c7d] dark:text-white/60 text-sm">
-                قسم الإعلام الرقمي — جامعة القاهرة · {TEAM_MEMBERS.length}{" "}
-                عضو
-              </p>
-            </div>
-          </Reveal>
-
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-            {TEAM_MEMBERS.map((name, i) => (
-              <motion.div
-                key={name}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ delay: i * 0.03, duration: 0.4 }}
-                whileHover={{ y: -3 }}
-                className="group relative bg-gradient-to-br from-[#f5f8fa] to-white dark:from-[#162033] dark:to-[#0a151f] rounded-xl p-4 border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#91b149]/40 transition-all text-center"
-              >
-                <div className="w-10 h-10 mx-auto mb-2 rounded-full bg-gradient-to-br from-[#91b149] to-[#6a8435] flex items-center justify-center text-white text-sm font-bold group-hover:scale-110 transition-transform">
-                  {name.charAt(0)}
-                </div>
-                <div className="text-xs font-semibold text-[#12394d] dark:text-white leading-tight">
-                  {name}
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -514,9 +433,9 @@ export default function AboutPage() {
               نسعد بتعاونك معنا
             </h2>
             <p className="text-white/70 mb-10 leading-relaxed max-w-xl mx-auto">
-              يمثّل مشروع واحة مبادرة إعلامية معاصرة لإعادة تسليط الضوء على
-              قيمة الموارد الطبيعية والبيئية في مصر، من خلال طرح توعوي يربط
-              بين الإنسان والطبيعة والاستدامة.
+              تمثّل واحة مبادرة إعلامية معاصرة لإعادة تسليط الضوء على قيمة
+              الموارد الطبيعية والبيئية في مصر، من خلال طرح توعوي يربط بين
+              الإنسان والطبيعة والاستدامة.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto mb-8">
