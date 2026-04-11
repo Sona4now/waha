@@ -22,7 +22,7 @@ export default function QuickActions({ destination }: Props) {
     } catch {}
   }, [destination.id]);
 
-  function toggleFavorite() {
+  async function toggleFavorite() {
     try {
       const favs: string[] = JSON.parse(
         localStorage.getItem(FAV_KEY) || "[]"
@@ -38,6 +38,16 @@ export default function QuickActions({ destination }: Props) {
           : `تمت الإضافة للمفضلة ${destination.name} ❤️`,
         isFavorite ? "info" : "success"
       );
+      // Track achievement
+      if (!isFavorite) {
+        try {
+          const { updateUserState, checkNewAchievements } = await import(
+            "@/lib/achievements"
+          );
+          updateUserState({ favoritesCount: next.length });
+          checkNewAchievements();
+        } catch {}
+      }
     } catch {
       showToast("حدث خطأ", "error");
     }

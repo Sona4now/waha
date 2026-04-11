@@ -12,6 +12,7 @@ import Teaser360 from "@/components/Teaser360";
 import TransitionScreen from "@/components/TransitionScreen";
 import AmbientSound from "@/components/AmbientSound";
 import ShareCard from "@/components/ShareCard";
+import CustomCursor from "@/components/CustomCursor";
 import { questions } from "@/data/questions";
 import { getRecommendation, type Answers } from "@/utils/getRecommendation";
 import type { Destination } from "@/data/destinations";
@@ -127,6 +128,7 @@ export default function CinematicExperience() {
 
   return (
     <div className="fixed inset-0 bg-[#070d15]">
+      <CustomCursor />
       {/* Ambient Sound */}
       <AmbientSound track={SOUND_MAP[step] || "nature"} volume={0.12} />
 

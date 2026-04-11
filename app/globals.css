@@ -148,6 +148,66 @@
   font-family: "Cairo", sans-serif !important;
 }
 
+/* ---- Print styles ---- */
+@media print {
+  nav,
+  footer,
+  .no-print,
+  [class*="ChatWidget"],
+  [class*="BottomNav"],
+  [class*="ComparisonTray"],
+  [class*="SmartWelcome"],
+  [class*="ToastContainer"],
+  button {
+    display: none !important;
+  }
+
+  body,
+  html {
+    background: white !important;
+    color: #000 !important;
+    font-size: 11pt;
+  }
+
+  main {
+    padding-top: 0 !important;
+  }
+
+  section {
+    page-break-inside: avoid;
+    padding: 1rem 0 !important;
+    background: white !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: #000 !important;
+    page-break-after: avoid;
+  }
+
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  a {
+    color: #1d5770 !important;
+    text-decoration: none !important;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    color: #666;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+}
+
 /* ---- Grain texture (subtle film look) ---- */
 .grain::after {
   content: "";

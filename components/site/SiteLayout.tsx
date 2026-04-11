@@ -8,6 +8,10 @@ import SearchCommand from "./SearchCommand";
 import ComparisonTray from "./ComparisonTray";
 import SmartWelcome from "./SmartWelcome";
 import ToastContainer from "./Toast";
+import ReadingProgress from "./ReadingProgress";
+import WellnessTip from "./WellnessTip";
+import AchievementListener from "./AchievementListener";
+import VisitTracker from "./VisitTracker";
 
 export default function SiteLayout({
   children,
@@ -20,6 +24,7 @@ export default function SiteLayout({
       dir="rtl"
     >
       <Navbar />
+      <ReadingProgress />
       <main>{children}</main>
       <Footer />
       <ChatWidget />
@@ -28,6 +33,9 @@ export default function SiteLayout({
       <ComparisonTray />
       <SmartWelcome />
       <ToastContainer />
+      <WellnessTip />
+      <AchievementListener />
+      <VisitTracker />
     </div>
   );
 }

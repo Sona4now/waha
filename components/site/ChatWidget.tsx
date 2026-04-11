@@ -16,6 +16,19 @@ type Message = {
   content: string;
 };
 
+/** Parse the SUGGESTIONS line from an assistant message. Returns [cleanContent, suggestions]. */
+function parseSuggestions(content: string): [string, string[]] {
+  const match = content.match(/SUGGESTIONS:\s*(.+?)(?:\n|$)/);
+  if (!match) return [content, []];
+  const suggestions = match[1]
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .slice(0, 3);
+  const cleanContent = content.replace(/SUGGESTIONS:.+?(?:\n|$)/, "").trim();
+  return [cleanContent, suggestions];
+}
+
 const GREETING: Message = {
   id: "greeting",
   role: "assistant",
@@ -110,6 +123,12 @@ export default function ChatWidget() {
 
   async function sendMessage(text: string) {
     if (!text.trim() || isStreaming) return;
+
+    // Track achievement
+    try {
+      const { trackAction } = await import("@/lib/achievements");
+      trackAction("aiChatUsed");
+    } catch {}
 
     setError(null);
     const userMsg: Message = {
@@ -383,37 +402,78 @@ export default function ChatWidget() {
                     </div>
 
                     {/* Bubble */}
-                    <div
-                      className={`max-w-[82%] rounded-2xl px-3.5 py-2.5 ${
-                        msg.role === "user"
-                          ? "bg-[#1d5770] text-white rounded-tr-sm"
-                          : "bg-white border border-[#d0dde4] text-[#12394d] rounded-tl-sm shadow-sm"
-                      }`}
-                    >
-                      {msg.content ? (
-                        <p className="text-[13px] leading-relaxed whitespace-pre-wrap">
-                          {msg.content}
-                          {isStreaming &&
-                            msg.role === "assistant" &&
-                            msg.id ===
-                              messages[messages.length - 1]?.id && (
-                              <span className="inline-block w-1 h-3.5 ml-0.5 bg-[#91b149] animate-pulse align-middle" />
+                    <div className="max-w-[82%] flex flex-col gap-2">
+                      {(() => {
+                        const [cleanContent, suggestions] =
+                          msg.role === "assistant"
+                            ? parseSuggestions(msg.content)
+                            : [msg.content, []];
+                        const isLast =
+                          msg.id === messages[messages.length - 1]?.id;
+                        const showSuggestions =
+                          suggestions.length > 0 &&
+                          !isStreaming &&
+                          msg.role === "assistant" &&
+                          isLast;
+
+                        return (
+                          <>
+                            <div
+                              className={`rounded-2xl px-3.5 py-2.5 ${
+                                msg.role === "user"
+                                  ? "bg-[#1d5770] text-white rounded-tr-sm"
+                                  : "bg-white border border-[#d0dde4] text-[#12394d] rounded-tl-sm shadow-sm"
+                              }`}
+                            >
+                              {cleanContent || msg.content ? (
+                                <p className="text-[13px] leading-relaxed whitespace-pre-wrap">
+                                  {cleanContent}
+                                  {isStreaming &&
+                                    msg.role === "assistant" &&
+                                    isLast && (
+                                      <span className="inline-block w-1 h-3.5 ml-0.5 bg-[#91b149] animate-pulse align-middle" />
+                                    )}
+                                </p>
+                              ) : null}
+                              {!msg.content && (
+                                <div className="flex gap-1 py-0.5">
+                                  {[0, 1, 2].map((i) => (
+                                    <span
+                                      key={i}
+                                      className="w-1.5 h-1.5 rounded-full bg-[#91b149]"
+                                      style={{
+                                        animation: `chatBounce 1.4s infinite ease-in-out`,
+                                        animationDelay: `${i * 0.16}s`,
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Quick reply suggestions */}
+                            {showSuggestions && (
+                              <motion.div
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.2 }}
+                                className="flex flex-wrap gap-1.5"
+                              >
+                                {suggestions.map((s) => (
+                                  <button
+                                    key={s}
+                                    onClick={() => sendMessage(s)}
+                                    className="text-[11px] px-2.5 py-1.5 rounded-full bg-[#91b149]/10 border border-[#91b149]/30 text-[#6a8435] hover:bg-[#91b149]/20 hover:border-[#91b149] transition-all"
+                                  >
+                                    {s}
+                                  </button>
+                                ))}
+                              </motion.div>
                             )}
-                        </p>
-                      ) : (
-                        <div className="flex gap-1 py-0.5">
-                          {[0, 1, 2].map((i) => (
-                            <span
-                              key={i}
-                              className="w-1.5 h-1.5 rounded-full bg-[#91b149]"
-                              style={{
-                                animation: `chatBounce 1.4s infinite ease-in-out`,
-                                animationDelay: `${i * 0.16}s`,
-                              }}
-                            />
-                          ))}
-                        </div>
-                      )}
+                          </>
+                        );
+                      })()}
+
                     </div>
                   </motion.div>
                 ))}

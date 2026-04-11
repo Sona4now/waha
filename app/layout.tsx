@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import Script from "next/script";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 export const metadata: Metadata = {
   title: {
@@ -82,9 +84,37 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <link rel="apple-touch-icon" href="/logo.png" />
+        {/* JSON-LD structured data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "واحة — WAHA",
+              alternateName: "Waaha Therapeutic Tourism",
+              url: "https://wahaeg.com",
+              description:
+                "منصة محتوى رقمية للتوعية حول السياحة البيئية والاستشفاء من الطبيعة في مصر",
+              inLanguage: "ar-EG",
+              publisher: {
+                "@type": "EducationalOrganization",
+                name: "جامعة القاهرة — كلية الإعلام",
+                department: "قسم الإعلام الرقمي",
+              },
+              potentialAction: {
+                "@type": "SearchAction",
+                target: "https://wahaeg.com/search?q={search_term_string}",
+                "query-input": "required name=search_term_string",
+              },
+            }),
+          }}
+        />
       </head>
       <body className="h-full bg-[#070d15]">
         {children}
+        <Analytics />
+        <SpeedInsights />
 
         {/* Register Service Worker */}
         <Script

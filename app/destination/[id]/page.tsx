@@ -13,6 +13,7 @@ import DayTimeline, {
   getDayForDestination,
 } from "@/components/site/DayTimeline";
 import WeatherWidget from "@/components/site/WeatherWidget";
+import FeedbackWidget from "@/components/site/FeedbackWidget";
 import { DESTINATIONS, getDestById } from "@/data/siteData";
 
 const BASE_TABS = [
@@ -1712,6 +1713,7 @@ export default function DestinationDetailPage() {
               items={getFAQForDestination(dest.id)}
               title={`أسئلة شائعة عن ${dest.name}`}
             />
+            <FeedbackWidget pageId={`dest-${dest.id}`} pageTitle={dest.name} />
           </div>
         </section>
 
