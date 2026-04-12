@@ -234,46 +234,147 @@ export default function ChatWidget() {
       {/* Floating Button */}
       <AnimatePresence>
         {!isOpen && (
-          <motion.button
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0, opacity: 0 }}
-            transition={{ type: "spring", stiffness: 260, damping: 20 }}
-            onClick={handleOpen}
-            className="fixed bottom-6 left-6 md:bottom-8 md:left-8 z-[100] group"
-            aria-label="فتح المساعد الذكي"
+          <motion.div
+            initial={{ scale: 0, opacity: 0, y: 50 }}
+            animate={{
+              scale: 1,
+              opacity: 1,
+              y: [0, -6, 0],
+            }}
+            exit={{ scale: 0, opacity: 0, y: 50 }}
+            transition={{
+              scale: { type: "spring", stiffness: 260, damping: 18 },
+              opacity: { duration: 0.3 },
+              y: {
+                duration: 3,
+                repeat: Infinity,
+                ease: "easeInOut",
+              },
+            }}
+            className="fixed bottom-24 left-4 md:bottom-8 md:left-8 z-[100] group"
           >
-            {/* Pulse ring */}
-            <span className="absolute inset-0 rounded-full bg-[#91b149] opacity-30 animate-ping" />
+            {/* Outer animated glow ring (largest) */}
+            <motion.span
+              className="absolute inset-0 rounded-full"
+              style={{
+                background:
+                  "conic-gradient(from 0deg, #91b149, #1d5770, #91b149)",
+              }}
+              animate={{ rotate: 360 }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
 
-            {/* Button */}
-            <span className="relative flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#1d5770] to-[#0d2a39] text-white shadow-xl group-hover:scale-110 transition-transform duration-300 border-2 border-white/20">
-              <svg
-                width="22"
-                height="22"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-              </svg>
+            {/* Multi-layer pulse rings */}
+            <motion.span
+              className="absolute inset-0 rounded-full bg-[#91b149]"
+              animate={{
+                scale: [1, 1.5, 1.8],
+                opacity: [0.5, 0.2, 0],
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeOut",
+              }}
+            />
+            <motion.span
+              className="absolute inset-0 rounded-full bg-[#1d5770]"
+              animate={{
+                scale: [1, 1.6, 2],
+                opacity: [0.4, 0.15, 0],
+              }}
+              transition={{
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeOut",
+                delay: 0.8,
+              }}
+            />
 
-              {/* New badge */}
-              {hasNewBadge && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-red-500 border-2 border-white flex items-center justify-center">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white" />
-                </span>
-              )}
-            </span>
+            {/* The actual button */}
+            <motion.button
+              onClick={handleOpen}
+              aria-label="فتح المساعد الذكي"
+              className="relative block"
+              whileHover={{ scale: 1.12 }}
+              whileTap={{ scale: 0.92 }}
+              transition={{ type: "spring", stiffness: 400, damping: 15 }}
+            >
+              {/* Inner gradient background (with padding for the glow ring to show) */}
+              <span className="relative flex items-center justify-center w-14 h-14 md:w-16 md:h-16 rounded-full bg-gradient-to-br from-[#1d5770] via-[#12394d] to-[#0d2a39] text-white shadow-[0_10px_40px_-8px_rgba(29,87,112,0.6)] border-[3px] border-white m-[3px] overflow-hidden">
+                {/* Inner shimmer shine */}
+                <motion.span
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background:
+                      "linear-gradient(130deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%)",
+                    backgroundSize: "200% 200%",
+                  }}
+                  animate={{
+                    backgroundPosition: ["200% 200%", "-100% -100%"],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    ease: "linear",
+                    repeatDelay: 1,
+                  }}
+                />
+
+                {/* Chat icon with subtle rotation on hover */}
+                <motion.svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="relative z-10"
+                  animate={{ rotate: [0, -8, 8, 0] }}
+                  transition={{
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </motion.svg>
+
+                {/* New badge with pulse */}
+                {hasNewBadge && (
+                  <motion.span
+                    className="absolute -top-0.5 -right-0.5 w-5 h-5 rounded-full bg-red-500 border-2 border-white flex items-center justify-center z-20"
+                    animate={{
+                      scale: [1, 1.15, 1],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                  </motion.span>
+                )}
+              </span>
+            </motion.button>
 
             {/* Tooltip */}
-            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 whitespace-nowrap bg-[#0d2a39] text-white text-xs px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-              اسأل المساعد الذكي
-            </span>
-          </motion.button>
+            <motion.span
+              initial={{ opacity: 0, y: 5 }}
+              whileHover={{ opacity: 1, y: 0 }}
+              className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 whitespace-nowrap bg-[#0d2a39] text-white text-xs px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none shadow-lg"
+            >
+              اسأل المساعد الذكي 💬
+              <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 bg-[#0d2a39] rotate-45" />
+            </motion.span>
+          </motion.div>
         )}
       </AnimatePresence>
 
