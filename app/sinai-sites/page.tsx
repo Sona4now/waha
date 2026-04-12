@@ -268,7 +268,7 @@ function SiteCard({
       className={`w-full text-right p-4 rounded-2xl border-2 transition-all duration-300 group ${
         isActive
           ? "border-current shadow-lg scale-[1.02]"
-          : "border-transparent bg-white shadow-sm hover:shadow-md hover:scale-[1.01]"
+          : "border-transparent bg-white dark:bg-[#162033] shadow-sm hover:shadow-md hover:scale-[1.01]"
       }`}
       style={{
         borderColor: isActive ? site.color : undefined,
@@ -284,7 +284,7 @@ function SiteCard({
           >
             {site.name}
           </h3>
-          <p className="text-xs text-[#7b7c7d] truncate">{site.subtitle}</p>
+          <p className="text-xs text-[#7b7c7d] dark:text-white/50 truncate">{site.subtitle}</p>
         </div>
         <svg
           className={`w-5 h-5 transition-transform duration-300 ${isActive ? "rotate-90" : ""}`}
@@ -303,10 +303,10 @@ function SiteCard({
 
 function QuickFact({ label, value, icon }: { label: string; value: string; icon: string }) {
   return (
-    <div className="bg-white rounded-xl p-4 text-center shadow-sm border border-[#d0dde4] hover:shadow-md transition-shadow">
+    <div className="bg-white dark:bg-[#162033] rounded-xl p-4 text-center shadow-sm border border-[#d0dde4] dark:border-[#1e3a5f] hover:shadow-md transition-shadow">
       <span className="text-2xl block mb-1">{icon}</span>
-      <div className="text-lg font-bold text-[#12394d]">{value}</div>
-      <div className="text-[11px] text-[#7b7c7d]">{label}</div>
+      <div className="text-lg font-bold text-[#12394d] dark:text-white">{value}</div>
+      <div className="text-[11px] text-[#7b7c7d] dark:text-white/50">{label}</div>
     </div>
   );
 }
@@ -325,7 +325,7 @@ function SectionBlock({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1, duration: 0.5 }}
-      className="bg-white rounded-2xl p-6 shadow-sm border border-[#d0dde4]"
+      className="bg-white dark:bg-[#162033] rounded-2xl p-6 shadow-sm border border-[#d0dde4] dark:border-[#1e3a5f]"
     >
       <h3
         className="font-bold font-display text-lg mb-4 flex items-center gap-2"
@@ -341,7 +341,7 @@ function SectionBlock({
               className="mt-2 w-2 h-2 rounded-full flex-shrink-0"
               style={{ background: `${color}40` }}
             />
-            <p className="text-[0.9rem] text-[#12394d]/80 leading-relaxed">{text}</p>
+            <p className="text-[0.9rem] text-[#12394d]/80 dark:text-white/70 leading-relaxed">{text}</p>
           </div>
         ))}
       </div>
@@ -417,7 +417,7 @@ export default function SinaiSitesPage() {
         <div className="grid grid-cols-1 lg:grid-cols-[300px_1fr] gap-8">
           {/* Sidebar — Site Selector */}
           <div>
-            <h2 className="text-sm font-bold text-[#7b7c7d] mb-3 px-1">
+            <h2 className="text-sm font-bold text-[#7b7c7d] dark:text-white/60 mb-3 px-1">
               المواقع الاستشفائية في سيناء
             </h2>
             <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
@@ -468,14 +468,14 @@ export default function SinaiSitesPage() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.5 }}
-                    className="mt-6 bg-red-50 border border-red-200 rounded-2xl p-6"
+                    className="mt-6 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 rounded-2xl p-6"
                   >
-                    <h3 className="font-bold text-red-700 font-display flex items-center gap-2 mb-3">
+                    <h3 className="font-bold text-red-700 dark:text-red-400 font-display flex items-center gap-2 mb-3">
                       <span>⚠️</span> تحذيرات مهمة
                     </h3>
                     <ul className="space-y-2">
                       {activeSite.warnings.map((w, i) => (
-                        <li key={i} className="flex items-center gap-2 text-sm text-red-600">
+                        <li key={i} className="flex items-center gap-2 text-sm text-red-600 dark:text-red-400">
                           <span className="w-1.5 h-1.5 rounded-full bg-red-400" />
                           {w}
                         </li>
@@ -494,7 +494,7 @@ export default function SinaiSitesPage() {
                   </Link>
                   <Link
                     href="/map"
-                    className="px-6 py-3 border border-[#d0dde4] hover:border-[#1d5770] text-[#12394d] font-bold text-sm rounded-full transition-all duration-300 no-underline"
+                    className="px-6 py-3 border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#1d5770] text-[#12394d] dark:text-white font-bold text-sm rounded-full transition-all duration-300 no-underline"
                   >
                     عرض على الخريطة
                   </Link>

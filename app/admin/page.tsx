@@ -4,7 +4,8 @@ import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
 
-const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2026";
+// Admin password verified via API — see /api/admin-auth
+const ADMIN_AUTH_ENDPOINT = "/api/admin-auth";
 
 interface Feedback {
   pageId: string;
@@ -77,13 +78,24 @@ export default function AdminPage() {
     } catch {}
   }
 
-  function handleLogin(e: FormEvent) {
+  async function handleLogin(e: FormEvent) {
     e.preventDefault();
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true);
-      sessionStorage.setItem("waaha_admin", "1");
-      setError(false);
-    } else {
+    try {
+      const res = await fetch(ADMIN_AUTH_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAuthenticated(true);
+        sessionStorage.setItem("waaha_admin", "1");
+        setError(false);
+      } else {
+        setError(true);
+        setPassword("");
+      }
+    } catch {
       setError(true);
       setPassword("");
     }

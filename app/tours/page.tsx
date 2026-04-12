@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 
@@ -171,7 +172,7 @@ export default function ToursPage() {
 
       <section className="max-w-[1280px] mx-auto px-4 md:px-6 py-8 md:py-12">
         {/* Info Banner */}
-        <div className="mb-8 bg-gradient-to-l from-[#e4edf2] to-[#eef3e0] rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 border border-[#d0dde4]">
+        <div className="mb-8 bg-gradient-to-l from-[#e4edf2] to-[#eef3e0] dark:from-[#162033] dark:to-[#162033] rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-4 border border-[#d0dde4] dark:border-[#1e3a5f]">
           <div className="w-12 h-12 rounded-full bg-[#1d5770] flex items-center justify-center flex-shrink-0">
             <svg
               width="22"
@@ -189,10 +190,10 @@ export default function ToursPage() {
             </svg>
           </div>
           <div className="flex-1">
-            <h3 className="font-bold font-display text-[#12394d] mb-1">
+            <h3 className="font-bold font-display text-[#12394d] dark:text-white mb-1">
               كيف تستخدم الجولات التفاعلية؟
             </h3>
-            <p className="text-sm text-[#7b7c7d] leading-relaxed">
+            <p className="text-sm text-[#7b7c7d] dark:text-white/60 leading-relaxed">
               اسحب بالماوس أو إصبعك لتدوير المشهد · استخدم عجلة التمرير للتكبير
               · اضغط على أيقونة VR للتجربة الغامرة · اضغط على الشاشة الكاملة لتجربة سينمائية
             </p>
@@ -211,7 +212,7 @@ export default function ToursPage() {
               className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
                 activeFilter === f.id
                   ? "bg-[#1d5770] text-white shadow-md"
-                  : "bg-white text-[#12394d] border border-[#d0dde4] hover:border-[#1d5770] hover:text-[#1d5770]"
+                  : "bg-white dark:bg-[#162033] text-[#12394d] dark:text-white border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#1d5770] hover:text-[#1d5770]"
               }`}
             >
               {f.label}
@@ -219,7 +220,7 @@ export default function ToursPage() {
                 className={`text-xs px-2 py-0.5 rounded-full ${
                   activeFilter === f.id
                     ? "bg-white/20 text-white"
-                    : "bg-[#f5f8fa] text-[#7b7c7d]"
+                    : "bg-[#f5f8fa] dark:bg-[#0a151f] text-[#7b7c7d] dark:text-white/50"
                 }`}
               >
                 {f.count}
@@ -239,7 +240,7 @@ export default function ToursPage() {
               transition={{ duration: 0.4 }}
               className="mb-8"
             >
-              <div className="bg-[#0d2a39] rounded-2xl overflow-hidden shadow-2xl border border-[#d0dde4]">
+              <div className="bg-[#0d2a39] rounded-2xl overflow-hidden shadow-2xl border border-[#d0dde4] dark:border-[#1e3a5f]">
                 {/* Header */}
                 <div className="p-5 flex items-center justify-between gap-4 border-b border-white/10">
                   <div className="flex items-center gap-3 min-w-0">
@@ -339,18 +340,19 @@ export default function ToursPage() {
                     ?.scrollIntoView({ behavior: "smooth", block: "center" });
                 }, 100);
               }}
-              className={`group text-right bg-white rounded-2xl overflow-hidden shadow-sm border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
+              className={`group text-right bg-white dark:bg-[#162033] rounded-2xl overflow-hidden shadow-sm border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${
                 activeTour?.id === tour.id
                   ? "border-[#1d5770] ring-2 ring-[#1d5770]/20"
-                  : "border-transparent hover:border-[#d0dde4]"
+                  : "border-transparent hover:border-[#d0dde4] dark:hover:border-[#1e3a5f]"
               }`}
             >
               {/* Thumbnail */}
               <div className="relative h-48 overflow-hidden">
-                <img
+                <Image
                   src={tour.thumbnail}
                   alt={tour.name}
-                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
                   loading="lazy"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -392,18 +394,18 @@ export default function ToursPage() {
               {/* Content */}
               <div className="p-5">
                 <h3
-                  className="font-bold font-display text-lg text-[#12394d] mb-1 group-hover:text-[#1d5770] transition-colors"
+                  className="font-bold font-display text-lg text-[#12394d] dark:text-white mb-1 group-hover:text-[#1d5770] transition-colors"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
                   {tour.name}
                 </h3>
-                <p className="text-xs text-[#7b7c7d] mb-3">{tour.subtitle}</p>
-                <p className="text-sm text-[#12394d]/70 leading-relaxed line-clamp-2">
+                <p className="text-xs text-[#7b7c7d] dark:text-white/50 mb-3">{tour.subtitle}</p>
+                <p className="text-sm text-[#12394d]/70 dark:text-white/60 leading-relaxed line-clamp-2">
                   {tour.description}
                 </p>
 
                 <div className="mt-4 flex items-center justify-between">
-                  <span className="text-xs text-[#7b7c7d] flex items-center gap-1">
+                  <span className="text-xs text-[#7b7c7d] dark:text-white/50 flex items-center gap-1">
                     <svg
                       width="12"
                       height="12"
@@ -444,7 +446,7 @@ export default function ToursPage() {
         {/* Empty State */}
         {filteredTours.length === 0 && (
           <div className="text-center py-16">
-            <p className="text-[#7b7c7d] text-sm mb-3">
+            <p className="text-[#7b7c7d] dark:text-white/50 text-sm mb-3">
               لا توجد جولات متاحة حالياً
             </p>
           </div>

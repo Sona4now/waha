@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import { BLOG_POSTS } from "@/data/siteData";
@@ -31,7 +32,7 @@ export default function BlogPage() {
         ]}
       />
 
-      <section className="bg-[#f5f8fa] py-16">
+      <section className="bg-[#f5f8fa] dark:bg-[#0a151f] py-16">
         <div className="container mx-auto px-4">
           {/* Category Filter Pills */}
           <div className="mb-12 flex flex-wrap justify-center gap-3" dir="rtl">
@@ -42,7 +43,7 @@ export default function BlogPage() {
                 className={`rounded-full px-6 py-2.5 text-sm font-display font-semibold transition-all duration-300 ${
                   activeCategory === cat.id
                     ? "bg-[#1d5770] text-white shadow-lg shadow-[#1d5770]/25"
-                    : "bg-white text-[#7b7c7d] hover:bg-[#1d5770]/10 hover:text-[#1d5770] border border-gray-200"
+                    : "bg-white dark:bg-[#162033] text-[#7b7c7d] dark:text-white/60 hover:bg-[#1d5770]/10 hover:text-[#1d5770] border border-gray-200 dark:border-[#1e3a5f]"
                 }`}
               >
                 {cat.label}
@@ -58,14 +59,15 @@ export default function BlogPage() {
             {filteredPosts.map((post: any, index: number) => (
               <article
                 key={post.id ?? index}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-gray-100"
+                className="group bg-white dark:bg-[#162033] rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1 border border-gray-100 dark:border-[#1e3a5f]"
               >
                 {/* Card Image */}
                 <div className="relative h-52 overflow-hidden">
-                  <img
+                  <Image
                     src={post.image}
                     alt={post.title}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                   {/* Category Badge */}
@@ -78,19 +80,19 @@ export default function BlogPage() {
 
                 {/* Card Content */}
                 <div className="p-6">
-                  <h3 className="font-display text-lg font-bold text-[#12394d] mb-3 line-clamp-2 group-hover:text-[#1d5770] transition-colors">
+                  <h3 className="font-display text-lg font-bold text-[#12394d] dark:text-white mb-3 line-clamp-2 group-hover:text-[#1d5770] transition-colors">
                     {post.title}
                   </h3>
-                  <p className="text-[#7b7c7d] text-sm leading-relaxed mb-4 line-clamp-3">
+                  <p className="text-[#7b7c7d] dark:text-white/60 text-sm leading-relaxed mb-4 line-clamp-3">
                     {post.excerpt}
                   </p>
 
                   {/* Meta */}
-                  <div className="flex items-center justify-between border-t border-gray-100 pt-4">
-                    <span className="text-xs text-[#7b7c7d]">
+                  <div className="flex items-center justify-between border-t border-gray-100 dark:border-[#1e3a5f] pt-4">
+                    <span className="text-xs text-[#7b7c7d] dark:text-white/50">
                       {post.date}
                     </span>
-                    <span className="flex items-center gap-1 text-xs text-[#7b7c7d]">
+                    <span className="flex items-center gap-1 text-xs text-[#7b7c7d] dark:text-white/50">
                       <svg
                         className="h-4 w-4"
                         fill="none"
@@ -115,7 +117,7 @@ export default function BlogPage() {
           {/* Empty State */}
           {filteredPosts.length === 0 && (
             <div className="text-center py-16" dir="rtl">
-              <p className="text-[#7b7c7d] text-lg font-display">
+              <p className="text-[#7b7c7d] dark:text-white/50 text-lg font-display">
                 لا توجد مقالات في هذا التصنيف حالياً
               </p>
             </div>

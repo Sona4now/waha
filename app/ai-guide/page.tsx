@@ -163,7 +163,7 @@ export default function AIGuidePage() {
 
       <section className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-12">
         {/* Chat Container */}
-        <div className="bg-white rounded-2xl border border-[#d0dde4] shadow-sm overflow-hidden flex flex-col h-[70vh] min-h-[500px]">
+        <div className="bg-white dark:bg-[#162033] rounded-2xl border border-[#d0dde4] dark:border-[#1e3a5f] shadow-sm overflow-hidden flex flex-col h-[70vh] min-h-[500px]">
           {/* Header */}
           <div className="bg-[#0d2a39] px-5 py-4 flex items-center justify-between border-b border-white/10">
             <div className="flex items-center gap-3">
@@ -206,7 +206,7 @@ export default function AIGuidePage() {
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto px-5 py-6 space-y-5 bg-gradient-to-b from-[#f5f8fa] to-white">
+          <div className="flex-1 overflow-y-auto px-5 py-6 space-y-5 bg-gradient-to-b from-[#f5f8fa] to-white dark:from-[#0d1b2a] dark:to-[#162033]">
             {messages.map((msg) => (
               <motion.div
                 key={msg.id}
@@ -247,7 +247,7 @@ export default function AIGuidePage() {
                   className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                     msg.role === "user"
                       ? "bg-[#1d5770] text-white rounded-tr-sm"
-                      : "bg-white border border-[#d0dde4] text-[#12394d] rounded-tl-sm shadow-sm"
+                      : "bg-white dark:bg-[#0d1b2a] border border-[#d0dde4] dark:border-[#1e3a5f] text-[#12394d] dark:text-white rounded-tl-sm shadow-sm"
                   }`}
                 >
                   {msg.content ? (
@@ -285,7 +285,7 @@ export default function AIGuidePage() {
                 transition={{ delay: 0.4 }}
                 className="pt-4"
               >
-                <p className="text-xs text-[#7b7c7d] mb-3 text-center">
+                <p className="text-xs text-[#7b7c7d] dark:text-white/50 mb-3 text-center">
                   أو جرّب أحد الأسئلة دي:
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -293,7 +293,7 @@ export default function AIGuidePage() {
                     <button
                       key={p.text}
                       onClick={() => sendMessage(p.text)}
-                      className="flex items-center gap-2 p-3 text-right rounded-xl bg-white border border-[#d0dde4] hover:border-[#1d5770] hover:bg-[#f5f8fa] transition-all text-xs text-[#12394d]"
+                      className="flex items-center gap-2 p-3 text-right rounded-xl bg-white dark:bg-[#0d1b2a] border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#1d5770] hover:bg-[#f5f8fa] dark:hover:bg-[#162033] transition-all text-xs text-[#12394d] dark:text-white"
                     >
                       <span className="text-base flex-shrink-0">{p.icon}</span>
                       <span className="text-right leading-tight">
@@ -312,7 +312,7 @@ export default function AIGuidePage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0 }}
-                  className="bg-red-50 border border-red-200 rounded-xl p-3 text-center"
+                  className="bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 rounded-xl p-3 text-center"
                 >
                   <p className="text-xs text-red-600">⚠️ {error}</p>
                 </motion.div>
@@ -325,7 +325,7 @@ export default function AIGuidePage() {
           {/* Input */}
           <form
             onSubmit={handleSubmit}
-            className="border-t border-[#d0dde4] p-4 bg-white"
+            className="border-t border-[#d0dde4] dark:border-[#1e3a5f] p-4 bg-white dark:bg-[#162033]"
           >
             <div className="flex gap-2 items-end">
               <input
@@ -336,7 +336,7 @@ export default function AIGuidePage() {
                   isStreaming ? "جاري التفكير..." : "اكتب سؤالك هنا..."
                 }
                 disabled={isStreaming}
-                className="flex-1 px-4 py-3 bg-[#f5f8fa] border border-[#d0dde4] rounded-full text-sm text-[#12394d] placeholder:text-[#7b7c7d] focus:outline-none focus:border-[#1d5770] focus:bg-white transition-all disabled:opacity-60"
+                className="flex-1 px-4 py-3 bg-[#f5f8fa] dark:bg-[#0d1b2a] border border-[#d0dde4] dark:border-[#1e3a5f] rounded-full text-sm text-[#12394d] dark:text-white placeholder:text-[#7b7c7d] dark:placeholder:text-white/40 focus:outline-none focus:border-[#1d5770] focus:bg-white dark:focus:bg-[#162033] transition-all disabled:opacity-60"
                 autoFocus
               />
               {isStreaming ? (
@@ -379,7 +379,7 @@ export default function AIGuidePage() {
                 </button>
               )}
             </div>
-            <p className="text-[10px] text-[#7b7c7d] text-center mt-2">
+            <p className="text-[10px] text-[#7b7c7d] dark:text-white/40 text-center mt-2">
               المساعد الذكي قد يخطئ أحياناً. استشر طبيبك قبل أي علاج طبيعي.
             </p>
           </form>
@@ -387,7 +387,7 @@ export default function AIGuidePage() {
 
         {/* How it works */}
         <div className="mt-10">
-          <h2 className="text-xl font-bold text-center mb-6 font-display text-[#12394d]">
+          <h2 className="text-xl font-bold text-center mb-6 font-display text-[#12394d] dark:text-white">
             كيف يعمل المساعد الذكي؟
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -410,15 +410,15 @@ export default function AIGuidePage() {
             ].map((step) => (
               <div
                 key={step.icon}
-                className="bg-white rounded-xl p-5 border border-[#d0dde4] text-center"
+                className="bg-white dark:bg-[#162033] rounded-xl p-5 border border-[#d0dde4] dark:border-[#1e3a5f] text-center"
               >
                 <div className="w-10 h-10 rounded-full bg-[#1d5770] text-white font-bold text-lg flex items-center justify-center mx-auto mb-3">
                   {step.icon}
                 </div>
-                <h3 className="font-bold font-display text-[#12394d] mb-1">
+                <h3 className="font-bold font-display text-[#12394d] dark:text-white mb-1">
                   {step.title}
                 </h3>
-                <p className="text-xs text-[#7b7c7d] leading-relaxed">
+                <p className="text-xs text-[#7b7c7d] dark:text-white/50 leading-relaxed">
                   {step.desc}
                 </p>
               </div>

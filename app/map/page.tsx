@@ -11,10 +11,10 @@ import { DESTINATIONS } from "@/data/siteData";
 const EgyptMap = dynamic(() => import("@/components/site/EgyptMap"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full rounded-2xl bg-[#e8f0f5] flex items-center justify-center">
+    <div className="w-full h-full rounded-2xl bg-[#e8f0f5] dark:bg-[#162033] flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="w-10 h-10 border-3 border-[#1d5770] border-t-transparent rounded-full animate-spin" />
-        <span className="text-[#7b7c7d] text-sm">جاري تحميل الخريطة...</span>
+        <span className="text-[#7b7c7d] dark:text-white/50 text-sm">جاري تحميل الخريطة...</span>
       </div>
     </div>
   ),
@@ -58,7 +58,7 @@ export default function MapPage() {
       <section className="max-w-[1280px] mx-auto px-4 md:px-6 py-8 md:py-12">
         {/* Treatment Filters */}
         <div className="mb-6">
-          <h2 className="text-sm font-bold text-[#12394d] mb-3 font-display">
+          <h2 className="text-sm font-bold text-[#12394d] dark:text-white mb-3 font-display">
             تصفية حسب العلاج
           </h2>
           <div className="flex flex-wrap gap-2">
@@ -72,7 +72,7 @@ export default function MapPage() {
                 className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
                   activeFilter === filter
                     ? "bg-[#1d5770] text-white shadow-md"
-                    : "bg-white text-[#12394d] border border-[#d0dde4] hover:border-[#1d5770] hover:text-[#1d5770]"
+                    : "bg-white dark:bg-[#162033] text-[#12394d] dark:text-white border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#1d5770] hover:text-[#1d5770]"
                 }`}
               >
                 {filter}
@@ -84,7 +84,7 @@ export default function MapPage() {
         {/* Map + Sidebar Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
           {/* Map */}
-          <div className="h-[450px] md:h-[600px] rounded-2xl overflow-hidden shadow-lg border border-[#d0dde4]">
+          <div className="h-[450px] md:h-[600px] rounded-2xl overflow-hidden shadow-lg border border-[#d0dde4] dark:border-[#1e3a5f]">
             <EgyptMap
               destinations={filteredDestinations}
               activeDestination={activeDestination}
@@ -93,7 +93,7 @@ export default function MapPage() {
           </div>
 
           {/* Sidebar */}
-          <div className="bg-white rounded-2xl border border-[#d0dde4] shadow-sm overflow-hidden">
+          <div className="bg-white dark:bg-[#162033] rounded-2xl border border-[#d0dde4] dark:border-[#1e3a5f] shadow-sm overflow-hidden">
             {/* Header */}
             <div className="bg-[#12394d] px-5 py-4">
               <h3 className="text-white font-bold font-display text-lg">
@@ -111,9 +111,9 @@ export default function MapPage() {
                 <button
                   key={dest.id}
                   onClick={() => handleSelectDestination(dest.id)}
-                  className={`w-full flex items-center gap-3 px-5 py-4 text-right transition-all duration-200 border-b border-[#f0f0f0] hover:bg-[#f5f8fa] group ${
+                  className={`w-full flex items-center gap-3 px-5 py-4 text-right transition-all duration-200 border-b border-[#f0f0f0] dark:border-[#1e3a5f] hover:bg-[#f5f8fa] dark:hover:bg-[#0d1b2a] group ${
                     activeDestination === dest.id
-                      ? "bg-[#e4edf2] border-r-4 border-r-[#1d5770]"
+                      ? "bg-[#e4edf2] dark:bg-[#0d1b2a] border-r-4 border-r-[#1d5770]"
                       : ""
                   }`}
                 >
@@ -126,7 +126,7 @@ export default function MapPage() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-[#12394d] font-display">
+                      <span className="font-bold text-[#12394d] dark:text-white font-display">
                         {dest.name}
                       </span>
                       <span
@@ -143,7 +143,7 @@ export default function MapPage() {
                       {dest.treatments.slice(0, 3).map((t) => (
                         <span
                           key={t}
-                          className="text-[10px] text-[#7b7c7d] bg-[#f5f8fa] px-1.5 py-0.5 rounded"
+                          className="text-[10px] text-[#7b7c7d] dark:text-white/50 bg-[#f5f8fa] dark:bg-[#0a151f] px-1.5 py-0.5 rounded"
                         >
                           {t}
                         </span>
@@ -170,7 +170,7 @@ export default function MapPage() {
 
               {filteredDestinations.length === 0 && (
                 <div className="p-8 text-center">
-                  <p className="text-[#7b7c7d] text-sm mb-3">
+                  <p className="text-[#7b7c7d] dark:text-white/50 text-sm mb-3">
                     لا توجد وجهات تطابق هذا الفلتر
                   </p>
                   <button
@@ -185,7 +185,7 @@ export default function MapPage() {
 
             {/* Footer CTA */}
             {activeDestination && (
-              <div className="p-4 border-t border-[#f0f0f0] bg-[#f5f8fa]">
+              <div className="p-4 border-t border-[#f0f0f0] dark:border-[#1e3a5f] bg-[#f5f8fa] dark:bg-[#0d1b2a]">
                 <Link
                   href={`/destination/${activeDestination}`}
                   className="block w-full text-center py-3 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-sm rounded-full transition-all duration-300 no-underline"
@@ -199,8 +199,8 @@ export default function MapPage() {
         </div>
 
         {/* Legend */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-5 text-xs text-[#7b7c7d]">
-          <span className="font-semibold text-[#12394d]">دليل الألوان:</span>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-5 text-xs text-[#7b7c7d] dark:text-white/50">
+          <span className="font-semibold text-[#12394d] dark:text-white">دليل الألوان:</span>
           {[
             { label: "بحر", color: "#0e7490", icon: "🌊" },
             { label: "صحراء", color: "#b45309", icon: "🏜️" },

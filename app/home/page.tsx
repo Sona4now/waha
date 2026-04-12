@@ -150,7 +150,7 @@ export default function HomePage() {
   return (
     <SiteLayout>
       {/* Hero — personalized if recommendation exists */}
-      <section className="relative min-h-screen flex items-center overflow-hidden bg-[#12394d]">
+      <section className="relative min-h-screen flex items-center overflow-hidden bg-[#12394d] max-w-[100vw]">
         <Image
           src={
             recDest?.heroBg ||
@@ -165,7 +165,7 @@ export default function HomePage() {
           className="object-cover animate-[kenBurns_14s_ease-out_forwards]"
         />
         <div className="absolute inset-0 bg-gradient-to-bl from-[#1b4f72]/90 via-[#1b4f72]/55 to-black/20" />
-        <div className="relative z-10 max-w-[1280px] mx-auto px-4 sm:px-6 pt-[72px] text-white">
+        <div className="relative z-10 w-full max-w-[1280px] mx-auto px-4 sm:px-6 pt-[72px] text-white overflow-hidden">
           {recDest ? (
             <>
               <div className="inline-flex items-center gap-2 bg-[#91b149]/20 backdrop-blur-sm text-[#91b149] text-[0.75rem] sm:text-[0.82rem] font-bold px-3 sm:px-4 py-1.5 rounded-full border border-[#91b149]/40 mb-5">

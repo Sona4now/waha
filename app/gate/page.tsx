@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 export default function GatePage() {
   const [password, setPassword] = useState("");
@@ -55,10 +56,12 @@ export default function GatePage() {
       <div className="relative z-10 w-full max-w-sm mx-4">
         <div className="flex flex-col items-center gap-6 text-center">
           {/* Logo */}
-          <img
+          <Image
             src="/logo.png"
-            alt="واحة"
-            className="w-20 h-20 rounded-full bg-white/90 p-1"
+            alt="واحة — شعار المنصة"
+            width={80}
+            height={80}
+            className="rounded-full bg-white/90 p-1"
           />
 
           <div>
