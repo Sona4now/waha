@@ -15,7 +15,7 @@ const links = [
   { href: "/compare", label: "المقارنة" },
   { href: "/achievements", label: "إنجازاتي" },
   { href: "/about", label: "من نحن" },
-  { href: "/contact", label: "الفريق" },
+  { href: "/team", label: "الفريق" },
 ];
 
 export default function Navbar() {

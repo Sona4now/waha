@@ -55,7 +55,7 @@ export default function Footer() {
                 المدونة
               </Link>
               <Link
-                href="/contact"
+                href="/team"
                 className="text-[0.88rem] text-white/60 hover:text-[#1d5770] transition-colors no-underline"
               >
                 الفريق
