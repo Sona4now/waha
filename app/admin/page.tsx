@@ -4,7 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
 
-const ADMIN_PASSWORD = "admin2026";
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD || "admin2026";
 
 interface Feedback {
   pageId: string;

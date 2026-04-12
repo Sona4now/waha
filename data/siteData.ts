@@ -20,6 +20,8 @@ export interface DestinationFull {
   lat: number;
   lng: number;
   color: string;
+  features?: string[];
+  [key: string]: unknown;
 }
 
 export const DESTINATIONS: DestinationFull[] = [
@@ -57,6 +59,7 @@ export const DESTINATIONS: DestinationFull[] = [
     lat: 26.73,
     lng: 33.94,
     color: "#0e7490",
+    features: ["رمال سوداء علاجية", "مياه غنية بالمعادن", "أشعة شمس معتدلة", "هواء نقي جاف"],
   },
   {
     id: "siwa",
@@ -95,6 +98,7 @@ export const DESTINATIONS: DestinationFull[] = [
     lat: 29.2,
     lng: 25.52,
     color: "#92400e",
+    features: ["عيون كبريتية ساخنة", "بحيرة مالحة طبيعية", "بناء من الكرشيف", "هدوء صحراوي"],
   },
   {
     id: "sinai",
@@ -136,6 +140,7 @@ export const DESTINATIONS: DestinationFull[] = [
     lat: 28.55,
     lng: 33.97,
     color: "#44403c",
+    features: ["حمامات طبيعية ساخنة", "جبال وتأمل", "أعشاب طبية", "هواء جبلي نقي"],
   },
   {
     id: "fayoum",
@@ -171,6 +176,7 @@ export const DESTINATIONS: DestinationFull[] = [
     lat: 29.31,
     lng: 30.84,
     color: "#065f46",
+    features: ["بحيرة قارون", "وادي الحيتان", "هواء جاف صحراوي", "قريبة من القاهرة"],
   },
   {
     id: "bahariya",
@@ -209,6 +215,7 @@ export const DESTINATIONS: DestinationFull[] = [
     lat: 28.35,
     lng: 28.86,
     color: "#b45309",
+    features: ["صحراء بيضاء فريدة", "ينابيع ساخنة", "دفن بالرمال", "سفاري علاجي"],
   },
 ];
 

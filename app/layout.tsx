@@ -138,7 +138,7 @@ export default function RootLayout({
                 events: [],
                 track: function(event, data) {
                   this.events.push({ event, data, timestamp: Date.now() });
-                  console.log('[Analytics]', event, data);
+                  // analytics event stored
                 }
               };
               // Track page views

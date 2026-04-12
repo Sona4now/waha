@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
+import Reveal from "@/components/site/Reveal";
+import { showToast } from "@/components/site/Toast";
 import { TEAM } from "@/data/siteData";
 
 export default function ContactPage() {
@@ -13,116 +14,128 @@ export default function ContactPage() {
     subject: "",
     message: "",
   });
+  const [sending, setSending] = useState(false);
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >
+    >,
   ) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    alert("تم إرسال رسالتك بنجاح! سنتواصل معك قريبا.");
-    setFormData({ name: "", email: "", subject: "", message: "" });
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      showToast("البريد الإلكتروني غير صحيح", "error");
+      return;
+    }
+
+    if (formData.message.length < 10) {
+      showToast("الرسالة قصيرة جداً — اكتب 10 حروف على الأقل", "warning");
+      return;
+    }
+
+    setSending(true);
+
+    // Build mailto link as fallback (no backend)
+    const subject = encodeURIComponent(
+      `[واحة] ${formData.subject} — من ${formData.name}`,
+    );
+    const body = encodeURIComponent(
+      `الاسم: ${formData.name}\nالإيميل: ${formData.email}\n\n${formData.message}`,
+    );
+    window.open(`mailto:waha.team.contact@gmail.com?subject=${subject}&body=${body}`, "_self");
+
+    // Save to localStorage for admin dashboard
+    try {
+      const messages = JSON.parse(
+        localStorage.getItem("waaha_contact_messages") || "[]",
+      );
+      messages.push({ ...formData, timestamp: Date.now() });
+      localStorage.setItem(
+        "waaha_contact_messages",
+        JSON.stringify(messages),
+      );
+    } catch {}
+
+    setTimeout(() => {
+      setSending(false);
+      showToast("تم فتح تطبيق البريد — أرسل الرسالة من هناك", "success");
+      setFormData({ name: "", email: "", subject: "", message: "" });
+    }, 800);
   };
 
   return (
     <SiteLayout>
-      <PageHero title="الفريق" />
+      <PageHero
+        title="الفريق"
+        breadcrumb={[
+          { label: "الرئيسية", href: "/home" },
+          { label: "الفريق والتواصل" },
+        ]}
+      />
 
       {/* Team Section */}
-      <section className="py-16 px-4" style={{ backgroundColor: "#f5f8fa" }}>
+      <section className="py-16 px-4 bg-[#f5f8fa] dark:bg-[#0a151f]">
         <div className="max-w-6xl mx-auto" dir="rtl">
-          <h2
-            className="text-3xl font-bold mb-4 text-center"
-            style={{ color: "#12394d" }}
-          >
-            فريق العمل
-          </h2>
-          <p
-            className="text-center mb-12 max-w-2xl mx-auto"
-            style={{ color: "#7b7c7d" }}
-          >
-            تعرّف على الفريق الأكاديمي القائم على هذا المشروع البحثي
-          </p>
+          <Reveal>
+            <h2 className="text-3xl font-bold mb-4 text-center text-[#12394d] dark:text-white font-display">
+              فريق العمل
+            </h2>
+            <p className="text-center mb-12 max-w-2xl mx-auto text-[#7b7c7d] dark:text-white/50">
+              تعرّف على الفريق الأكاديمي القائم على هذا المشروع البحثي
+            </p>
+          </Reveal>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {TEAM.map((member, idx) => (
-              <div
-                key={idx}
-                className="bg-white rounded-2xl p-8 shadow-md hover:shadow-lg transition-shadow duration-300 text-center"
-              >
-                {/* Avatar */}
-                <div
-                  className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto mb-5"
-                  style={{ backgroundColor: "#f0f7ed" }}
-                >
-                  {member.avatar || "👤"}
-                </div>
-
-                {/* Name */}
-                <h3
-                  className="text-xl font-bold mb-1"
-                  style={{ color: "#1d5770" }}
-                >
-                  {member.name}
-                </h3>
-
-                {/* Role */}
-                <p
-                  className="text-sm font-medium mb-3"
-                  style={{ color: "#91b149" }}
-                >
-                  {member.role}
-                </p>
-
-                {/* Bio */}
-                {member.bio && (
-                  <p
-                    className="text-sm leading-relaxed"
-                    style={{ color: "#7b7c7d" }}
-                  >
-                    {member.bio}
+              <Reveal key={idx} delay={idx * 0.08}>
+                <div className="bg-white dark:bg-[#162033] rounded-2xl p-8 shadow-md hover:shadow-lg dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)] border border-transparent dark:border-[#1e3a5f] transition-all duration-300 text-center hover:-translate-y-1">
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mx-auto mb-5 bg-[#f0f7ed] dark:bg-[#1e3a5f]">
+                    {member.avatar || "👤"}
+                  </div>
+                  <h3 className="text-xl font-bold mb-1 text-[#1d5770] dark:text-white">
+                    {member.name}
+                  </h3>
+                  <p className="text-sm font-medium mb-3 text-[#91b149]">
+                    {member.role}
                   </p>
-                )}
-              </div>
+                  {member.bio && (
+                    <p className="text-sm leading-relaxed text-[#7b7c7d] dark:text-white/50">
+                      {member.bio}
+                    </p>
+                  )}
+                </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
       {/* Contact Form Section */}
-      <section className="py-16 px-4 bg-white">
+      <section className="py-16 px-4 bg-white dark:bg-[#0d1b2a]">
         <div className="max-w-4xl mx-auto" dir="rtl">
-          <h2
-            className="text-3xl font-bold mb-4 text-center"
-            style={{ color: "#12394d" }}
-          >
-            تواصل معنا
-          </h2>
-          <p
-            className="text-center mb-12 max-w-2xl mx-auto"
-            style={{ color: "#7b7c7d" }}
-          >
-            لديك سؤال أو اقتراح؟ لا تتردد في التواصل معنا
-          </p>
+          <Reveal>
+            <h2 className="text-3xl font-bold mb-4 text-center text-[#12394d] dark:text-white font-display">
+              تواصل معنا
+            </h2>
+            <p className="text-center mb-12 max-w-2xl mx-auto text-[#7b7c7d] dark:text-white/50">
+              لديك سؤال أو اقتراح؟ لا تتردد في التواصل معنا
+            </p>
+          </Reveal>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {/* Form */}
-            <div className="md:col-span-2">
+            <Reveal className="md:col-span-2">
               <form
                 onSubmit={handleSubmit}
-                className="bg-white border rounded-2xl p-8 space-y-6"
-                style={{ borderColor: "#e5e7eb" }}
+                className="bg-white dark:bg-[#162033] border border-[#e5e7eb] dark:border-[#1e3a5f] rounded-2xl p-6 sm:p-8 space-y-6"
               >
-                {/* Name */}
                 <div>
-                  <label
-                    className="block text-sm font-bold mb-2"
-                    style={{ color: "#12394d" }}
-                  >
+                  <label className="block text-sm font-bold mb-2 text-[#12394d] dark:text-white">
                     الاسم
                   </label>
                   <input
@@ -132,17 +145,12 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     placeholder="أدخل اسمك الكامل"
-                    className="w-full px-4 py-3 rounded-lg border text-sm outline-none transition-colors focus:border-[#1d5770]"
-                    style={{ borderColor: "#d1d5db", color: "#12394d" }}
+                    className="w-full px-4 py-3 rounded-lg border border-[#d1d5db] dark:border-[#1e3a5f] bg-white dark:bg-[#0a151f] text-[#12394d] dark:text-white text-sm outline-none transition-colors focus:border-[#1d5770] dark:focus:border-[#91b149] placeholder:text-[#7b7c7d]/50"
                   />
                 </div>
 
-                {/* Email */}
                 <div>
-                  <label
-                    className="block text-sm font-bold mb-2"
-                    style={{ color: "#12394d" }}
-                  >
+                  <label className="block text-sm font-bold mb-2 text-[#12394d] dark:text-white">
                     البريد الإلكتروني
                   </label>
                   <input
@@ -152,17 +160,13 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     placeholder="example@email.com"
-                    className="w-full px-4 py-3 rounded-lg border text-sm outline-none transition-colors focus:border-[#1d5770]"
-                    style={{ borderColor: "#d1d5db", color: "#12394d" }}
+                    dir="ltr"
+                    className="w-full px-4 py-3 rounded-lg border border-[#d1d5db] dark:border-[#1e3a5f] bg-white dark:bg-[#0a151f] text-[#12394d] dark:text-white text-sm outline-none transition-colors focus:border-[#1d5770] dark:focus:border-[#91b149] placeholder:text-[#7b7c7d]/50"
                   />
                 </div>
 
-                {/* Subject */}
                 <div>
-                  <label
-                    className="block text-sm font-bold mb-2"
-                    style={{ color: "#12394d" }}
-                  >
+                  <label className="block text-sm font-bold mb-2 text-[#12394d] dark:text-white">
                     الموضوع
                   </label>
                   <select
@@ -170,8 +174,7 @@ export default function ContactPage() {
                     value={formData.subject}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 rounded-lg border text-sm outline-none transition-colors focus:border-[#1d5770] bg-white"
-                    style={{ borderColor: "#d1d5db", color: "#12394d" }}
+                    className="w-full px-4 py-3 rounded-lg border border-[#d1d5db] dark:border-[#1e3a5f] bg-white dark:bg-[#0a151f] text-[#12394d] dark:text-white text-sm outline-none transition-colors focus:border-[#1d5770] dark:focus:border-[#91b149]"
                   >
                     <option value="">اختر الموضوع</option>
                     <option value="استفسار عام">استفسار عام</option>
@@ -182,12 +185,8 @@ export default function ContactPage() {
                   </select>
                 </div>
 
-                {/* Message */}
                 <div>
-                  <label
-                    className="block text-sm font-bold mb-2"
-                    style={{ color: "#12394d" }}
-                  >
+                  <label className="block text-sm font-bold mb-2 text-[#12394d] dark:text-white">
                     الرسالة
                   </label>
                   <textarea
@@ -196,94 +195,69 @@ export default function ContactPage() {
                     onChange={handleChange}
                     required
                     rows={5}
+                    maxLength={2000}
                     placeholder="اكتب رسالتك هنا..."
-                    className="w-full px-4 py-3 rounded-lg border text-sm outline-none transition-colors focus:border-[#1d5770] resize-none"
-                    style={{ borderColor: "#d1d5db", color: "#12394d" }}
+                    className="w-full px-4 py-3 rounded-lg border border-[#d1d5db] dark:border-[#1e3a5f] bg-white dark:bg-[#0a151f] text-[#12394d] dark:text-white text-sm outline-none transition-colors focus:border-[#1d5770] dark:focus:border-[#91b149] resize-none placeholder:text-[#7b7c7d]/50"
                   />
+                  <p className="text-[10px] text-[#7b7c7d] mt-1 text-left" dir="ltr">
+                    {formData.message.length} / 2000
+                  </p>
                 </div>
 
-                {/* Submit */}
                 <button
                   type="submit"
-                  className="w-full py-3 rounded-lg text-white font-bold text-sm transition-opacity hover:opacity-90"
-                  style={{ backgroundColor: "#1d5770" }}
+                  disabled={sending}
+                  className="w-full py-3 rounded-lg bg-[#1d5770] hover:bg-[#174860] disabled:opacity-60 text-white font-bold text-sm transition-all"
                 >
-                  إرسال الرسالة
+                  {sending ? "جاري الإرسال..." : "إرسال الرسالة"}
                 </button>
               </form>
-            </div>
+            </Reveal>
 
             {/* Contact Info Sidebar */}
-            <div className="space-y-6">
-              <div
-                className="rounded-2xl p-6"
-                style={{ backgroundColor: "#f5f8fa" }}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <span
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                    style={{ backgroundColor: "#1d5770" }}
+            <Reveal delay={0.2}>
+              <div className="space-y-6">
+                {[
+                  {
+                    icon: "📧",
+                    title: "البريد الإلكتروني",
+                    info: "waha.team.contact@gmail.com",
+                    bg: "bg-[#1d5770]",
+                  },
+                  {
+                    icon: "💬",
+                    title: "المساعد الذكي",
+                    info: "تحدث مع مساعدنا الذكي في أي وقت",
+                    bg: "bg-[#91b149]",
+                  },
+                  {
+                    icon: "🕐",
+                    title: "ساعات العمل",
+                    info: "السبت - الخميس: 9 صباحاً - 5 مساءً",
+                    bg: "bg-[#12394d]",
+                  },
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    className="rounded-2xl p-6 bg-[#f5f8fa] dark:bg-[#162033] border border-transparent dark:border-[#1e3a5f]"
                   >
-                    📧
-                  </span>
-                  <h4
-                    className="font-bold"
-                    style={{ color: "#12394d" }}
-                  >
-                    البريد الإلكتروني
-                  </h4>
-                </div>
-                <p className="text-sm" style={{ color: "#7b7c7d" }}>
-                  info@therapeutic-tourism.eg
-                </p>
+                    <div className="flex items-center gap-3 mb-3">
+                      <span
+                        className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${item.bg}`}
+                      >
+                        {item.icon}
+                      </span>
+                      <h4 className="font-bold text-[#12394d] dark:text-white">
+                        {item.title}
+                      </h4>
+                    </div>
+                    <p className="text-sm text-[#7b7c7d] dark:text-white/50">
+                      {item.info}
+                    </p>
+                  </div>
+                ))}
               </div>
-
-              <div
-                className="rounded-2xl p-6"
-                style={{ backgroundColor: "#f5f8fa" }}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <span
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                    style={{ backgroundColor: "#91b149" }}
-                  >
-                    💬
-                  </span>
-                  <h4
-                    className="font-bold"
-                    style={{ color: "#12394d" }}
-                  >
-                    واتساب
-                  </h4>
-                </div>
-                <p className="text-sm" style={{ color: "#7b7c7d" }}>
-                  +20 100 000 0000
-                </p>
-              </div>
-
-              <div
-                className="rounded-2xl p-6"
-                style={{ backgroundColor: "#f5f8fa" }}
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <span
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-lg"
-                    style={{ backgroundColor: "#12394d" }}
-                  >
-                    🕐
-                  </span>
-                  <h4
-                    className="font-bold"
-                    style={{ color: "#12394d" }}
-                  >
-                    ساعات العمل
-                  </h4>
-                </div>
-                <p className="text-sm" style={{ color: "#7b7c7d" }}>
-                  السبت - الخميس: 9 صباحا - 5 مساء
-                </p>
-              </div>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>

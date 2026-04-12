@@ -165,14 +165,14 @@ export default function HomePage() {
           className="object-cover animate-[kenBurns_14s_ease-out_forwards]"
         />
         <div className="absolute inset-0 bg-gradient-to-bl from-[#1b4f72]/90 via-[#1b4f72]/55 to-black/20" />
-        <div className="relative z-10 max-w-[1280px] mx-auto px-6 pt-[72px] text-white">
+        <div className="relative z-10 max-w-[1280px] mx-auto px-4 sm:px-6 pt-[72px] text-white">
           {recDest ? (
             <>
-              <div className="inline-flex items-center gap-2 bg-[#91b149]/20 backdrop-blur-sm text-[#91b149] text-[0.82rem] font-bold px-4 py-1.5 rounded-full border border-[#91b149]/40 mb-5">
+              <div className="inline-flex items-center gap-2 bg-[#91b149]/20 backdrop-blur-sm text-[#91b149] text-[0.75rem] sm:text-[0.82rem] font-bold px-3 sm:px-4 py-1.5 rounded-full border border-[#91b149]/40 mb-5">
                 <span className="w-2 h-2 rounded-full bg-[#91b149] animate-pulse" />
                 وجهتك المقترحة بناءً على إجاباتك
               </div>
-              <h1 className="text-4xl md:text-6xl font-black mb-3 font-display leading-tight max-w-[680px]">
+              <h1 className="text-2xl sm:text-4xl md:text-6xl font-black mb-3 font-display leading-tight max-w-[680px]">
                 رحلتك تبدأ من
                 <span className="text-[#91b149] mr-3">{recDest.name}</span>
               </h1>
@@ -230,7 +230,7 @@ export default function HomePage() {
                 stagger={0.08}
                 delay={0.2}
                 direction="up"
-                className="text-4xl md:text-6xl font-black mb-5 font-display leading-tight max-w-[680px]"
+                className="text-2xl sm:text-4xl md:text-6xl font-black mb-5 font-display leading-tight max-w-[680px]"
               />
               <AnimatedText
                 as="p"
@@ -239,7 +239,7 @@ export default function HomePage() {
                 stagger={0.02}
                 delay={1}
                 duration={0.5}
-                className="text-white/80 text-lg mb-8 max-w-[520px] leading-relaxed"
+                className="text-white/80 text-base sm:text-lg mb-8 max-w-[520px] leading-relaxed"
               />
               <div className="flex gap-3.5 flex-wrap">
                 <MagneticButton strength={14}>
@@ -321,7 +321,7 @@ export default function HomePage() {
               اكتشف أفضل الأماكن العلاجية في مصر
             </p>
           </Reveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {DESTINATIONS.slice(0, 4).map((dest, i) => (
               <Reveal key={dest.id} delay={i * 0.1}>
                 <TiltCard maxTilt={6} scale={1.03} className="h-full">
