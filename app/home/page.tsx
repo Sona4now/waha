@@ -6,10 +6,13 @@ import MoodBoard from "@/components/site/MoodBoard";
 import AnimatedText from "@/components/site/AnimatedText";
 import TiltCard from "@/components/site/TiltCard";
 import MagneticButton from "@/components/site/MagneticButton";
+import FAQ from "@/components/site/FAQ";
+import type { FAQItem } from "@/components/site/FAQ";
 import Link from "next/link";
 import Image from "next/image";
 import { DESTINATIONS } from "@/data/siteData";
 import { useEffect, useState, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 // 8x8 blurred placeholder (generic ocean tone)
 const BLUR_DATA_URL =
@@ -50,6 +53,80 @@ function Counter({ target, label }: { target: number; label: string }) {
       </div>
       <div className="text-[#7b7c7d] text-sm">{label}</div>
     </div>
+  );
+}
+
+const HOME_FAQ: FAQItem[] = [
+  {
+    question: "ما هي السياحة الاستشفائية؟",
+    answer:
+      "السياحة الاستشفائية هي نوع من السياحة يعتمد على استخدام الموارد الطبيعية مثل المياه المعدنية، الرمال الساخنة، الهواء الجاف، والشمس لعلاج أمراض مزمنة مثل الروماتيزم، الصدفية، والتوتر النفسي.",
+  },
+  {
+    question: "لماذا مصر تحديداً للسياحة الاستشفائية؟",
+    answer:
+      "مصر تتميز بتنوع بيئي فريد يجمع بين البحر الأحمر الغني بالمعادن، الصحاري الجافة، الواحات بعيونها الكبريتية، والجبال. هذا التنوع يوفر خيارات علاجية لا تجدها في أي مكان آخر في العالم.",
+  },
+  {
+    question: "هل أحتاج استشارة طبية قبل السفر؟",
+    answer:
+      "يُنصح دائماً باستشارة طبيبك قبل أي رحلة علاجية، خاصة إذا كنت تعاني من أمراض مزمنة. بعض العلاجات مثل الدفن بالرمال الساخنة أو الحمامات الكبريتية قد لا تناسب جميع الحالات.",
+  },
+  {
+    question: "ما أفضل وقت في السنة للسياحة الاستشفائية في مصر؟",
+    answer:
+      "الموسم الأفضل هو من أكتوبر إلى أبريل عندما يكون الجو معتدلاً. لكن بعض الوجهات مثل سيوة تكون مثالية في الشتاء، بينما سفاجا ممتازة طوال العام بسبب مناخها المعتدل.",
+  },
+  {
+    question: "كيف يمكنني اختيار الوجهة المناسبة لحالتي؟",
+    answer:
+      "يمكنك استخدام تجربتنا التفاعلية أو التحدث مع مساعدنا الذكي اللي هيسألك عن حالتك واحتياجاتك ويرشحلك الوجهة الأنسب. كمان ممكن تستكشف صفحة الأماكن وتفلتر حسب نوع العلاج أو البيئة.",
+  },
+];
+
+function CTASection() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
+
+  return (
+    <section ref={ref} className="relative py-24 text-white text-center overflow-hidden">
+      <motion.div
+        style={{ y: bgY }}
+        className="absolute inset-0 -top-20 -bottom-20 bg-gradient-to-br from-[#12394d] via-[#1d5770] to-[#0d2a39]"
+      />
+      <div className="relative z-10 max-w-[1280px] mx-auto px-6">
+        <Reveal>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 font-display">
+            ابدأ رحلتك الاستشفائية الآن
+          </h2>
+          <p className="text-white/70 mb-8 max-w-lg mx-auto">
+            خُذ تجربتنا التفاعلية واكتشف الوجهة المثالية لك في دقيقة واحدة
+          </p>
+          <div className="flex gap-4 justify-center flex-wrap">
+            <MagneticButton strength={10}>
+              <Link
+                href="/"
+                className="inline-block px-8 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold rounded-full transition-all duration-300 no-underline text-sm shadow-[0_8px_24px_-8px_rgba(145,177,73,0.6)]"
+              >
+                ابدأ التجربة
+              </Link>
+            </MagneticButton>
+            <MagneticButton strength={10}>
+              <Link
+                href="/ai-guide"
+                className="inline-block px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full border border-white/20 transition-all duration-300 no-underline text-sm"
+              >
+                اسأل المساعد الذكي
+              </Link>
+            </MagneticButton>
+          </div>
+        </Reveal>
+      </div>
+    </section>
   );
 }
 
@@ -317,6 +394,137 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* How It Works */}
+      <section className="py-20 bg-white dark:bg-[#0d1b2a]">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <Reveal>
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 font-display text-[#12394d] dark:text-white">
+              كيف تبدأ رحلتك؟
+            </h2>
+            <p className="text-center text-[#7b7c7d] mb-14 max-w-lg mx-auto">
+              ثلاث خطوات بسيطة تفصلك عن تجربة شفاء حقيقية
+            </p>
+          </Reveal>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            {/* Connecting line (desktop only) */}
+            <div className="hidden md:block absolute top-14 left-1/6 right-1/6 h-px border-t-2 border-dashed border-[#91b149]/30" />
+            {[
+              {
+                num: "01",
+                title: "اختر المكان",
+                desc: "استكشف وجهاتنا الاستشفائية واختر البيئة المناسبة لحالتك — بحر، صحراء، واحة، أو جبال.",
+                icon: "🗺️",
+              },
+              {
+                num: "02",
+                title: "خطّط رحلتك",
+                desc: "استخدم أدواتنا الذكية لتخطيط رحلة مخصصة مع معلومات العلاج والإقامة والطقس.",
+                icon: "📋",
+              },
+              {
+                num: "03",
+                title: "استمتع بالشفاء",
+                desc: "انطلق في رحلتك العلاجية واستمتع بقوى الطبيعة الشافية في أجمل بقاع مصر.",
+                icon: "✨",
+              },
+            ].map((step, i) => (
+              <Reveal key={step.num} delay={i * 0.15}>
+                <div className="relative text-center">
+                  <div className="relative z-10 w-28 h-28 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#1d5770] to-[#12394d] flex items-center justify-center shadow-xl border-4 border-white dark:border-[#0d1b2a]">
+                    <span className="text-4xl">{step.icon}</span>
+                  </div>
+                  <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
+                    الخطوة {step.num}
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 text-[#12394d] dark:text-white font-display">
+                    {step.title}
+                  </h3>
+                  <p className="text-sm text-[#7b7c7d] dark:text-white/60 leading-relaxed max-w-xs mx-auto">
+                    {step.desc}
+                  </p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 bg-[#f5f8fa] dark:bg-[#0a151f]">
+        <div className="max-w-[1280px] mx-auto px-6">
+          <Reveal>
+            <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 font-display text-[#12394d] dark:text-white">
+              تجارب حقيقية
+            </h2>
+            <p className="text-center text-[#7b7c7d] mb-12 max-w-lg mx-auto">
+              ماذا يقول زوارنا عن رحلاتهم الاستشفائية
+            </p>
+          </Reveal>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                quote:
+                  "بعد أسبوعين في سفاجا، لاحظت تحسن كبير في حالة الصدفية. البحر والشمس هنا مختلفين فعلاً.",
+                name: "أحمد محمود",
+                dest: "سفاجا",
+                rating: 5,
+              },
+              {
+                quote:
+                  "سيوة غيرت حياتي. العيون الكبريتية والهدوء اللي هناك خلاني أرجع إنسان جديد.",
+                name: "نورا السيد",
+                dest: "سيوة",
+                rating: 5,
+              },
+              {
+                quote:
+                  "أول مرة أجرب العلاج بالرمال في الصحراء. تجربة مذهلة وآلام المفاصل خفّت بشكل ملحوظ.",
+                name: "خالد إبراهيم",
+                dest: "الواحات البحرية",
+                rating: 5,
+              },
+              {
+                quote:
+                  "الفيوم قريبة وسهلة الوصول. قضيت ويكند هادي وسط الطبيعة وبقيت مرتاح نفسياً جداً.",
+                name: "سارة عبدالله",
+                dest: "الفيوم",
+                rating: 4,
+              },
+            ].map((t, i) => (
+              <Reveal key={i} delay={i * 0.1}>
+                <div className="bg-white dark:bg-[#162033] rounded-2xl p-6 shadow-md border border-[#d0dde4] dark:border-[#1e3a5f] h-full flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+                  {/* Quote icon */}
+                  <div className="text-[#91b149] text-4xl font-serif leading-none mb-3">
+                    &ldquo;
+                  </div>
+                  <p className="text-sm text-[#12394d] dark:text-white/80 leading-relaxed flex-1 mb-4">
+                    {t.quote}
+                  </p>
+                  <div className="flex items-center gap-3 mt-auto pt-4 border-t border-[#d0dde4] dark:border-[#1e3a5f]">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1d5770] to-[#12394d] flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">
+                        {t.name[0]}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="font-bold text-sm text-[#12394d] dark:text-white">
+                        {t.name}
+                      </div>
+                      <div className="text-[10px] text-[#91b149] font-bold">
+                        {t.dest}
+                      </div>
+                    </div>
+                    <div className="mr-auto text-[#91b149] text-sm tracking-wider">
+                      {"★".repeat(t.rating)}
+                    </div>
+                  </div>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Mood Board */}
       <section className="py-20">
         <div className="max-w-4xl mx-auto px-6">
@@ -326,31 +534,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-20 bg-gradient-to-br from-[#12394d] to-[#1d5770] text-white text-center">
-        <div className="max-w-[1280px] mx-auto px-6">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4 font-display">
-            ابدأ رحلتك الاستشفائية الآن
-          </h2>
-          <p className="text-white/70 mb-8 max-w-lg mx-auto">
-            خُذ تجربتنا التفاعلية واكتشف الوجهة المثالية لك في دقيقة واحدة
-          </p>
-          <div className="flex gap-4 justify-center flex-wrap">
-            <Link
-              href="/"
-              className="px-8 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold rounded-full transition-all duration-300 no-underline text-sm"
-            >
-              ابدأ التجربة
-            </Link>
-            <Link
-              href="/ai-guide"
-              className="px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full border border-white/20 transition-all duration-300 no-underline text-sm"
-            >
-              اسأل المساعد الذكي
-            </Link>
-          </div>
+      {/* FAQ */}
+      <section className="py-20 bg-[#f5f8fa] dark:bg-[#0a151f]">
+        <div className="max-w-3xl mx-auto px-6">
+          <Reveal>
+            <FAQ
+              title="أسئلة شائعة عن السياحة الاستشفائية"
+              items={HOME_FAQ}
+            />
+          </Reveal>
         </div>
       </section>
+
+      {/* CTA with parallax */}
+      <CTASection />
     </SiteLayout>
   );
 }
