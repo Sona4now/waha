@@ -3,6 +3,9 @@
 import SiteLayout from "@/components/site/SiteLayout";
 import Reveal from "@/components/site/Reveal";
 import MoodBoard from "@/components/site/MoodBoard";
+import AnimatedText from "@/components/site/AnimatedText";
+import TiltCard from "@/components/site/TiltCard";
+import MagneticButton from "@/components/site/MagneticButton";
 import Link from "next/link";
 import Image from "next/image";
 import { DESTINATIONS } from "@/data/siteData";
@@ -140,28 +143,44 @@ export default function HomePage() {
           ) : (
             <>
               <div className="inline-flex items-center gap-2 bg-white/[0.13] backdrop-blur-sm text-white text-[0.82rem] font-bold px-4 py-1.5 rounded-full border border-white/[0.22] mb-5">
-                السياحة الاستشفائية الطبيعية
+                <span className="w-1.5 h-1.5 rounded-full bg-[#91b149] animate-pulse" />
+                السياحة البيئية الطبيعية
               </div>
-              <h1 className="text-4xl md:text-6xl font-black mb-5 font-display leading-tight max-w-[680px]">
-                استكشف رحلة شفائك في قلب مصر
-              </h1>
-              <p className="text-white/80 text-lg mb-8 max-w-[520px] leading-relaxed">
-                طبيعة مصر تمتلك سراً قديماً. مياه تعالج، هواء يجدد، وصمت يشفي.
-                اكتشف الوجهة التي تناسب جسدك وروحك.
-              </p>
+              <AnimatedText
+                as="h1"
+                text="استكشف رحلة شفائك في قلب مصر"
+                splitBy="word"
+                stagger={0.08}
+                delay={0.2}
+                direction="up"
+                className="text-4xl md:text-6xl font-black mb-5 font-display leading-tight max-w-[680px]"
+              />
+              <AnimatedText
+                as="p"
+                text="طبيعة مصر تمتلك سراً قديماً. مياه تعالج، هواء يجدد، وصمت يشفي. اكتشف الوجهة التي تناسب جسدك وروحك."
+                splitBy="word"
+                stagger={0.02}
+                delay={1}
+                duration={0.5}
+                className="text-white/80 text-lg mb-8 max-w-[520px] leading-relaxed"
+              />
               <div className="flex gap-3.5 flex-wrap">
-                <Link
-                  href="/"
-                  className="px-8 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold rounded-full transition-all duration-300 no-underline text-sm"
-                >
-                  ابدأ رحلتك
-                </Link>
-                <Link
-                  href="/destinations"
-                  className="px-8 py-3.5 bg-white/[0.13] hover:bg-white/[0.22] backdrop-blur-sm text-white font-bold rounded-full border border-white/[0.22] transition-all duration-300 no-underline text-sm"
-                >
-                  استكشف الأماكن
-                </Link>
+                <MagneticButton strength={14}>
+                  <Link
+                    href="/"
+                    className="inline-block px-8 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold rounded-full transition-all duration-300 no-underline text-sm shadow-[0_8px_24px_-8px_rgba(145,177,73,0.6)] hover:shadow-[0_12px_32px_-8px_rgba(145,177,73,0.9)]"
+                  >
+                    ابدأ رحلتك
+                  </Link>
+                </MagneticButton>
+                <MagneticButton strength={14}>
+                  <Link
+                    href="/destinations"
+                    className="inline-block px-8 py-3.5 bg-white/[0.13] hover:bg-white/[0.22] backdrop-blur-sm text-white font-bold rounded-full border border-white/[0.22] transition-all duration-300 no-underline text-sm"
+                  >
+                    استكشف الأماكن
+                  </Link>
+                </MagneticButton>
               </div>
             </>
           )}
@@ -228,43 +247,46 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {DESTINATIONS.slice(0, 4).map((dest, i) => (
               <Reveal key={dest.id} delay={i * 0.1}>
-                <Link
-                  href={`/destination/${dest.id}`}
-                  className="block bg-white dark:bg-[#162033] rounded-[20px] overflow-hidden shadow-[0_2px_8px_rgba(29,87,112,0.07)] border border-[#d0dde4] dark:border-[#1e3a5f] hover:-translate-y-2 hover:shadow-[0_8px_40px_rgba(29,87,112,0.16)] dark:hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-300 no-underline group h-full"
-                >
-                  <div className="relative overflow-hidden h-[220px]">
-                    <Image
-                      src={dest.image}
-                      alt={dest.name}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      placeholder="blur"
-                      blurDataURL={BLUR_DATA_URL}
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-5">
-                    <span
-                      className={`inline-flex items-center gap-1 text-[0.75rem] font-bold px-2.5 py-1 rounded-full mb-2 ${
-                        dest.envClass === "env-sea"
-                          ? "bg-[#EBF8FF] text-[#0369a1]"
-                          : dest.envClass === "env-desert"
-                            ? "bg-[#FEF9EB] text-[#92400e]"
-                            : dest.envClass === "env-oasis"
-                              ? "bg-[#ECFDF5] text-[#065f46]"
-                              : "bg-[#F1F5F9] text-[#374151]"
-                      }`}
-                    >
-                      {dest.envIcon} {dest.environment}
-                    </span>
-                    <h3 className="text-lg font-bold text-[#12394d] dark:text-white mb-1.5">
-                      {dest.name}
-                    </h3>
-                    <p className="text-[0.85rem] text-[#7b7c7d] dark:text-white/60 leading-relaxed line-clamp-2">
-                      {dest.description}
-                    </p>
-                  </div>
-                </Link>
+                <TiltCard maxTilt={6} scale={1.03} className="h-full">
+                  <Link
+                    href={`/destination/${dest.id}`}
+                    className="block bg-white dark:bg-[#162033] rounded-[20px] overflow-hidden shadow-[0_2px_8px_rgba(29,87,112,0.07)] border border-[#d0dde4] dark:border-[#1e3a5f] hover:shadow-[0_20px_60px_rgba(29,87,112,0.2)] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-all duration-500 no-underline group h-full"
+                  >
+                    <div className="relative overflow-hidden h-[220px]">
+                      <Image
+                        src={dest.image}
+                        alt={dest.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        placeholder="blur"
+                        blurDataURL={BLUR_DATA_URL}
+                        className="object-cover group-hover:scale-110 transition-transform duration-700"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    </div>
+                    <div className="p-5">
+                      <span
+                        className={`inline-flex items-center gap-1 text-[0.75rem] font-bold px-2.5 py-1 rounded-full mb-2 ${
+                          dest.envClass === "env-sea"
+                            ? "bg-[#EBF8FF] text-[#0369a1]"
+                            : dest.envClass === "env-desert"
+                              ? "bg-[#FEF9EB] text-[#92400e]"
+                              : dest.envClass === "env-oasis"
+                                ? "bg-[#ECFDF5] text-[#065f46]"
+                                : "bg-[#F1F5F9] text-[#374151]"
+                        }`}
+                      >
+                        {dest.envIcon} {dest.environment}
+                      </span>
+                      <h3 className="text-lg font-bold text-[#12394d] dark:text-white mb-1.5 group-hover:text-[#91b149] transition-colors">
+                        {dest.name}
+                      </h3>
+                      <p className="text-[0.85rem] text-[#7b7c7d] dark:text-white/60 leading-relaxed line-clamp-2">
+                        {dest.description}
+                      </p>
+                    </div>
+                  </Link>
+                </TiltCard>
               </Reveal>
             ))}
           </div>

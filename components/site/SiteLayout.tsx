@@ -12,6 +12,7 @@ import ReadingProgress from "./ReadingProgress";
 import WellnessTip from "./WellnessTip";
 import AchievementListener from "./AchievementListener";
 import VisitTracker from "./VisitTracker";
+import CursorFollower from "./CursorFollower";
 
 export default function SiteLayout({
   children,
@@ -36,6 +37,7 @@ export default function SiteLayout({
       <WellnessTip />
       <AchievementListener />
       <VisitTracker />
+      <CursorFollower />
     </div>
   );
 }
