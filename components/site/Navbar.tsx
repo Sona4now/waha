@@ -11,7 +11,6 @@ const links = [
   { href: "/tours", label: "جولات 360°" },
   { href: "/map", label: "الخريطة" },
   { href: "/blog", label: "المدونة" },
-  { href: "/body-scanner", label: "الجسم التفاعلي" },
   { href: "/healing-dna", label: "بصمتك العلاجية" },
   { href: "/therapy-room", label: "غرفة العلاج" },
   { href: "/symptoms", label: "فاحص الأعراض" },

@@ -58,7 +58,19 @@
       "Bash(export PATH=\"/Users/youseffouad1icloud.com/.nvm/versions/node/v24.14.1/bin:$PATH\")",
       "Bash(npm list:*)",
       "Bash(ls /Users/youseffouad1icloud.com/Desktop/mahaaa/app/favicon*)",
-      "Bash(export PATH=/Users/youseffouad1icloud.com/.nvm/versions/node/v24.14.1/bin:$PATH)"
+      "Bash(export PATH=/Users/youseffouad1icloud.com/.nvm/versions/node/v24.14.1/bin:$PATH)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(find /Users/youseffouad1icloud.com/Desktop/mahaaa/components -type f \\\\\\(-name *.tsx -o -name *.ts -o -name *.jsx -o -name *.js \\\\\\))",
+      "Bash(ls /Users/youseffouad1icloud.com/Desktop/mahaaa/app/destination/[id]/)",
+      "Bash(grep -n \"generateMetadata\\\\|export metadata\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/destination/[id]/page.tsx)",
+      "Bash(grep -L \"dark:\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/**/page.tsx)",
+      "Bash(grep -E \"sm:|md:|lg:|xl:\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/**/page.tsx)",
+      "Bash(grep -E \"alt=|aria-label\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/**/page.tsx)",
+      "Bash(/usr/local/bin/npx tsc:*)",
+      "Bash(git push:*)",
+      "Bash(ls -la /Users/youseffouad1icloud.com/Desktop/mahaaa/app/api/*/)",
+      "Bash(grep -E \"page\\\\.\\(tsx|ts\\)$\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app -r)"
     ]
   }
 }
