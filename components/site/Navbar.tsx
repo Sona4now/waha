@@ -11,7 +11,6 @@ const links = [
   { href: "/tours", label: "جولات 360°" },
   { href: "/map", label: "الخريطة" },
   { href: "/blog", label: "المدونة" },
-  { href: "/breathe", label: "نَفَسَك" },
   { href: "/therapy-room", label: "غرفة العلاج" },
   { href: "/symptoms", label: "فاحص الأعراض" },
   { href: "/compare", label: "المقارنة" },
