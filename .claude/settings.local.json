@@ -70,7 +70,8 @@
       "Bash(/usr/local/bin/npx tsc:*)",
       "Bash(git push:*)",
       "Bash(ls -la /Users/youseffouad1icloud.com/Desktop/mahaaa/app/api/*/)",
-      "Bash(grep -E \"page\\\\.\\(tsx|ts\\)$\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app -r)"
+      "Bash(grep -E \"page\\\\.\\(tsx|ts\\)$\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app -r)",
+      "Bash(npx vercel:*)"
     ]
   }
 }
