@@ -73,6 +73,8 @@ export default function Footer() {
                 { id: "sinai", name: "سيناء" },
                 { id: "fayoum", name: "الفيوم" },
                 { id: "bahariya", name: "الواحات البحرية" },
+                { id: "wadi-degla", name: "وادي دجلة" },
+                { id: "shagie-farms", name: "مزارع شجيع" },
               ].map((d) => (
                 <Link
                   key={d.id}
