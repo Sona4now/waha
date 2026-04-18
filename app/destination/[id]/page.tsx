@@ -6,7 +6,6 @@ import Link from "next/link";
 import Image from "next/image";
 import SiteLayout from "@/components/site/SiteLayout";
 import FAQ, { getFAQForDestination } from "@/components/site/FAQ";
-import { CompareButton } from "@/components/site/ComparisonTray";
 import QuickActions from "@/components/site/QuickActions";
 import Gallery, { getGalleryForDestination } from "@/components/site/Gallery";
 import DayTimeline, {
@@ -14,7 +13,12 @@ import DayTimeline, {
 } from "@/components/site/DayTimeline";
 import WeatherWidget from "@/components/site/WeatherWidget";
 import FeedbackWidget from "@/components/site/FeedbackWidget";
-import { DESTINATIONS, getDestById } from "@/data/siteData";
+import QuickFactsBar from "@/components/destination/QuickFactsBar";
+import StickyBottomBar from "@/components/destination/StickyBottomBar";
+import SectionNav from "@/components/destination/SectionNav";
+import Testimonials from "@/components/destination/Testimonials";
+import SmartRelated from "@/components/destination/SmartRelated";
+import { getDestById } from "@/data/siteData";
 
 const BASE_TABS = [
   { key: "overview", label: "نبذة" },
@@ -884,28 +888,31 @@ export default function DestinationDetailPage() {
   const [activeBahariyaId, setActiveBahariyaId] = useState(BAHARIYA_SITES[0].id);
   const activeBahariyaSite = BAHARIYA_SITES.find((s) => s.id === activeBahariyaId)!;
 
-  const relatedDestinations = DESTINATIONS.filter((d) => d.id !== dest.id).slice(0, 3);
-
   return (
     <SiteLayout>
+      {/* Sticky section navigation — appears on scroll */}
+      <SectionNav />
+      {/* Floating bottom action bar */}
+      <StickyBottomBar destName={dest.name} destId={dest.id} />
+
       <div dir="rtl">
         {/* Hero Section */}
-        <section className="relative w-full h-[60vh] min-h-[400px] overflow-hidden">
+        <section className="relative w-full h-[55vh] min-h-[380px] overflow-hidden">
           <Image
             src={dest.image}
             alt={dest.name}
             fill
-            className="object-cover"
+            className="object-cover scale-105 animate-[kenBurns_16s_ease-out_forwards]"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
-          <div className="absolute bottom-0 right-0 left-0 p-8 md:p-16">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+          <div className="absolute bottom-0 right-0 left-0 p-6 pb-16 md:p-16 md:pb-24">
             <div className="max-w-6xl mx-auto">
               <span
-                className="inline-block px-4 py-1.5 rounded-full text-sm text-white mb-4"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-sm text-white mb-4 font-bold"
                 style={{ backgroundColor: "#91b149" }}
               >
-                {dest.environment}
+                {dest.envIcon} {dest.environment}
               </span>
               <h1
                 className="text-4xl md:text-6xl font-bold text-white mb-3"
@@ -913,15 +920,18 @@ export default function DestinationDetailPage() {
               >
                 {dest.name}
               </h1>
-              <p className="text-white/90 text-lg md:text-xl max-w-2xl">
+              <p className="text-white/90 text-base md:text-xl max-w-2xl leading-relaxed">
                 {dest.description}
               </p>
             </div>
           </div>
         </section>
 
+        {/* Quick Facts Bar — overlaps hero bottom */}
+        <QuickFactsBar dest={dest} />
+
         {/* Main Content */}
-        <section className="max-w-6xl mx-auto px-4 py-12">
+        <section id="overview" className="max-w-6xl mx-auto px-4 py-12 pt-8">
           <div className="flex flex-col lg:flex-row gap-10">
             {/* Content Area */}
             <div className="flex-1 min-w-0">
@@ -1686,7 +1696,10 @@ export default function DestinationDetailPage() {
         </section>
 
         {/* Day in the Life */}
-        <section className="py-16 bg-gradient-to-b from-white to-[#f5f8fa] dark:from-[#0d1b2a] dark:to-[#0a151f]">
+        <section
+          id="day"
+          className="py-16 bg-gradient-to-b from-white to-[#f5f8fa] dark:from-[#0d1b2a] dark:to-[#0a151f]"
+        >
           <div className="max-w-5xl mx-auto px-4">
             <DayTimeline
               steps={getDayForDestination(dest.id)}
@@ -1695,19 +1708,24 @@ export default function DestinationDetailPage() {
           </div>
         </section>
 
-        {/* Weather & Gallery side by side */}
-        <section className="py-16 bg-[#f5f8fa] dark:bg-[#0a151f]">
+        {/* Weather (timing) */}
+        <section id="timing" className="py-16 bg-[#f5f8fa] dark:bg-[#0a151f]">
           <div className="max-w-6xl mx-auto px-4 grid grid-cols-1 lg:grid-cols-[400px_1fr] gap-6">
             <WeatherWidget destId={dest.id} destName={dest.name} />
-            <Gallery
-              images={getGalleryForDestination(dest.id)}
-              title={`معرض صور ${dest.name}`}
-            />
+            <div id="gallery">
+              <Gallery
+                images={getGalleryForDestination(dest.id)}
+                title={`معرض صور ${dest.name}`}
+              />
+            </div>
           </div>
         </section>
 
+        {/* Testimonials — social proof */}
+        <Testimonials destId={dest.id} destName={dest.name} />
+
         {/* FAQ Section */}
-        <section className="py-16 bg-white dark:bg-[#0d1b2a]">
+        <section id="faq" className="py-16 bg-white dark:bg-[#0d1b2a]">
           <div className="max-w-4xl mx-auto px-4">
             <FAQ
               items={getFAQForDestination(dest.id)}
@@ -1717,61 +1735,8 @@ export default function DestinationDetailPage() {
           </div>
         </section>
 
-        {/* Related Destinations */}
-        <section
-          className="py-16 dark:bg-[#0d1b2a]"
-          style={{ backgroundColor: "#f8faf5" }}
-        >
-          <div className="max-w-6xl mx-auto px-4">
-            <h2
-              className="text-3xl font-bold mb-8 text-center"
-              style={{
-                color: "#12394d",
-                fontFamily: "var(--font-display)",
-              }}
-            >
-              وجهات ذات صلة
-            </h2>
-            <div className="grid gap-6 md:grid-cols-3">
-              {relatedDestinations.map((rd) => (
-                <Link
-                  key={rd.id}
-                  href={`/destination/${rd.id}`}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow"
-                >
-                  <div className="relative h-48 overflow-hidden">
-                    <Image
-                      src={rd.image}
-                      alt={rd.name}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-5">
-                    <span
-                      className="inline-block px-2.5 py-0.5 rounded-full text-xs text-white mb-2"
-                      style={{ backgroundColor: "#91b149" }}
-                    >
-                      {rd.environment}
-                    </span>
-                    <h3
-                      className="text-lg font-bold mb-1"
-                      style={{
-                        color: "#12394d",
-                        fontFamily: "var(--font-display)",
-                      }}
-                    >
-                      {rd.name}
-                    </h3>
-                    <p className="text-sm line-clamp-2" style={{ color: "#7b7c7d" }}>
-                      {rd.description}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Smart Related Destinations */}
+        <SmartRelated currentDest={dest} />
       </div>
     </SiteLayout>
   );

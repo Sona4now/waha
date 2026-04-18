@@ -21,6 +21,18 @@ export interface DestinationFull {
   lng: number;
   color: string;
   features?: string[];
+  /** Distance from Cairo in km */
+  distanceKm?: number;
+  /** Suggested stay duration, e.g. "14 يوم" */
+  duration?: string;
+  /** Approximate cost in EGP, e.g. "من 8,000 ج" */
+  costFrom?: string;
+  /** Difficulty level */
+  difficulty?: "سهل" | "متوسط" | "متقدم";
+  /** Target audience */
+  audience?: string;
+  /** Short pitch — one-line unique selling point */
+  pitch?: string;
   [key: string]: unknown;
 }
 
@@ -60,6 +72,12 @@ export const DESTINATIONS: DestinationFull[] = [
     lng: 33.94,
     color: "#0e7490",
     features: ["رمال سوداء علاجية", "مياه غنية بالمعادن", "أشعة شمس معتدلة", "هواء نقي جاف"],
+    distanceKm: 520,
+    duration: "14 يوم",
+    costFrom: "من 8,500 ج",
+    difficulty: "سهل",
+    audience: "عائلات · كبار السن · متعافون",
+    pitch: "الأعلى عالمياً في شفاء الصدفية — معتمدة من منظمة الصحة العالمية",
   },
   {
     id: "siwa",
@@ -99,6 +117,12 @@ export const DESTINATIONS: DestinationFull[] = [
     lng: 25.52,
     color: "#92400e",
     features: ["عيون كبريتية ساخنة", "بحيرة مالحة طبيعية", "بناء من الكرشيف", "هدوء صحراوي"],
+    distanceKm: 820,
+    duration: "21 يوم",
+    costFrom: "من 12,000 ج",
+    difficulty: "متوسط",
+    audience: "باحثون عن الهدوء · محبو الطبيعة",
+    pitch: "عيون كبريتية عمرها آلاف السنين + ثقافة أمازيغية أصيلة",
   },
   {
     id: "sinai",
@@ -141,6 +165,12 @@ export const DESTINATIONS: DestinationFull[] = [
     lng: 33.97,
     color: "#44403c",
     features: ["حمامات طبيعية ساخنة", "جبال وتأمل", "أعشاب طبية", "هواء جبلي نقي"],
+    distanceKm: 380,
+    duration: "10 أيام",
+    costFrom: "من 7,500 ج",
+    difficulty: "متوسط",
+    audience: "المغامرون · الباحثون عن القوة",
+    pitch: "هواء جبلي نقي + حمام موسى + أعشاب بدوية علاجية",
   },
   {
     id: "fayoum",
@@ -177,6 +207,12 @@ export const DESTINATIONS: DestinationFull[] = [
     lng: 30.84,
     color: "#065f46",
     features: ["بحيرة قارون", "وادي الحيتان", "هواء جاف صحراوي", "قريبة من القاهرة"],
+    distanceKm: 100,
+    duration: "7 أيام",
+    costFrom: "من 4,500 ج",
+    difficulty: "سهل",
+    audience: "عائلات · رحلة ويكند",
+    pitch: "ساعة ونصف من القاهرة — واحة خضراء + وادي الحيتان",
   },
   {
     id: "bahariya",
@@ -216,6 +252,12 @@ export const DESTINATIONS: DestinationFull[] = [
     lng: 28.86,
     color: "#b45309",
     features: ["صحراء بيضاء فريدة", "ينابيع ساخنة", "دفن بالرمال", "سفاري علاجي"],
+    distanceKm: 365,
+    duration: "14 يوم",
+    costFrom: "من 9,000 ج",
+    difficulty: "متوسط",
+    audience: "محبو المغامرة · سفاري علاجي",
+    pitch: "الصحراء البيضاء + علاج فرعوني بالدفن في الرمال",
   },
   {
     id: "wadi-degla",
@@ -258,6 +300,12 @@ export const DESTINATIONS: DestinationFull[] = [
       "100+ كم مسارات هايكنج",
       "تخييم تحت النجوم",
     ],
+    distanceKm: 15,
+    duration: "يوم واحد",
+    costFrom: "رمزية",
+    difficulty: "متوسط",
+    audience: "رياضيون · Digital Detox · قاهريون",
+    pitch: "15 دقيقة من المعادي — محمية طبيعية + 100 كم مسارات",
   },
   {
     id: "shagie-farms",
@@ -300,6 +348,12 @@ export const DESTINATIONS: DestinationFull[] = [
       "أنشطة زراعية وحيوانات المزرعة",
       "إقامة في خيم مكيفة وشاليهات",
     ],
+    distanceKm: 125,
+    duration: "يوم واحد",
+    costFrom: "من 600 ج",
+    difficulty: "سهل",
+    audience: "عائلات · أطفال · سياح أجانب",
+    pitch: "رائدة سياحة المانجو في أفريقيا — تجربة ريفية متكاملة",
   },
 ];
 
