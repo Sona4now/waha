@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
+import TeamGate from "@/components/team/TeamGate";
 import MagazineView from "@/components/team/MagazineView";
 import HallOfFameView from "@/components/team/HallOfFameView";
 import CreditsTickerView from "@/components/team/CreditsTickerView";
@@ -35,6 +36,7 @@ export default function TeamPage() {
   const ActiveComponent = activeTab.Component;
 
   return (
+    <TeamGate>
     <SiteLayout>
       <div className="bg-[#070d15] min-h-screen" dir="rtl">
         {/* Page header */}
@@ -112,5 +114,6 @@ export default function TeamPage() {
         }
       `}</style>
     </SiteLayout>
+    </TeamGate>
   );
 }
