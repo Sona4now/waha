@@ -119,7 +119,11 @@
       "Bash(grep \"export const metadata\\\\|export const generateMetadata\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/*/page.tsx)",
       "Bash(find /Users/youseffouad1icloud.com/Desktop/mahaaa/app -name \"page.tsx\" -exec grep -l \"generateMetadata\\\\|metadata.*export\" {} \\\\;)",
       "Bash(ls /Users/youseffouad1icloud.com/Desktop/mahaaa/components/**/*.tsx)",
-      "Bash([ -f \"app/$page/layout.tsx\" ])"
+      "Bash([ -f \"app/$page/layout.tsx\" ])",
+      "Bash(curl -s -X POST https://wahaeg.com/api/auth -H \"Content-Type: application/json\" -d '{\"password\":\"Pola@0100450\"}')",
+      "Bash(curl -s -X POST https://wahaeg.com/api/team-auth -H \"Content-Type: application/json\" -d '{\"password\":\"12345\"}')",
+      "Bash(curl -s -o /dev/null -w 'attempt __TRACKED_VAR__: %{http_code}\\\\n' -X POST https://wahaeg.com/api/admin-auth -H 'Content-Type: application/json' -d '{\"password\":\"wrong\"}')",
+      "Bash(curl -sI https://wahaeg.com/)"
     ]
   }
 }

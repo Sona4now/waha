@@ -76,7 +76,7 @@ const TIPS: Tip[] = [
 const STORAGE_KEY = "waaha_tip_dismissed";
 const DELAY_MS = 20000;
 const AUTO_DISMISS_MS = 6000;
-const HIDDEN_PATHS = ["/", "/gate"];
+const HIDDEN_PATHS = ["/", "/gate", "/therapy-room"];
 
 function getTipForToday(): Tip {
   const dayOfYear = Math.floor(

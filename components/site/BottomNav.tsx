@@ -103,7 +103,7 @@ const items = [
   },
 ];
 
-const HIDDEN_PATHS = ["/", "/gate"];
+const HIDDEN_PATHS = ["/", "/gate", "/therapy-room"];
 
 export default function BottomNav() {
   const pathname = usePathname();

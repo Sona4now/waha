@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-const HIDDEN_PATHS = ["/", "/gate"];
+const HIDDEN_PATHS = ["/", "/gate", "/therapy-room"];
 
 export default function ReadingProgress() {
   const pathname = usePathname();
