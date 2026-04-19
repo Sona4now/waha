@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { usePathname } from "next/navigation";
 
-const HIDDEN_PATHS = ["/", "/therapy-room"]; // cinematic intro + meditation
+const HIDDEN_PATHS = ["/", "/therapy-room", "/map"]; // cinematic intro + meditation + map story
 
 export default function CursorFollower() {
   const pathname = usePathname();

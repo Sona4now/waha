@@ -44,7 +44,7 @@ const SUGGESTED_PROMPTS = [
 ];
 
 // Don't show the widget on these paths
-const HIDDEN_PATHS = ["/", "/gate", "/therapy-room"];
+const HIDDEN_PATHS = ["/", "/gate", "/therapy-room", "/map"];
 
 const STORAGE_KEY = "waaha_chat_messages";
 

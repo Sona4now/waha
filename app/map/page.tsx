@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -14,6 +14,7 @@ import { THERAPEUTIC_SITES } from "@/lib/therapeuticSites";
 import StoryOverlay, {
   type Act,
 } from "@/components/map/StoryOverlay";
+import { playChime } from "@/lib/meditation/chimes";
 
 // Leaflet only runs in the browser.
 const StoryMap = dynamic(() => import("@/components/map/StoryMap"), {
@@ -83,6 +84,30 @@ export default function MapPage() {
     setManualHighlight(null);
   }, []);
 
+  const restartStory = useCallback(() => {
+    setFreeExplore(false);
+    setManualHighlight(null);
+    setAct("welcome");
+  }, []);
+
+  // Play a soft chime when the user crosses into a new narrative act.
+  // Different frequencies for different "feelings" of the acts.
+  const prevActRef = useRef<Act>(act);
+  useEffect(() => {
+    if (prevActRef.current === act) return;
+    prevActRef.current = act;
+    if (freeExplore) return;
+    const freqByAct: Record<Act, number> = {
+      welcome: 659.25, // E5 — inviting
+      context: 587.33, // D5 — settled
+      "fly-to": 783.99, // G5 — uplifting
+      reveal: 880.0, // A5 — resolved
+      sites: 523.25, // C5 — grounded
+      compare: 493.88, // B4 — reflective
+    };
+    playChime(freqByAct[act], 0.15, 1.4);
+  }, [act, freeExplore]);
+
   // Before the localStorage check resolves, keep the shell silent.
   if (!loaded) {
     return (
@@ -103,7 +128,11 @@ export default function MapPage() {
 
   return (
     <SiteLayout>
-      <div className="relative w-full min-h-[calc(100vh-72px)] bg-[#0a151f]" dir="rtl">
+      <div
+        className="relative w-full bg-[#0a151f]"
+        style={{ height: "calc(100vh - 72px)" }}
+        dir="rtl"
+      >
         {/* Map fills the screen as a canvas */}
         <div className="absolute inset-0">
           <StoryMap
@@ -116,45 +145,48 @@ export default function MapPage() {
           />
         </div>
 
-        {/* Ambient vignette while the story plays */}
-        {!freeExplore && (
+        {/* Soft vignette — only during the welcome act so the rest of
+            the story keeps the map fully readable. */}
+        {!freeExplore && act === "welcome" && (
           <div
-            className="pointer-events-none absolute inset-0"
+            className="pointer-events-none absolute inset-0 transition-opacity duration-700"
             style={{
               background:
-                "radial-gradient(ellipse at center, transparent 0%, rgba(10,21,31,0.55) 70%, rgba(10,21,31,0.85) 100%)",
+                "radial-gradient(ellipse at center, transparent 25%, rgba(10,21,31,0.40) 80%, rgba(10,21,31,0.65) 100%)",
             }}
           />
         )}
 
-        {/* Top bar */}
-        <div className="absolute top-4 right-4 left-4 z-[1000] flex items-center justify-between pointer-events-none">
+        {/* Top bar — respects iOS safe-area notch */}
+        <div
+          className="absolute right-3 left-3 z-[1000] flex items-center justify-between gap-2 pointer-events-none"
+          style={{
+            top: "max(12px, env(safe-area-inset-top))",
+          }}
+        >
           <Link
             href="/home"
-            className="pointer-events-auto inline-flex items-center gap-2 bg-[#12394d]/80 backdrop-blur px-3 py-1.5 rounded-full text-white text-xs font-bold border border-white/10 hover:bg-[#12394d] no-underline transition-colors"
+            className="pointer-events-auto inline-flex items-center gap-1.5 bg-[#12394d]/90 backdrop-blur-md px-3 h-9 rounded-full text-white text-xs font-bold border border-white/15 hover:bg-[#12394d] no-underline transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
+            aria-label="العودة للرئيسية"
           >
-            ← الرئيسية
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+            <span className="hidden xs:inline sm:inline">الرئيسية</span>
           </Link>
-          {!freeExplore && (
+          {freeExplore ? (
             <button
-              onClick={skipToExplore}
-              className="pointer-events-auto bg-[#12394d]/80 backdrop-blur px-3 py-1.5 rounded-full text-white/70 hover:text-white text-xs font-bold border border-white/10 transition-colors"
+              onClick={restartStory}
+              className="pointer-events-auto bg-[#91b149] hover:bg-[#a3c45a] px-3 h-9 rounded-full text-[#0a0f14] text-xs font-bold border border-white/10 transition-colors inline-flex items-center gap-1.5 shadow-[0_4px_12px_rgba(145,177,73,0.3)]"
+              aria-label="إعادة القصة"
             >
-              تخطي القصة
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <polyline points="1 4 1 10 7 10" />
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+              </svg>
+              <span>إعادة القصة</span>
             </button>
-          )}
-          {freeExplore && (
-            <button
-              onClick={() => {
-                setFreeExplore(false);
-                setManualHighlight(null);
-                setAct("reveal");
-              }}
-              className="pointer-events-auto bg-[#91b149]/90 px-3 py-1.5 rounded-full text-white text-xs font-bold border border-white/10 transition-colors"
-            >
-              ارجع لرحلتك
-            </button>
-          )}
+          ) : null}
         </div>
 
         {/* Narrative overlay (bottom-right on desktop, bottom on mobile) */}

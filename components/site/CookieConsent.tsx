@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 
 const STORAGE_KEY = "waaha_cookie_consent";
-const HIDDEN_PATHS = ["/", "/gate", "/therapy-room"];
+const HIDDEN_PATHS = ["/", "/gate", "/therapy-room", "/map"];
 
 /**
  * Minimal cookie / data-use consent banner.

@@ -129,7 +129,8 @@
       "Bash(curl -sL -o /dev/null -w \"digital-detox: %{http_code}\\\\n\" https://wahaeg.com/blog/digital-detox)",
       "Bash(curl -sL -o /dev/null -w \"helwan: %{http_code}\\\\n\" https://wahaeg.com/blog/helwan-sulfur-baths)",
       "Bash(curl -sL -o /dev/null -w \"healing-of-kings: %{http_code}\\\\n\" https://wahaeg.com/blog/healing-of-kings)",
-      "Bash(curl -sL -o /dev/null -w \"map: %{http_code}\\\\n\" https://wahaeg.com/map)"
+      "Bash(curl -sL -o /dev/null -w \"map: %{http_code}\\\\n\" https://wahaeg.com/map)",
+      "Bash(curl -sI http://localhost:3000/map)"
     ]
   }
 }

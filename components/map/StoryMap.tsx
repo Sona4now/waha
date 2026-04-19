@@ -49,8 +49,30 @@ L.Icon.Default.mergeOptions({
 
 /* ── Icons ─────────────────────────────────────────────── */
 
-function destinationIcon(color: string, emoji: string, size = 48, dim = false) {
+function destinationIcon(
+  color: string,
+  emoji: string,
+  size = 48,
+  dim = false,
+  recommended = false,
+) {
   const opacity = dim ? 0.35 : 1;
+  // A small gold star rides on top of the recommended pin so it's
+  // distinguishable without relying on color alone.
+  const starBadge = recommended
+    ? `
+      <div style="
+        position: absolute;
+        top: -6px; right: -6px;
+        width: 22px; height: 22px;
+        background: #f59e0b;
+        border: 2px solid white;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        font-size: 11px;
+      ">⭐</div>`
+    : "";
   return L.divIcon({
     className: "custom-marker",
     html: `
@@ -69,6 +91,7 @@ function destinationIcon(color: string, emoji: string, size = 48, dim = false) {
         ">
           <span style="transform: rotate(45deg); font-size: ${size * 0.42}px; line-height: 1;">${emoji}</span>
         </div>
+        ${starBadge}
       </div>
     `,
     iconSize: [size, size],
@@ -77,24 +100,86 @@ function destinationIcon(color: string, emoji: string, size = 48, dim = false) {
   });
 }
 
-function subSiteIcon(emoji: string) {
+function subSiteIcon(emoji: string, name: string = "") {
+  // Escape a short display name in the label under the pin.
+  const safe = (name || "").toString();
+  const safeName = safe.length > 18 ? safe.slice(0, 17) + "…" : safe;
+  const esc = safeName.replace(/</g, "&lt;").replace(/>/g, "&gt;");
   return L.divIcon({
     className: "sub-site-marker",
     html: `
       <div style="
-        width: 30px; height: 30px;
-        background: rgba(255,255,255,0.95);
-        border: 2px solid #91b149;
-        border-radius: 50%;
-        display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        font-size: 14px; line-height: 1;
-      ">${emoji}</div>
+        position: relative;
+        display: flex; flex-direction: column;
+        align-items: center; gap: 2px;
+        font-family: Cairo, sans-serif;
+      ">
+        <div style="
+          width: 30px; height: 30px;
+          background: rgba(255,255,255,0.95);
+          border: 2px solid #91b149;
+          border-radius: 50%;
+          display: flex; align-items: center; justify-content: center;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+          font-size: 14px; line-height: 1;
+        ">${emoji}</div>
+        <span style="
+          background: rgba(18,57,77,0.92);
+          color: white;
+          padding: 2px 8px;
+          border-radius: 10px;
+          font-size: 10px;
+          font-weight: 700;
+          white-space: nowrap;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          direction: rtl;
+        ">${esc}</span>
+      </div>
     `,
-    iconSize: [30, 30],
-    iconAnchor: [15, 15],
+    iconSize: [120, 48],
+    iconAnchor: [60, 15],
     popupAnchor: [0, -15],
   });
+}
+
+/**
+ * Forces Leaflet to re-measure its container after mount and whenever
+ * the window resizes. Without this, a <MapContainer> placed inside an
+ * `absolute inset-0` wrapper often ends up with a 0-height tile-pane
+ * and tiles never paint.
+ */
+function MapInvalidator() {
+  const map = useMap();
+  useEffect(() => {
+    const invalidate = () => map.invalidateSize({ animate: false });
+
+    // Re-measure now + a few frames later (covers font loading, layout
+    // reflow from fixed/absolute siblings, etc.)
+    invalidate();
+    const t1 = setTimeout(invalidate, 100);
+    const t2 = setTimeout(invalidate, 400);
+    const t3 = setTimeout(invalidate, 1200);
+
+    window.addEventListener("resize", invalidate);
+
+    // ResizeObserver on the map container itself — catches the case
+    // where a parent lays out after Leaflet mounted.
+    const container = map.getContainer();
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(invalidate);
+      ro.observe(container);
+    }
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener("resize", invalidate);
+      ro?.disconnect();
+    };
+  }, [map]);
+  return null;
 }
 
 /* ── Camera controller ─────────────────────────────────── */
@@ -168,6 +253,7 @@ export default function StoryMap({
         maxZoom={tile.maxZoom}
       />
 
+      <MapInvalidator />
       <CameraController target={cameraTarget} zoom={cameraZoom} />
 
       <StyleSwitcher current={mapStyle} onChange={setMapStyle} />
@@ -199,7 +285,13 @@ export default function StoryMap({
             )}
             <Marker
               position={[dest.lat, dest.lng]}
-              icon={destinationIcon(dest.color, dest.envIcon, size, dim)}
+              icon={destinationIcon(
+                dest.color,
+                dest.envIcon,
+                size,
+                dim,
+                !!isRecommended,
+              )}
               eventHandlers={{ click: () => onSelectDestination(dest.id) }}
             >
               <Popup maxWidth={260} className="custom-popup">
@@ -276,7 +368,7 @@ export default function StoryMap({
         <Marker
           key={site.id}
           position={[site.lat, site.lng]}
-          icon={subSiteIcon(site.icon)}
+          icon={subSiteIcon(site.icon, site.name)}
         >
           <Popup maxWidth={240}>
             <div dir="rtl" style={{ fontFamily: "Cairo, sans-serif" }}>
@@ -332,20 +424,30 @@ function MapZoomControl() {
 
   return (
     <div
-      className="leaflet-top leaflet-left"
+      className="leaflet-bottom leaflet-left"
       style={{ pointerEvents: "auto" }}
     >
-      <div style={{ margin: 12, display: "flex", flexDirection: "column", gap: 2 }}>
+      <div
+        style={{
+          margin: 12,
+          marginBottom: 80, // Keep clear of bottom nav + overlay
+          display: "flex",
+          flexDirection: "column",
+          gap: 2,
+        }}
+      >
         <button
           onClick={zoomIn}
           aria-label="تكبير"
           style={{
-            width: 36, height: 36,
-            background: "rgba(18, 57, 77, 0.9)",
+            width: 44,
+            height: 44,
+            background: "rgba(18, 57, 77, 0.92)",
             color: "white",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "10px 10px 0 0",
-            fontSize: 18, fontWeight: 700,
+            border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: "12px 12px 0 0",
+            fontSize: 20,
+            fontWeight: 700,
             cursor: "pointer",
             backdropFilter: "blur(8px)",
           }}
@@ -356,12 +458,14 @@ function MapZoomControl() {
           onClick={zoomOut}
           aria-label="تصغير"
           style={{
-            width: 36, height: 36,
-            background: "rgba(18, 57, 77, 0.9)",
+            width: 44,
+            height: 44,
+            background: "rgba(18, 57, 77, 0.92)",
             color: "white",
-            border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "0 0 10px 10px",
-            fontSize: 18, fontWeight: 700,
+            border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: "0 0 12px 12px",
+            fontSize: 20,
+            fontWeight: 700,
             cursor: "pointer",
             backdropFilter: "blur(8px)",
           }}
@@ -385,21 +489,33 @@ function StyleSwitcher({
   onChange: (s: MapStyle) => void;
 }) {
   const styles: MapStyle[] = ["streets", "satellite", "terrain"];
+  // Collapse to icon-only under ~640px so it can't overflow the top bar.
+  const [isSmall, setIsSmall] = useState(
+    typeof window !== "undefined" ? window.innerWidth < 640 : false,
+  );
+  useEffect(() => {
+    const onResize = () => setIsSmall(window.innerWidth < 640);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
   return (
     <div
-      className="leaflet-top leaflet-right"
+      className="leaflet-bottom leaflet-right"
       style={{ pointerEvents: "auto" }}
     >
       <div
         style={{
           margin: 12,
+          marginBottom: 80,
           display: "flex",
-          background: "rgba(18, 57, 77, 0.9)",
-          border: "1px solid rgba(255,255,255,0.1)",
+          background: "rgba(18, 57, 77, 0.92)",
+          border: "1px solid rgba(255,255,255,0.15)",
           borderRadius: 999,
-          padding: 3,
+          padding: 4,
           backdropFilter: "blur(8px)",
           gap: 2,
+          boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
         }}
         dir="rtl"
         role="group"
@@ -418,21 +534,24 @@ function StyleSwitcher({
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 4,
-                padding: "5px 10px",
+                justifyContent: "center",
+                gap: isSmall ? 0 : 6,
+                minWidth: 40,
+                minHeight: 40,
+                padding: isSmall ? "0 10px" : "6px 14px",
                 background: active ? "#91b149" : "transparent",
-                color: active ? "#0a0f14" : "rgba(255,255,255,0.7)",
+                color: active ? "#0a0f14" : "rgba(255,255,255,0.8)",
                 border: "none",
                 borderRadius: 999,
-                fontSize: 11,
+                fontSize: 13,
                 fontWeight: 700,
                 cursor: "pointer",
                 fontFamily: "Cairo, sans-serif",
                 transition: "background 0.2s, color 0.2s",
               }}
             >
-              <span>{cfg.icon}</span>
-              <span>{cfg.label}</span>
+              <span style={{ fontSize: 15 }}>{cfg.icon}</span>
+              {!isSmall && <span>{cfg.label}</span>}
             </button>
           );
         })}
