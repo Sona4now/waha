@@ -25,7 +25,7 @@ const securityHeaders = [
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://va.vercel-scripts.com https://vercel.live",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com data:",
-      "img-src 'self' data: blob: https://images.unsplash.com https://*.tile.openstreetmap.org",
+      "img-src 'self' data: blob: https://images.unsplash.com https://*.tile.openstreetmap.org https://*.basemaps.cartocdn.com https://server.arcgisonline.com https://tile.opentopomap.org https://*.opentopomap.org https://unpkg.com",
       "media-src 'self' https://cdn.freesound.org https://*.freesound.org blob: data:",
       "connect-src 'self' https://*.vercel.com https://vercel.live https://api.anthropic.com https://cdn.freesound.org",
       "frame-src 'self' https://kuula.co",

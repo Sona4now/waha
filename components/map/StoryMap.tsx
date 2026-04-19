@@ -7,6 +7,38 @@ import type { DestinationFull } from "@/data/siteData";
 import type { TherapeuticSite } from "@/lib/therapeuticSites";
 import type { Recommendation } from "@/hooks/useRecommendation";
 
+/* ── Map styles — real tile providers, not abstract art ── */
+type MapStyle = "streets" | "satellite" | "terrain";
+
+const TILE_CONFIG: Record<
+  MapStyle,
+  { url: string; attribution: string; maxZoom: number; label: string; icon: string }
+> = {
+  streets: {
+    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+    attribution: "&copy; OpenStreetMap contributors",
+    maxZoom: 19,
+    label: "خريطة عادية",
+    icon: "🗺️",
+  },
+  satellite: {
+    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    attribution:
+      "Tiles &copy; Esri, Maxar, Earthstar Geographics, USDA, USGS, AeroGRID, IGN, GIS User Community",
+    maxZoom: 19,
+    label: "أقمار صناعية",
+    icon: "🛰️",
+  },
+  terrain: {
+    url: "https://tile.opentopomap.org/{z}/{x}/{y}.png",
+    attribution:
+      "Map data: &copy; OpenStreetMap contributors, SRTM | Style: &copy; OpenTopoMap (CC-BY-SA)",
+    maxZoom: 17,
+    label: "تضاريس",
+    icon: "⛰️",
+  },
+};
+
 /* ── Leaflet default icon fix (must run once) ── */
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)._getIconUrl;
 L.Icon.Default.mergeOptions({
@@ -100,6 +132,9 @@ export default function StoryMap({
   showSubSites,
   onSelectDestination,
 }: Props) {
+  const [mapStyle, setMapStyle] = useState<MapStyle>("streets");
+  const tile = TILE_CONFIG[mapStyle];
+
   const highlightedDest = useMemo(
     () => destinations.find((d) => d.id === highlighted) ?? null,
     [destinations, highlighted],
@@ -121,18 +156,21 @@ export default function StoryMap({
       center={[26.8, 30.8]}
       zoom={6}
       minZoom={5}
-      maxZoom={14}
+      maxZoom={tile.maxZoom}
       className="w-full h-full"
-      style={{ background: "#1a2332" }}
+      style={{ background: "#0a151f" }}
       zoomControl={false}
-      attributionControl={false}
     >
       <TileLayer
-        attribution='&copy; OpenStreetMap'
-        url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+        key={mapStyle}
+        attribution={tile.attribution}
+        url={tile.url}
+        maxZoom={tile.maxZoom}
       />
 
       <CameraController target={cameraTarget} zoom={cameraZoom} />
+
+      <StyleSwitcher current={mapStyle} onChange={setMapStyle} />
 
       {/* Destination pins */}
       {destinations.map((dest) => {
@@ -330,6 +368,74 @@ function MapZoomControl() {
         >
           −
         </button>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Segmented toggle for map style — rendered inside the leaflet container
+ * so it sits on top of the tiles with the proper z-index.
+ */
+function StyleSwitcher({
+  current,
+  onChange,
+}: {
+  current: MapStyle;
+  onChange: (s: MapStyle) => void;
+}) {
+  const styles: MapStyle[] = ["streets", "satellite", "terrain"];
+  return (
+    <div
+      className="leaflet-top leaflet-right"
+      style={{ pointerEvents: "auto" }}
+    >
+      <div
+        style={{
+          margin: 12,
+          display: "flex",
+          background: "rgba(18, 57, 77, 0.9)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: 999,
+          padding: 3,
+          backdropFilter: "blur(8px)",
+          gap: 2,
+        }}
+        dir="rtl"
+        role="group"
+        aria-label="نمط الخريطة"
+      >
+        {styles.map((s) => {
+          const cfg = TILE_CONFIG[s];
+          const active = current === s;
+          return (
+            <button
+              key={s}
+              onClick={() => onChange(s)}
+              aria-pressed={active}
+              aria-label={cfg.label}
+              title={cfg.label}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+                padding: "5px 10px",
+                background: active ? "#91b149" : "transparent",
+                color: active ? "#0a0f14" : "rgba(255,255,255,0.7)",
+                border: "none",
+                borderRadius: 999,
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: "pointer",
+                fontFamily: "Cairo, sans-serif",
+                transition: "background 0.2s, color 0.2s",
+              }}
+            >
+              <span>{cfg.icon}</span>
+              <span>{cfg.label}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
