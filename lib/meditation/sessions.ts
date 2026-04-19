@@ -666,20 +666,20 @@ export function narrationLinesOf(session: Session): string[] {
    (see docs/AUDIO_ASSETS.md).
    ───────────────────────────────────────────────────────── */
 
-const AUDIO_ROOT = "/audio/meditation";
+const AUDIO_ROOT = "/meditation";
 
 const ENV_MUSIC: Record<EnvId, string> = {
-  sea: `${AUDIO_ROOT}/music/red-sea-waves.mp3`,
-  desert: `${AUDIO_ROOT}/music/desert-wind-night.mp3`,
-  mountain: `${AUDIO_ROOT}/music/mountain-dawn.mp3`,
-  oasis: `${AUDIO_ROOT}/music/fayoum-oasis.mp3`,
+  sea: `${AUDIO_ROOT}/ambient/ambient__sea__loop.mp3`,
+  desert: `${AUDIO_ROOT}/ambient/ambient__desert__loop.mp3`,
+  mountain: `${AUDIO_ROOT}/ambient/ambient__mountain__loop.mp3`,
+  oasis: `${AUDIO_ROOT}/ambient/ambient__oasis__loop.mp3`,
 };
 
 const ENV_VIDEO: Record<EnvId, string> = {
-  sea: `${AUDIO_ROOT}/videos/sea-video.webm`,
-  desert: `${AUDIO_ROOT}/videos/desert-video.webm`,
-  mountain: `${AUDIO_ROOT}/videos/mountain-video.webm`,
-  oasis: `${AUDIO_ROOT}/videos/oasis-video.webm`,
+  sea: `${AUDIO_ROOT}/videos/backdrop__sea.webm`,
+  desert: `${AUDIO_ROOT}/videos/backdrop__desert.webm`,
+  mountain: `${AUDIO_ROOT}/videos/backdrop__mountain.webm`,
+  oasis: `${AUDIO_ROOT}/videos/backdrop__oasis.webm`,
 };
 
 /**
@@ -699,22 +699,21 @@ export function getSessionVideoTrack(session: Session): string {
 
 /**
  * Resolves the MP3 path for a VO clip.
- * The clip id is like `quick-calm__intro` → `/audio/meditation/vo/quick-calm/intro.mp3`
+ * The clip id is like `quick-calm__intro` → `/meditation/vo/quick-calm__intro.mp3`
+ * (flat layout — matches useTimedVoice + audioAssets.ts).
  */
 export function getVoClipPath(clipId: string): string {
-  const [sessionId, ...rest] = clipId.split("__");
-  const name = rest.join("__");
-  return `${AUDIO_ROOT}/vo/${sessionId}/${name}.mp3`;
+  return `${AUDIO_ROOT}/vo/${clipId}.mp3`;
 }
 
 export const CHIMES = {
-  start: `${AUDIO_ROOT}/chimes/bell-start.mp3`,
-  end: `${AUDIO_ROOT}/chimes/bell-end.mp3`,
-  transition: `${AUDIO_ROOT}/chimes/bell-transition.mp3`,
-  signature: `${AUDIO_ROOT}/chimes/chime-signature.mp3`,
+  start: `${AUDIO_ROOT}/chimes/chime__session-start.mp3`,
+  end: `${AUDIO_ROOT}/chimes/chime__session-end.mp3`,
+  transition: `${AUDIO_ROOT}/chimes/chime__milestone.mp3`,
+  signature: `${AUDIO_ROOT}/chimes/chime__breath-in.mp3`,
 } as const;
 
-export const SIGNATURE_INTRO = `${AUDIO_ROOT}/vo/_signature/brand-intro.mp3`;
+export const SIGNATURE_INTRO = `${AUDIO_ROOT}/vo/signature__welcome.mp3`;
 
 // Journeys moved to ./journeys.ts — they have a richer shape (per-day teasers,
 // cover images, progress tracking) than a flat sessionIds array supports.

@@ -159,17 +159,17 @@ export default function ImmersiveEntry({
                 opacity: orbBreath === "in" ? 0.7 : 0.3,
               }}
               transition={{ duration: 4, ease: "easeInOut" }}
-              className="absolute inset-0 rounded-full border-2 border-[#91b149]/60"
+              className="absolute inset-0 rounded-full border-2 border-[#91b149]/60 pointer-events-none"
             />
             <motion.div
               animate={{
                 scale: orbBreath === "in" ? 1.08 : 0.96,
               }}
               transition={{ duration: 4, ease: "easeInOut" }}
-              className="absolute inset-4 rounded-full bg-gradient-to-br from-[#91b149] to-[#5d7a2d] shadow-[0_8px_40px_rgba(145,177,73,0.5)]"
+              className="absolute inset-4 rounded-full bg-gradient-to-br from-[#91b149] to-[#5d7a2d] shadow-[0_8px_40px_rgba(145,177,73,0.5)] pointer-events-none"
             />
-            {/* Center label */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-[#0a1a0a] font-display">
+            {/* Center label — pointer-events:none so clicks pass through to button */}
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-[#0a1a0a] font-display pointer-events-none">
               <span className="text-3xl mb-1" aria-hidden="true">
                 {suggestedSession.icon}
               </span>
