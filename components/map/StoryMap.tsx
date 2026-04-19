@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useEffect, useMemo, useState, useCallback } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker, useMap } from "react-leaflet";
 import L from "leaflet";
 import type { DestinationFull } from "@/data/siteData";
@@ -8,7 +8,7 @@ import type { TherapeuticSite } from "@/lib/therapeuticSites";
 import type { Recommendation } from "@/hooks/useRecommendation";
 
 /* ── Map styles — real tile providers, not abstract art ── */
-type MapStyle = "streets" | "satellite" | "terrain";
+type MapStyle = "streets" | "satellite" | "terrain" | "dark";
 
 const TILE_CONFIG: Record<
   MapStyle,
@@ -36,6 +36,13 @@ const TILE_CONFIG: Record<
     maxZoom: 17,
     label: "تضاريس",
     icon: "⛰️",
+  },
+  dark: {
+    url: "/api/tiles/dark/{z}/{x}/{y}",
+    attribution: "&copy; OpenStreetMap &copy; CARTO",
+    maxZoom: 19,
+    label: "ليلي",
+    icon: "🌙",
   },
 };
 
@@ -207,6 +214,10 @@ interface Props {
   highlighted: string | null; // currently focused destination id
   showSubSites: boolean;
   onSelectDestination: (id: string) => void;
+  /** Optional treatment filter — pins not matching get extra-dim */
+  treatmentFilter?: string | null;
+  /** Optional search query — filters destinations + sub-sites */
+  searchQuery?: string;
 }
 
 export default function StoryMap({
@@ -216,10 +227,14 @@ export default function StoryMap({
   highlighted,
   showSubSites,
   onSelectDestination,
+  treatmentFilter,
+  searchQuery,
 }: Props) {
   const [mapStyle, setMapStyle] = useState<MapStyle>("streets");
   const [tileError, setTileError] = useState(false);
   const [tilesSeen, setTilesSeen] = useState(0);
+  const [userLocation, setUserLocation] = useState<[number, number] | null>(null);
+  const [locating, setLocating] = useState(false);
   const tile = TILE_CONFIG[mapStyle];
 
   // Reset error state when switching styles — gives the new provider a fresh chance
@@ -228,15 +243,56 @@ export default function StoryMap({
     setTilesSeen(0);
   }, [mapStyle]);
 
+  // Auto-switch to dark tiles when user prefers dark mode (only on first mount)
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
+    const hasDarkClass = document.documentElement.classList.contains("dark");
+    if (prefersDark || hasDarkClass) {
+      setMapStyle("dark");
+    }
+  }, []);
+
   const highlightedDest = useMemo(
     () => destinations.find((d) => d.id === highlighted) ?? null,
     [destinations, highlighted],
   );
 
+  const normalizedSearch = (searchQuery || "").trim().toLowerCase();
+
+  const matchesSearch = useCallback(
+    (text: string) =>
+      !normalizedSearch || text.toLowerCase().includes(normalizedSearch),
+    [normalizedSearch],
+  );
+
   const visibleSubSites = useMemo(() => {
     if (!showSubSites || !highlighted) return [];
-    return subSites.filter((s) => s.destinationId === highlighted);
-  }, [subSites, showSubSites, highlighted]);
+    return subSites
+      .filter((s) => s.destinationId === highlighted)
+      .filter(
+        (s) =>
+          matchesSearch(s.name) ||
+          matchesSearch(s.subtitle) ||
+          s.treatments.some((t) => matchesSearch(t)),
+      );
+  }, [subSites, showSubSites, highlighted, matchesSearch]);
+
+  const handleLocateMe = useCallback(() => {
+    if (!navigator.geolocation) {
+      setLocating(false);
+      return;
+    }
+    setLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setUserLocation([pos.coords.latitude, pos.coords.longitude]);
+        setLocating(false);
+      },
+      () => setLocating(false),
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 },
+    );
+  }, []);
 
   const cameraTarget: [number, number] | null = highlightedDest
     ? [highlightedDest.lat, highlightedDest.lng]
@@ -313,10 +369,32 @@ export default function StoryMap({
         const isRecommended =
           recommendation && dest.id === recommendation.destinationId;
         const isHighlighted = highlighted === dest.id;
-        // Dim unrelated pins when a destination is focused.
+        // Filter match — dim pins that don't match the active treatment filter.
+        const matchesFilter =
+          !treatmentFilter ||
+          dest.treatments?.some((t) => t.includes(treatmentFilter));
+        const matchesQuery =
+          !normalizedSearch ||
+          matchesSearch(dest.name) ||
+          matchesSearch(dest.description || "") ||
+          (dest.treatments || []).some((t) => matchesSearch(t));
+        // Dim unrelated pins when a destination is focused OR filter doesn't match.
         const dim =
-          highlighted !== null && !isHighlighted && !isRecommended;
+          (highlighted !== null && !isHighlighted && !isRecommended) ||
+          !matchesFilter ||
+          !matchesQuery;
         const size = isRecommended ? 56 : 44;
+
+        // Build a descriptive alt label for screen readers.
+        const ariaLabel = [
+          dest.name,
+          dest.environment,
+          isRecommended ? "وجهتك المقترحة" : "",
+          dim ? "(غير مناسبة لبحثك)" : "",
+          dest.treatments?.length ? `تعالج: ${dest.treatments.join("، ")}` : "",
+        ]
+          .filter(Boolean)
+          .join(" — ");
 
         return (
           <Fragment key={dest.id}>
@@ -342,6 +420,9 @@ export default function StoryMap({
                 dim,
                 !!isRecommended,
               )}
+              alt={ariaLabel}
+              title={dim && !matchesFilter ? "مش مناسبة للفلتر الحالي — اضغط للاستكشاف" : dest.name}
+              keyboard={true}
               eventHandlers={{ click: () => onSelectDestination(dest.id) }}
             >
               <Popup maxWidth={260} className="custom-popup">
@@ -419,6 +500,9 @@ export default function StoryMap({
           key={site.id}
           position={[site.lat, site.lng]}
           icon={subSiteIcon(site.icon, site.name)}
+          alt={`${site.name} — ${site.subtitle} — ${site.treatments.join("، ")}`}
+          title={site.name}
+          keyboard={true}
         >
           <Popup maxWidth={240}>
             <div dir="rtl" style={{ fontFamily: "Cairo, sans-serif" }}>
@@ -461,8 +545,35 @@ export default function StoryMap({
         </Marker>
       ))}
 
-      {/* Zoom controls */}
-      <MapZoomControl />
+      {/* User location marker — shows current position when geolocation is granted */}
+      {userLocation && (
+        <>
+          <CircleMarker
+            center={userLocation}
+            radius={24}
+            pathOptions={{
+              color: "#3b82f6",
+              fillColor: "#3b82f6",
+              fillOpacity: 0.15,
+              weight: 0,
+            }}
+          />
+          <CircleMarker
+            center={userLocation}
+            radius={8}
+            pathOptions={{
+              color: "white",
+              fillColor: "#3b82f6",
+              fillOpacity: 1,
+              weight: 3,
+            }}
+          />
+          <UserLocationCamera target={userLocation} />
+        </>
+      )}
+
+      {/* Zoom + locate controls */}
+      <MapZoomControl onLocate={handleLocateMe} locating={locating} />
     </MapContainer>
 
       {/* Offline / tile-error banner — shown when tiles can't load.
@@ -484,10 +595,44 @@ export default function StoryMap({
   );
 }
 
-function MapZoomControl() {
+/**
+ * Recenters the map on the user's location when it becomes available.
+ * Only fires once per location update (not on every re-render).
+ */
+function UserLocationCamera({ target }: { target: [number, number] }) {
+  const map = useMap();
+  const lastTarget = useRef<string | null>(null);
+  useEffect(() => {
+    const key = `${target[0]},${target[1]}`;
+    if (lastTarget.current === key) return;
+    lastTarget.current = key;
+    map.flyTo(target, 10, { duration: 1.5 });
+  }, [target, map]);
+  return null;
+}
+
+function MapZoomControl({
+  onLocate,
+  locating,
+}: {
+  onLocate: () => void;
+  locating: boolean;
+}) {
   const map = useMap();
   const zoomIn = useCallback(() => map.zoomIn(), [map]);
   const zoomOut = useCallback(() => map.zoomOut(), [map]);
+
+  const baseBtnStyle: React.CSSProperties = {
+    width: 44,
+    height: 44,
+    background: "rgba(18, 57, 77, 0.92)",
+    color: "white",
+    border: "1px solid rgba(255,255,255,0.15)",
+    fontSize: 20,
+    fontWeight: 700,
+    cursor: "pointer",
+    backdropFilter: "blur(8px)",
+  };
 
   return (
     <div
@@ -500,44 +645,55 @@ function MapZoomControl() {
           marginTop: "calc(max(12px, env(safe-area-inset-top)) + 52px)",
           display: "flex",
           flexDirection: "column",
-          gap: 2,
+          gap: 6,
         }}
       >
+        {/* Zoom group */}
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <button
+            onClick={zoomIn}
+            aria-label="تكبير"
+            style={{ ...baseBtnStyle, borderRadius: "12px 12px 0 0" }}
+          >
+            +
+          </button>
+          <button
+            onClick={zoomOut}
+            aria-label="تصغير"
+            style={{ ...baseBtnStyle, borderRadius: "0 0 12px 12px" }}
+          >
+            −
+          </button>
+        </div>
+
+        {/* Locate-me button */}
         <button
-          onClick={zoomIn}
-          aria-label="تكبير"
+          onClick={onLocate}
+          aria-label={locating ? "جاري تحديد موقعك" : "اعرف موقعي"}
+          title="اعرف موقعي"
+          disabled={locating}
           style={{
-            width: 44,
-            height: 44,
-            background: "rgba(18, 57, 77, 0.92)",
-            color: "white",
-            border: "1px solid rgba(255,255,255,0.15)",
-            borderRadius: "12px 12px 0 0",
-            fontSize: 20,
-            fontWeight: 700,
-            cursor: "pointer",
-            backdropFilter: "blur(8px)",
+            ...baseBtnStyle,
+            borderRadius: 12,
+            fontSize: 18,
+            opacity: locating ? 0.6 : 1,
           }}
         >
-          +
-        </button>
-        <button
-          onClick={zoomOut}
-          aria-label="تصغير"
-          style={{
-            width: 44,
-            height: 44,
-            background: "rgba(18, 57, 77, 0.92)",
-            color: "white",
-            border: "1px solid rgba(255,255,255,0.15)",
-            borderRadius: "0 0 12px 12px",
-            fontSize: 20,
-            fontWeight: 700,
-            cursor: "pointer",
-            backdropFilter: "blur(8px)",
-          }}
-        >
-          −
+          {locating ? (
+            <span
+              style={{
+                display: "inline-block",
+                width: 14,
+                height: 14,
+                border: "2px solid rgba(255,255,255,0.3)",
+                borderTopColor: "#91b149",
+                borderRadius: "50%",
+                animation: "spin-slow 0.8s linear infinite",
+              }}
+            />
+          ) : (
+            "📍"
+          )}
         </button>
       </div>
     </div>

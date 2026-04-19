@@ -21,6 +21,9 @@ const UPSTREAM: Record<string, (z: string, x: string, y: string) => string> = {
     `https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/${z}/${y}/${x}`,
   // OpenTopoMap — hill-shaded terrain
   terrain: (z, x, y) => `https://a.tile.opentopomap.org/${z}/${x}/${y}.png`,
+  // CARTO Dark Matter — for dark mode / evening feel
+  dark: (z, x, y) =>
+    `https://a.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png`,
 };
 
 // Sanitize path params so we only forward digits/ascii-hyphens.
