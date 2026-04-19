@@ -369,7 +369,7 @@ function OverlayCard({
 }) {
   return (
     <div
-      className="bg-[#12394d]/95 dark:bg-[#0a151f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.5)] overflow-hidden w-full max-w-sm"
+      className="bg-[#12394d]/95 dark:bg-[#0a151f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.5)] overflow-hidden w-full max-w-sm flex flex-col max-h-[min(72vh,520px)]"
       dir="rtl"
       role="region"
       aria-label="قصة الخريطة"
@@ -404,7 +404,7 @@ function OverlayCard({
 
       {/* Body — announced to screen readers when act changes */}
       <div
-        className="p-5"
+        className="p-5 flex-1 overflow-y-auto overscroll-contain"
         role="status"
         aria-live="polite"
         aria-atomic="true"

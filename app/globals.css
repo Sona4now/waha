@@ -156,6 +156,34 @@
   }
 }
 
+/* ---- Map shell — handles iOS dynamic viewport + mobile bottom-nav ---- */
+.map-shell {
+  /* Desktop: below the 72px top nav */
+  height: calc(100vh - 72px);
+  height: calc(100dvh - 72px);
+}
+
+@media (max-width: 768px) {
+  .map-shell {
+    /* Mobile: use the full screen since BottomNav is hidden on /map.
+       100dvh = dynamic viewport height (excludes iOS URL bar when hidden). */
+    height: calc(100vh - 72px);
+    height: calc(100dvh - 72px);
+  }
+}
+
+/* Prevent parent's pb-16 on mobile from pushing the map down/off-screen */
+body:has(.map-shell) > div.min-h-screen {
+  padding-bottom: 0 !important;
+}
+
+/* Leaflet needs explicit dimensions — guard against any parent collapsing it */
+.map-shell .leaflet-container {
+  width: 100%;
+  height: 100%;
+  background: #0a151f;
+}
+
 /* ---- Leaflet custom styles ---- */
 .custom-marker {
   background: none !important;

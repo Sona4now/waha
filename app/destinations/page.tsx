@@ -304,9 +304,11 @@ export default function DestinationsPage() {
                 <Reveal key={dest.id} delay={i * 0.08}>
                   <div className="relative group h-full">
                     <CompareButton id={dest.id} />
+                    {/* Outer glow ring — appears on hover */}
+                    <div className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#91b149]/40 via-transparent to-[#1d5770]/40 blur-[2px]" />
                     <Link
                       href={`/destination/${dest.id}`}
-                      className="flex flex-col bg-white dark:bg-[#162033] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl dark:hover:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.6)] transition-all duration-500 hover:-translate-y-2 border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#91b149]/40 h-full no-underline"
+                      className="relative flex flex-col bg-white dark:bg-[#162033] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl dark:hover:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.6)] transition-all duration-500 hover:-translate-y-2 border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#91b149]/60 h-full no-underline"
                     >
                       {/* Image */}
                       <div className="relative h-52 overflow-hidden">
@@ -317,22 +319,30 @@ export default function DestinationsPage() {
                           sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                           className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent transition-opacity duration-500" />
+
+                        {/* Glassmorphism hover overlay with CTA */}
+                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-400 bg-[#0a151f]/30 backdrop-blur-[2px]">
+                          <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/90 text-[#12394d] font-bold text-sm shadow-xl backdrop-blur-md transform translate-y-2 group-hover:translate-y-0 transition-transform duration-400">
+                            اكتشف المزيد
+                            <span className="text-base leading-none">←</span>
+                          </span>
+                        </div>
 
                         {/* Environment badge */}
-                        <span className="absolute top-3 right-3 text-xs font-bold px-3 py-1.5 rounded-full text-white bg-[#91b149] shadow-lg">
+                        <span className="absolute top-3 right-3 text-xs font-bold px-3 py-1.5 rounded-full text-white bg-[#91b149] shadow-lg z-[1]">
                           {dest.envIcon} {dest.environment}
                         </span>
 
                         {/* Distance chip (left) */}
                         {dest.distanceKm !== undefined && (
-                          <span className="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full text-white bg-black/50 backdrop-blur-sm">
+                          <span className="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full text-white bg-black/50 backdrop-blur-sm z-[1]">
                             📍 {dest.distanceKm} كم
                           </span>
                         )}
 
                         {/* Name overlay at bottom */}
-                        <div className="absolute bottom-3 right-4 left-4">
+                        <div className="absolute bottom-3 right-4 left-4 z-[1]">
                           <h3 className="text-2xl font-bold text-white font-display drop-shadow-md">
                             {dest.name}
                           </h3>
@@ -377,7 +387,7 @@ export default function DestinationsPage() {
                             {dest.treatments.map((t, idx) => (
                               <span
                                 key={idx}
-                                className="text-[10px] px-2 py-0.5 rounded-full bg-[#f0f7ed] dark:bg-[#91b149]/15 text-[#91b149] font-bold"
+                                className="text-[10px] px-2 py-0.5 rounded-full bg-[#f0f7ed] dark:bg-[#91b149]/15 text-[#91b149] font-bold transition-all duration-300 hover:bg-[#91b149] hover:text-white hover:scale-105 border border-transparent hover:border-[#91b149]/40"
                               >
                                 {t}
                               </span>

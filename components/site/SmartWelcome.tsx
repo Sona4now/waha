@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { usePathname } from "next/navigation";
 import { DESTINATIONS } from "@/data/siteData";
 
 interface VisitData {
@@ -13,14 +14,17 @@ interface VisitData {
 
 const STORAGE_KEY = "waaha_visits";
 const DISMISS_KEY = "waaha_welcome_dismissed";
-const AUTO_DISMISS_MS = 7000;
+const AUTO_DISMISS_MS = 6000;
+const HIDDEN_PATHS = ["/", "/gate", "/therapy-room", "/map"];
 
 export default function SmartWelcome() {
+  const pathname = usePathname();
   const [show, setShow] = useState(false);
   const [visitData, setVisitData] = useState<VisitData | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
+    if (HIDDEN_PATHS.includes(pathname)) return;
 
     const dismissed = sessionStorage.getItem(DISMISS_KEY);
     if (dismissed) return;
@@ -52,9 +56,8 @@ export default function SmartWelcome() {
       setVisitData(data);
       setTimeout(() => setShow(true), 1500);
     }
-  }, []);
+  }, [pathname]);
 
-  // Auto-dismiss
   useEffect(() => {
     if (!show) return;
     const timer = setTimeout(() => handleDismiss(), AUTO_DISMISS_MS);
@@ -66,6 +69,7 @@ export default function SmartWelcome() {
     sessionStorage.setItem(DISMISS_KEY, "1");
   }
 
+  if (HIDDEN_PATHS.includes(pathname)) return null;
   if (!visitData?.recommendationId) return null;
 
   const dest = DESTINATIONS.find((d) => d.id === visitData.recommendationId);
@@ -89,9 +93,10 @@ export default function SmartWelcome() {
           exit={{ opacity: 0, y: 20 }}
           transition={{ type: "spring", stiffness: 300, damping: 28 }}
           className="fixed bottom-16 md:bottom-0 left-0 right-0 z-[75] no-print"
+          role="status"
+          aria-live="polite"
         >
           <div className="relative bg-gradient-to-l from-[#12394d] to-[#1d5770] border-t border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.3)]">
-            {/* Progress bar */}
             <div className="absolute top-0 left-0 right-0 h-[2px] overflow-hidden">
               <motion.div
                 initial={{ scaleX: 1 }}
@@ -101,15 +106,13 @@ export default function SmartWelcome() {
               />
             </div>
 
-            <div className="max-w-3xl mx-auto flex items-center gap-3 px-4 py-3">
-              {/* Label */}
+            <div className="max-w-3xl mx-auto flex items-center gap-3 px-4 py-2.5">
               <span className="text-[11px] font-bold text-[#91b149] flex-shrink-0">
                 {visitLabel}
               </span>
 
-              <span className="text-white/30">|</span>
+              <span className="text-white/30 hidden sm:inline">|</span>
 
-              {/* Destination link */}
               <Link
                 href={`/destination/${dest.id}`}
                 onClick={handleDismiss}
@@ -118,7 +121,6 @@ export default function SmartWelcome() {
                 وجهتك المقترحة: {dest.name} ←
               </Link>
 
-              {/* Close */}
               <button
                 onClick={handleDismiss}
                 className="flex-shrink-0 w-7 h-7 rounded-full hover:bg-white/10 text-white/50 hover:text-white flex items-center justify-center transition-colors"

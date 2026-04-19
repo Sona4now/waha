@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useCallback } from "react";
+import { Fragment, useEffect, useMemo, useState, useCallback } from "react";
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker, useMap } from "react-leaflet";
 import L from "leaflet";
 import type { DestinationFull } from "@/data/siteData";
@@ -14,25 +14,25 @@ const TILE_CONFIG: Record<
   MapStyle,
   { url: string; attribution: string; maxZoom: number; label: string; icon: string }
 > = {
+  // All tiles proxied through our own /api/tiles route so they're same-origin
+  // and bypass CSP/CORS/sandbox restrictions.
   streets: {
-    url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    attribution: "&copy; OpenStreetMap contributors",
+    url: "/api/tiles/streets/{z}/{x}/{y}",
+    attribution: "&copy; OpenStreetMap &copy; CARTO",
     maxZoom: 19,
-    label: "خريطة عادية",
+    label: "خريطة",
     icon: "🗺️",
   },
   satellite: {
-    url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-    attribution:
-      "Tiles &copy; Esri, Maxar, Earthstar Geographics, USDA, USGS, AeroGRID, IGN, GIS User Community",
+    url: "/api/tiles/satellite/{z}/{x}/{y}",
+    attribution: "Tiles &copy; Esri, Maxar",
     maxZoom: 19,
-    label: "أقمار صناعية",
+    label: "أقمار",
     icon: "🛰️",
   },
   terrain: {
-    url: "https://tile.opentopomap.org/{z}/{x}/{y}.png",
-    attribution:
-      "Map data: &copy; OpenStreetMap contributors, SRTM | Style: &copy; OpenTopoMap (CC-BY-SA)",
+    url: "/api/tiles/terrain/{z}/{x}/{y}",
+    attribution: "© OpenStreetMap, SRTM | © OpenTopoMap",
     maxZoom: 17,
     label: "تضاريس",
     icon: "⛰️",
@@ -218,7 +218,15 @@ export default function StoryMap({
   onSelectDestination,
 }: Props) {
   const [mapStyle, setMapStyle] = useState<MapStyle>("streets");
+  const [tileError, setTileError] = useState(false);
+  const [tilesSeen, setTilesSeen] = useState(0);
   const tile = TILE_CONFIG[mapStyle];
+
+  // Reset error state when switching styles — gives the new provider a fresh chance
+  useEffect(() => {
+    setTileError(false);
+    setTilesSeen(0);
+  }, [mapStyle]);
 
   const highlightedDest = useMemo(
     () => destinations.find((d) => d.id === highlighted) ?? null,
@@ -236,21 +244,63 @@ export default function StoryMap({
 
   const cameraZoom = showSubSites ? 10 : 6;
 
+  // If no tiles have loaded after ~4s, assume they failed and show a fallback banner.
+  const showTileFailureBanner = tileError && tilesSeen === 0;
+
   return (
-    <MapContainer
-      center={[26.8, 30.8]}
-      zoom={6}
-      minZoom={5}
-      maxZoom={tile.maxZoom}
-      className="w-full h-full"
-      style={{ background: "#0a151f" }}
-      zoomControl={false}
-    >
+    <div className="relative w-full h-full">
+      {/* Decorative base layer: stylized Egypt outline visible when tiles fail.
+          Sits under the leaflet container so loaded tiles always cover it. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background:
+            "radial-gradient(ellipse at 30% 40%, #1a3a4f 0%, #0e1e2b 55%, #070d15 100%)",
+          backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(
+            `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 800' preserveAspectRatio='xMidYMid meet'>
+              <defs>
+                <pattern id='grid' width='40' height='40' patternUnits='userSpaceOnUse'>
+                  <path d='M 40 0 L 0 0 0 40' fill='none' stroke='rgba(145,177,73,0.06)' stroke-width='1'/>
+                </pattern>
+              </defs>
+              <rect width='800' height='800' fill='url(%23grid)' />
+              <!-- Simplified Egypt outline (approximate) -->
+              <path d='M 200 180 L 560 180 L 640 200 L 680 260 L 700 340 L 680 420 L 650 480 L 600 540 L 540 580 L 480 600 L 420 620 L 380 640 L 340 620 L 320 580 L 300 540 L 290 480 L 280 420 L 260 360 L 240 300 L 220 240 Z'
+                    fill='rgba(145,177,73,0.08)' stroke='rgba(145,177,73,0.25)' stroke-width='2' stroke-dasharray='4 4' />
+              <!-- Nile river -->
+              <path d='M 420 620 Q 400 500 410 400 Q 420 300 400 220' fill='none' stroke='rgba(100,180,220,0.3)' stroke-width='3' stroke-linecap='round' />
+              <!-- Red Sea hint -->
+              <path d='M 560 280 Q 600 380 580 500' fill='none' stroke='rgba(220,100,100,0.15)' stroke-width='8' stroke-linecap='round' />
+            </svg>`,
+          )}")`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+        }}
+      />
+
+      <MapContainer
+        center={[26.8, 30.8]}
+        zoom={6}
+        minZoom={5}
+        maxZoom={tile.maxZoom}
+        className="w-full h-full relative"
+        style={{ background: "transparent" }}
+        zoomControl={false}
+      >
       <TileLayer
         key={mapStyle}
         attribution={tile.attribution}
         url={tile.url}
         maxZoom={tile.maxZoom}
+        eventHandlers={{
+          tileload: () => {
+            setTilesSeen((n) => n + 1);
+            setTileError(false);
+          },
+          tileerror: () => setTileError(true),
+        }}
       />
 
       <MapInvalidator />
@@ -269,7 +319,7 @@ export default function StoryMap({
         const size = isRecommended ? 56 : 44;
 
         return (
-          <div key={dest.id}>
+          <Fragment key={dest.id}>
             {/* Soft halo behind the recommended or highlighted pin */}
             {(isRecommended || isHighlighted) && (
               <CircleMarker
@@ -359,7 +409,7 @@ export default function StoryMap({
                 </div>
               </Popup>
             </Marker>
-          </div>
+          </Fragment>
         );
       })}
 
@@ -414,6 +464,23 @@ export default function StoryMap({
       {/* Zoom controls */}
       <MapZoomControl />
     </MapContainer>
+
+      {/* Offline / tile-error banner — shown when tiles can't load.
+          Positioned below all the map controls (zoom + style switcher
+          sit at ~60-130px from top). */}
+      {showTileFailureBanner && (
+        <div
+          className="absolute left-1/2 -translate-x-1/2 z-[500] pointer-events-none"
+          dir="rtl"
+          style={{ top: "calc(env(safe-area-inset-top) + 140px)" }}
+        >
+          <div className="pointer-events-auto bg-[#1d5770]/95 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1.5 rounded-full border border-white/15 shadow-lg flex items-center gap-1.5 max-w-[88vw]">
+            <span>📡</span>
+            <span className="truncate">وضع غير متصل — الخريطة شغالة بدون tiles</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -424,13 +491,13 @@ function MapZoomControl() {
 
   return (
     <div
-      className="leaflet-bottom leaflet-left"
+      className="leaflet-top leaflet-left"
       style={{ pointerEvents: "auto" }}
     >
       <div
         style={{
           margin: 12,
-          marginBottom: 80, // Keep clear of bottom nav + overlay
+          marginTop: "calc(max(12px, env(safe-area-inset-top)) + 52px)",
           display: "flex",
           flexDirection: "column",
           gap: 2,
@@ -501,13 +568,13 @@ function StyleSwitcher({
 
   return (
     <div
-      className="leaflet-bottom leaflet-right"
+      className="leaflet-top leaflet-right"
       style={{ pointerEvents: "auto" }}
     >
       <div
         style={{
           margin: 12,
-          marginBottom: 80,
+          marginTop: "calc(max(12px, env(safe-area-inset-top)) + 52px)",
           display: "flex",
           background: "rgba(18, 57, 77, 0.92)",
           border: "1px solid rgba(255,255,255,0.15)",

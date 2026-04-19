@@ -129,8 +129,7 @@ export default function MapPage() {
   return (
     <SiteLayout>
       <div
-        className="relative w-full bg-[#0a151f]"
-        style={{ height: "calc(100vh - 72px)" }}
+        className="map-shell relative w-full bg-[#0a151f] touch-manipulation"
         dir="rtl"
       >
         {/* Map fills the screen as a canvas */}
@@ -191,7 +190,10 @@ export default function MapPage() {
 
         {/* Narrative overlay (bottom-right on desktop, bottom on mobile) */}
         {!freeExplore && (
-          <div className="absolute bottom-4 right-4 left-4 md:left-auto md:right-6 md:bottom-6 md:max-w-sm z-[1000] pointer-events-none">
+          <div
+            className="absolute right-4 left-4 md:left-auto md:right-6 md:bottom-6 md:max-w-sm z-[1000] pointer-events-none"
+            style={{ bottom: "max(16px, env(safe-area-inset-bottom))" }}
+          >
             <StoryOverlay
               act={act}
               onActChange={setAct}
@@ -209,7 +211,8 @@ export default function MapPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="absolute bottom-4 right-4 left-4 md:left-auto md:right-6 md:max-w-sm z-[1000] bg-[#12394d]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_60px_-12px_rgba(0,0,0,0.5)]"
+            className="absolute right-4 left-4 md:left-auto md:right-6 md:max-w-sm z-[1000] bg-[#12394d]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_60px_-12px_rgba(0,0,0,0.5)]"
+            style={{ bottom: "max(16px, env(safe-area-inset-bottom))" }}
           >
             <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
               وضع الاستكشاف الحر
