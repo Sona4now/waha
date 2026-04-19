@@ -87,12 +87,25 @@ export function rateLimit(
 
 /**
  * Get the client identifier from request headers.
- * Prefers Vercel's forwarded IP.
+ * Prefers Vercel's forwarded IP. Falls back to a hash of the
+ * user-agent + accept-language so different anonymous clients don't
+ * share a single rate-limit bucket.
  */
 export function getClientId(req: Request): string {
   const forwarded = req.headers.get("x-forwarded-for");
-  if (forwarded) return forwarded.split(",")[0].trim();
+  if (forwarded) return `ip:${forwarded.split(",")[0].trim()}`;
   const real = req.headers.get("x-real-ip");
-  if (real) return real;
-  return "anonymous";
+  if (real) return `ip:${real}`;
+
+  // Degraded mode: derive a weak fingerprint from UA + Accept-Language.
+  // Not cryptographic — just enough to stop all anonymous traffic from
+  // colliding in one bucket when the IP header is missing.
+  const ua = req.headers.get("user-agent") || "";
+  const lang = req.headers.get("accept-language") || "";
+  let hash = 0;
+  const src = `${ua}|${lang}`;
+  for (let i = 0; i < src.length; i++) {
+    hash = (hash * 31 + src.charCodeAt(i)) | 0;
+  }
+  return `fp:${Math.abs(hash).toString(36)}`;
 }

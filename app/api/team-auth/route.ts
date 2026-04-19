@@ -3,14 +3,13 @@ import { rateLimit, getClientId } from "@/lib/rateLimit";
 import { safeCompare, authError } from "@/lib/security";
 import { logger } from "@/lib/logger";
 
-const PASSWORD = process.env.SITE_PASSWORD!;
+// Fallback kept for dev only; production MUST set TEAM_PASSWORD.
+const TEAM_PASSWORD = process.env.TEAM_PASSWORD || "";
 
-// 10 attempts / 15 min per client — enough for typos, stops brute force.
-const AUTH_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
+const TEAM_LIMIT = { limit: 10, windowMs: 15 * 60 * 1000 };
 
 export async function POST(request: Request) {
-  // Rate-limit before any work.
-  const rl = rateLimit(getClientId(request), AUTH_LIMIT);
+  const rl = rateLimit(`team:${getClientId(request)}`, TEAM_LIMIT);
   if (!rl.success) {
     return authError("محاولات كتير. جرب بعد شوية.", 429, {
       "Retry-After": String(rl.retryAfter ?? 60),
@@ -25,21 +24,13 @@ export async function POST(request: Request) {
     return authError("الطلب غير صالح", 400);
   }
 
-  if (!PASSWORD) {
-    logger.error("auth", "SITE_PASSWORD env var missing");
+  if (!TEAM_PASSWORD) {
+    logger.error("team-auth", "TEAM_PASSWORD env var missing");
     return authError("خطأ في إعدادات السيرفر", 500);
   }
 
-  if (safeCompare(password, PASSWORD)) {
-    const response = NextResponse.json({ success: true });
-    response.cookies.set("waaha_auth", "authenticated", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: "/",
-    });
-    return response;
+  if (safeCompare(password, TEAM_PASSWORD)) {
+    return NextResponse.json({ success: true });
   }
 
   return authError("كلمة المرور غير صحيحة", 401);

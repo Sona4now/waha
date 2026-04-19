@@ -1,3 +1,11 @@
+/**
+ * Lightweight destination schema used ONLY by the cinematic intro flow
+ * (app/page.tsx, ShareCard, RevealScreen, TransitionScreen, Teaser360).
+ *
+ * For the full site, import from `@/data/siteData` (DestinationFull).
+ * Kept separate because these only need visual metadata (poem, panorama,
+ * gradient) — not treatments, benefits, or FAQ.
+ */
 export type Destination = {
   id: string;
   name: string;

@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { DESTINATIONS } from "@/data/siteData";
-
-const BASE_URL = "https://wahaeg.com";
+import { SITE_URL as BASE_URL } from "@/lib/siteMeta";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -33,6 +32,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: "/contact",
       priority: 0.6,
       changeFrequency: "monthly" as const,
+    },
+    {
+      url: "/privacy",
+      priority: 0.3,
+      changeFrequency: "yearly" as const,
+    },
+    {
+      url: "/terms",
+      priority: 0.3,
+      changeFrequency: "yearly" as const,
     },
   ];
 

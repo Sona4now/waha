@@ -92,6 +92,21 @@ export default function Footer() {
           <p className="text-white/30 text-[0.82rem]">
             © 2026 واحة — WAHA · السياحة البيئية والاستشفاء من الطبيعة
           </p>
+          <div className="flex items-center gap-4 text-[0.75rem] text-white/30">
+            <Link
+              href="/privacy"
+              className="hover:text-white/60 no-underline transition-colors"
+            >
+              سياسة الخصوصية
+            </Link>
+            <span className="text-white/10">·</span>
+            <Link
+              href="/terms"
+              className="hover:text-white/60 no-underline transition-colors"
+            >
+              الشروط
+            </Link>
+          </div>
           <p className="text-white/20 text-[0.75rem]">
             شفاؤك من الطبيعة 🌿
           </p>

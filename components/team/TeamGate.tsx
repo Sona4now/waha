@@ -4,7 +4,7 @@ import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
-const TEAM_PASSWORD = "12345";
+const AUTH_ENDPOINT = "/api/team-auth";
 const STORAGE_KEY = "waaha_team_unlocked";
 
 interface Props {
@@ -22,6 +22,7 @@ export default function TeamGate({ children }: Props) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
   const [shake, setShake] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     try {
@@ -31,18 +32,34 @@ export default function TeamGate({ children }: Props) {
     setChecking(false);
   }, []);
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    if (password === TEAM_PASSWORD) {
-      try {
-        sessionStorage.setItem(STORAGE_KEY, "1");
-      } catch {}
-      setUnlocked(true);
-    } else {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch(AUTH_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.ok && data?.success) {
+        try {
+          sessionStorage.setItem(STORAGE_KEY, "1");
+        } catch {}
+        setUnlocked(true);
+      } else {
+        setError(true);
+        setShake(true);
+        setTimeout(() => setShake(false), 500);
+        setPassword("");
+      }
+    } catch {
       setError(true);
       setShake(true);
       setTimeout(() => setShake(false), 500);
-      setPassword("");
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -151,10 +168,10 @@ export default function TeamGate({ children }: Props) {
 
             <button
               type="submit"
-              disabled={!password}
+              disabled={!password || submitting}
               className="w-full py-4 bg-gradient-to-l from-[#91b149] to-[#6a8435] disabled:from-white/10 disabled:to-white/10 disabled:text-white/30 text-[#0a0f14] font-bold text-sm rounded-xl transition-all duration-300 hover:shadow-[0_8px_24px_rgba(145,177,73,0.4)]"
             >
-              دخول
+              {submitting ? "جاري التحقق..." : "دخول"}
             </button>
           </motion.form>
 

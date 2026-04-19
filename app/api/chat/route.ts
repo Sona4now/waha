@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest } from "next/server";
 import { rateLimit, getClientId } from "@/lib/rateLimit";
+import { logger } from "@/lib/logger";
 
 const client = new Anthropic();
 
@@ -9,6 +10,11 @@ const CHAT_LIMIT = {
   limit: 20,
   windowMs: 60 * 60 * 1000,
 };
+
+// Validation limits — keep tight to prevent cost abuse.
+const MAX_MESSAGES = 50;
+const MAX_MESSAGE_CHARS = 4096;
+const VALID_ROLES = new Set(["user", "assistant"]);
 
 const SYSTEM_PROMPT = `أنت المساعد الذكي لمنصة "واحة — WAHA" — منصة محتوى رقمية للسياحة البيئية المستدامة والاستشفاء من الطبيعة في مصر.
 
@@ -195,13 +201,64 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { messages }: { messages: Message[] } = await req.json();
+    let payload: unknown;
+    try {
+      payload = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid JSON body" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
 
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
+    const messagesRaw = (payload as { messages?: unknown })?.messages;
+
+    if (!messagesRaw || !Array.isArray(messagesRaw) || messagesRaw.length === 0) {
       return new Response(
         JSON.stringify({ error: "Messages array is required" }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
+    }
+
+    if (messagesRaw.length > MAX_MESSAGES) {
+      return new Response(
+        JSON.stringify({ error: `الحد الأقصى ${MAX_MESSAGES} رسالة` }),
+        { status: 413, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Strict validation of each message — role enum + content type + length.
+    const messages: Message[] = [];
+    for (const m of messagesRaw) {
+      if (!m || typeof m !== "object") {
+        return new Response(
+          JSON.stringify({ error: "Invalid message entry" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      const role = (m as { role?: unknown }).role;
+      const content = (m as { content?: unknown }).content;
+      if (typeof role !== "string" || !VALID_ROLES.has(role)) {
+        return new Response(
+          JSON.stringify({ error: "Invalid role" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      if (typeof content !== "string") {
+        return new Response(
+          JSON.stringify({ error: "Content must be a string" }),
+          { status: 400, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      if (content.length === 0 || content.length > MAX_MESSAGE_CHARS) {
+        return new Response(
+          JSON.stringify({
+            error: `كل رسالة لازم تكون بين 1 و ${MAX_MESSAGE_CHARS} حرف`,
+          }),
+          { status: 413, headers: { "Content-Type": "application/json" } }
+        );
+      }
+      messages.push({ role: role as Message["role"], content });
     }
 
     const stream = await client.messages.stream({
@@ -252,7 +309,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("[chat] error:", error);
+    logger.error("chat", "Unhandled error", { error });
 
     if (error instanceof Anthropic.AuthenticationError) {
       return new Response(

@@ -3,8 +3,10 @@ import "./globals.css";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { SITE_URL } from "@/lib/siteMeta";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: {
     default: "واحة — السياحة الاستشفائية في مصر",
     template: "%s | واحة",
@@ -93,7 +95,7 @@ export default function RootLayout({
               "@type": "WebSite",
               name: "واحة — WAHA",
               alternateName: "Waaha Therapeutic Tourism",
-              url: "https://wahaeg.com",
+              url: SITE_URL,
               description:
                 "منصة محتوى رقمية للتوعية حول السياحة البيئية والاستشفاء من الطبيعة في مصر",
               inLanguage: "ar-EG",
@@ -103,7 +105,7 @@ export default function RootLayout({
               },
               potentialAction: {
                 "@type": "SearchAction",
-                target: "https://wahaeg.com/search?q={search_term_string}",
+                target: `${SITE_URL}/search?q={search_term_string}`,
                 "query-input": "required name=search_term_string",
               },
             }),

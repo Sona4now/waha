@@ -13,6 +13,7 @@ import WellnessTip from "./WellnessTip";
 import AchievementListener from "./AchievementListener";
 import VisitTracker from "./VisitTracker";
 import CursorFollower from "./CursorFollower";
+import CookieConsent from "./CookieConsent";
 
 export default function SiteLayout({
   children,
@@ -45,6 +46,7 @@ export default function SiteLayout({
       <AchievementListener />
       <VisitTracker />
       <CursorFollower />
+      <CookieConsent />
     </div>
   );
 }
