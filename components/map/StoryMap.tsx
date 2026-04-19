@@ -198,10 +198,21 @@ interface CameraControllerProps {
 
 function CameraController({ target, zoom }: CameraControllerProps) {
   const map = useMap();
+  // Destructure to primitives so the effect dep array compares VALUES,
+  // not the array reference. Before: a fresh `[lat, lng]` array on every
+  // parent render re-fired `flyTo` and snapped the user's zoom back to
+  // `cameraZoom` — making manual zoom impossible.
+  const lat = target?.[0] ?? null;
+  const lng = target?.[1] ?? null;
+  const lastFlownRef = useRef<string>("");
   useEffect(() => {
-    if (!target) return;
-    map.flyTo(target, zoom, { duration: 1.8 });
-  }, [target, zoom, map]);
+    if (lat === null || lng === null) return;
+    // Skip if we already flew to this exact target at this zoom.
+    const key = `${lat.toFixed(4)},${lng.toFixed(4)},${zoom}`;
+    if (lastFlownRef.current === key) return;
+    lastFlownRef.current = key;
+    map.flyTo([lat, lng], zoom, { duration: 1.8 });
+  }, [lat, lng, zoom, map]);
   return null;
 }
 

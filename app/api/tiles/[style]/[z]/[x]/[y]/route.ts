@@ -26,8 +26,11 @@ const UPSTREAM: Record<string, (z: string, x: string, y: string) => string> = {
     `https://a.basemaps.cartocdn.com/dark_all/${z}/${x}/${y}.png`,
 };
 
-// Sanitize path params so we only forward digits/ascii-hyphens.
-const SAFE = /^-?\d{1,3}$/;
+// Sanitize path params so we only forward digits.
+// At zoom 18 the max coordinate is 2^18 = 262144 → 6 digits. Allow up to 7.
+const SAFE = /^\d{1,7}$/;
+// Max zoom we proxy. Higher levels rarely work on OSM tile servers anyway.
+const MAX_ZOOM = 19;
 
 type TileParams = { style: string; z: string; x: string; y: string };
 
@@ -43,6 +46,11 @@ export async function GET(
   const resolver = UPSTREAM[style];
   if (!resolver || !SAFE.test(z) || !SAFE.test(x) || !SAFE.test(cleanY)) {
     return new NextResponse("Invalid tile request", { status: 400 });
+  }
+  // Cap zoom to prevent abuse / upstream rejections
+  const zNum = Number(z);
+  if (zNum < 0 || zNum > MAX_ZOOM) {
+    return new NextResponse("Zoom out of range", { status: 400 });
   }
 
   const upstream = resolver(z, x, cleanY);
