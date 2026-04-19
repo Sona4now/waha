@@ -123,7 +123,8 @@
       "Bash(curl -s -X POST https://wahaeg.com/api/auth -H \"Content-Type: application/json\" -d '{\"password\":\"Pola@0100450\"}')",
       "Bash(curl -s -X POST https://wahaeg.com/api/team-auth -H \"Content-Type: application/json\" -d '{\"password\":\"12345\"}')",
       "Bash(curl -s -o /dev/null -w 'attempt __TRACKED_VAR__: %{http_code}\\\\n' -X POST https://wahaeg.com/api/admin-auth -H 'Content-Type: application/json' -d '{\"password\":\"wrong\"}')",
-      "Bash(curl -sI https://wahaeg.com/)"
+      "Bash(curl -sI https://wahaeg.com/)",
+      "Bash(curl -sL -o /dev/null -w \"%{http_code}\" https://wahaeg.com/therapy-room)"
     ]
   }
 }

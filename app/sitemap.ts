@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { DESTINATIONS } from "@/data/siteData";
+import { DESTINATIONS, BLOG_POSTS } from "@/data/siteData";
 import { SITE_URL as BASE_URL } from "@/lib/siteMeta";
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -51,7 +51,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly" as const,
   }));
 
-  return [...staticRoutes, ...destinationRoutes].map((route) => ({
+  const blogRoutes = BLOG_POSTS.map((p) => ({
+    url: `/blog/${p.id}`,
+    priority: 0.6,
+    changeFrequency: "monthly" as const,
+  }));
+
+  return [...staticRoutes, ...destinationRoutes, ...blogRoutes].map((route) => ({
     url: `${BASE_URL}${route.url}`,
     lastModified: now,
     changeFrequency: route.changeFrequency,
