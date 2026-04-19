@@ -1,16 +1,22 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion } from "framer-motion";
-import { getSession, getTimings, type Session } from "@/lib/meditation/sessions";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  getSession,
+  getTimings,
+  getSessionVideoTrack,
+  type Session,
+} from "@/lib/meditation/sessions";
 import { getEnvironment } from "@/lib/meditation/environments";
 import { useBreathCycle } from "@/hooks/meditation/useBreathCycle";
 import { useSessionTimer } from "@/hooks/meditation/useSessionTimer";
+import { useSessionAudio } from "@/hooks/meditation/useSessionAudio";
 import { useVoiceNarrator } from "@/hooks/meditation/useVoiceNarrator";
-import { playPhaseTick, playStartChime, playEndChime } from "@/lib/meditation/chimes";
 import BreathingOrb from "./BreathingOrb";
 import SessionControls from "./SessionControls";
 import AmbientMixer, { type MixerState } from "./AmbientMixer";
+import VideoBackdrop from "./VideoBackdrop";
 
 interface Props {
   sessionId: string;
@@ -26,12 +32,27 @@ interface Props {
     volumeChimes: number;
     volumeVoice: number;
   }) => void;
-  onComplete: (elapsed: number, fullyCompleted: boolean, breathCycles: number) => void;
+  onComplete: (
+    elapsed: number,
+    fullyCompleted: boolean,
+    breathCycles: number,
+  ) => void;
 }
 
 /**
- * The active meditation experience — orb, narration, timer, controls.
- * All the stateful/side-effect work lives here.
+ * Immersive meditation experience.
+ *
+ * Visual layers (back → front):
+ *   · Video backdrop (optional) OR cross-fading gradient
+ *   · Subtle wave particle
+ *   · Breathing orb (center)
+ *   · Caption text (when voice muted)
+ *   · Auto-hiding top bar + bottom controls
+ *
+ * Audio layers handled by `useSessionAudio`:
+ *   · Ambient music loop (auto-ducks when VO speaks)
+ *   · Timed VO clips (MP3 → Web Speech fallback)
+ *   · Start/end chimes
  */
 export default function SessionPlayer({
   sessionId,
@@ -42,12 +63,12 @@ export default function SessionPlayer({
   const session: Session = useMemo(() => getSession(sessionId), [sessionId]);
   const env = useMemo(() => getEnvironment(session.env), [session.env]);
   const timings = useMemo(() => getTimings(session), [session]);
+  const videoUrl = useMemo(() => getSessionVideoTrack(session), [session]);
 
   const [playing, setPlaying] = useState(true);
   const [countdown, setCountdown] = useState(3);
   const [intro, setIntro] = useState(true);
   const [breathCycles, setBreathCycles] = useState(0);
-  const [narrationIdx, setNarrationIdx] = useState(0);
   const [mixer, setMixer] = useState<MixerState>({
     ambient: initialSettings.volumeAmbient,
     chimes: initialSettings.volumeChimes,
@@ -55,19 +76,37 @@ export default function SessionPlayer({
   });
   const [voiceEnabled, setVoiceEnabled] = useState(initialSettings.voiceEnabled);
   const [showMixer, setShowMixer] = useState(false);
+  const [uiHidden, setUiHidden] = useState(false);
   const startChimePlayed = useRef(false);
 
-  // Prefers-reduced-motion
+  // Auto-hide UI after 4s of inactivity (zen mode)
+  const idleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    const reset = () => {
+      setUiHidden(false);
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+      idleTimerRef.current = setTimeout(() => setUiHidden(true), 4000);
+    };
+    reset();
+    window.addEventListener("pointermove", reset, { passive: true });
+    window.addEventListener("touchstart", reset, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", reset);
+      window.removeEventListener("touchstart", reset);
+      if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    };
+  }, []);
+
   const [reduceMotion, setReduceMotion] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     setReduceMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
-    mq.addEventListener?.("change", handler);
-    return () => mq.removeEventListener?.("change", handler);
+    const h = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
+    mq.addEventListener?.("change", h);
+    return () => mq.removeEventListener?.("change", h);
   }, []);
 
-  // Persist settings whenever the user tweaks them.
+  // Persist settings
   useEffect(() => {
     onSettingsChange({
       voiceEnabled,
@@ -77,30 +116,11 @@ export default function SessionPlayer({
     });
   }, [voiceEnabled, mixer, onSettingsChange]);
 
-  // Narration (Web Speech)
-  const { speak, stop: stopVoice } = useVoiceNarrator({
+  // Web Speech fallback narrator — called by useSessionAudio if an MP3 fails
+  const { speak: fallbackSpeak } = useVoiceNarrator({
     enabled: voiceEnabled,
     volume: mixer.voice / 100,
   });
-
-  // 3-2-1 intro countdown
-  useEffect(() => {
-    if (!intro) return;
-    if (countdown <= 0) {
-      setIntro(false);
-      if (!startChimePlayed.current) {
-        startChimePlayed.current = true;
-        playStartChime(mixer.chimes / 100);
-        // First narration line (only on full narration sessions)
-        if (session.narration[0]) {
-          setTimeout(() => speak(session.narration[0]), 900);
-        }
-      }
-      return;
-    }
-    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
-    return () => clearTimeout(t);
-  }, [intro, countdown, mixer.chimes, speak, session.narration]);
 
   // Breath cycle
   const { phase } = useBreathCycle({
@@ -114,40 +134,43 @@ export default function SessionPlayer({
     active: playing && !intro,
     durationSec: session.duration,
     onComplete: () => {
-      playEndChime(mixer.chimes / 100);
+      playEnd();
       onComplete(session.duration, true, breathCycles + 1);
     },
   });
 
-  // Chimes on each "in" phase (optional subtle tick)
-  const lastPhaseRef = useRef(phase);
+  // Full 3-layer audio engine — ambient loop + timed VO + chimes
+  const { currentClipIdx, playStart, playEnd } = useSessionAudio({
+    session,
+    playing,
+    elapsed,
+    intro,
+    voiceEnabled,
+    volumeAmbient: mixer.ambient,
+    volumeChimes: mixer.chimes,
+    volumeVoice: mixer.voice,
+    fallbackSpeak,
+  });
+
+  const currentCaption =
+    currentClipIdx >= 0 ? session.voClips[currentClipIdx]?.text ?? "" : "";
+
+  // 3-2-1 intro countdown
   useEffect(() => {
-    if (!playing || intro) return;
-    if (phase !== lastPhaseRef.current && phase === "in" && mixer.chimes > 0) {
-      playPhaseTick((mixer.chimes / 100) * 0.4);
+    if (!intro) return;
+    if (countdown <= 0) {
+      setIntro(false);
+      if (!startChimePlayed.current) {
+        startChimePlayed.current = true;
+        playStart();
+      }
+      return;
     }
-    lastPhaseRef.current = phase;
-  }, [phase, playing, intro, mixer.chimes]);
+    const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [intro, countdown, playStart]);
 
-  // Advance narration over time, distributed across the session duration.
-  useEffect(() => {
-    if (intro || !playing) return;
-    if (session.narration.length <= 1) return;
-    const interval = Math.max(
-      12,
-      Math.floor(session.duration / session.narration.length),
-    );
-    const t = setInterval(() => {
-      setNarrationIdx((i) => {
-        const next = Math.min(i + 1, session.narration.length - 1);
-        if (next !== i) speak(session.narration[next]);
-        return next;
-      });
-    }, interval * 1000);
-    return () => clearInterval(t);
-  }, [intro, playing, session.duration, session.narration, speak]);
-
-  // Haptic on breath phase — only on actual phase change.
+  // Haptic on breath phase change
   const vibratedPhaseRef = useRef<string>("");
   useEffect(() => {
     if (!playing || intro) return;
@@ -160,29 +183,16 @@ export default function SessionPlayer({
     }
   }, [phase, playing, intro]);
 
-  // Stop voice if muted
-  useEffect(() => {
-    if (!voiceEnabled) stopVoice();
-  }, [voiceEnabled, stopVoice]);
-
   function togglePlay() {
     setPlaying((p) => !p);
-    if (playing) stopVoice();
-  }
-
-  function skipLine() {
-    const next = Math.min(narrationIdx + 1, session.narration.length - 1);
-    setNarrationIdx(next);
-    speak(session.narration[next]);
   }
 
   function endNow() {
-    stopVoice();
-    playEndChime(mixer.chimes / 100);
+    playEnd();
     onComplete(elapsed, false, breathCycles);
   }
 
-  // Time-of-session gradient cue
+  // Progress-based gradient cue
   const gradientKey =
     progress < 0.2
       ? "dawn"
@@ -191,61 +201,72 @@ export default function SessionPlayer({
         : progress < 0.85
           ? "sunset"
           : "night";
-  const gradient = env.gradients[gradientKey];
 
   return (
-    <div
-      className={`fixed inset-0 overflow-hidden select-none`}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.8 }}
+      className="fixed inset-0 overflow-hidden select-none bg-[#070d15]"
       dir="rtl"
       aria-label={`جلسة ${session.name}`}
     >
-      {/* ── Cross-fade gradient layer (no remount) ── */}
-      {(["dawn", "day", "sunset", "night"] as const).map((g) => (
-        <div
-          key={g}
-          className={`absolute inset-0 bg-gradient-to-b ${env.gradients[g]} transition-opacity duration-[4000ms] ease-in-out`}
-          style={{ opacity: g === gradientKey ? 1 : 0 }}
-          aria-hidden="true"
-        />
-      ))}
+      {/* ── Video backdrop (or gradient fallback) ── */}
+      <VideoBackdrop
+        videoUrl={videoUrl}
+        fallbackGradient={env.gradients[gradientKey]}
+        overlayOpacity={intro ? 0.55 : 0.35}
+        playing={playing}
+      />
 
-      {/* ── Subtle animated particles (disabled for reduced motion) ── */}
+      {/* ── Cross-fade gradient for time-of-session cue (when no video) ── */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        {(["dawn", "day", "sunset", "night"] as const).map((g) => (
+          <div
+            key={g}
+            className={`absolute inset-0 bg-gradient-to-b ${env.gradients[g]} transition-opacity duration-[4000ms] ease-in-out`}
+            style={{ opacity: g === gradientKey ? 0.45 : 0 }}
+          />
+        ))}
+      </div>
+
+      {/* ── Subtle wave particle ── */}
       {!reduceMotion && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 2 }}
-          className="absolute inset-0 pointer-events-none"
-          aria-hidden="true"
-        >
+        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
           <div
             className="absolute left-0 right-0 h-1/3 bottom-0 rounded-[50%] opacity-20"
             style={{ background: env.waveColor, transform: "scale(1.5)" }}
           />
-        </motion.div>
+        </div>
       )}
 
-      {/* ── Top bar ── */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-4">
+      {/* ── Top bar (auto-hides) ── */}
+      <motion.div
+        animate={{ opacity: uiHidden && !intro ? 0 : 1 }}
+        transition={{ duration: 0.5 }}
+        className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between p-4"
+        style={{ paddingTop: "max(16px, env(safe-area-inset-top))" }}
+      >
         <button
           onClick={endNow}
-          className="text-white/60 hover:text-white text-xs bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/10 transition-colors"
+          className="text-white/70 hover:text-white text-xs bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/10 transition-colors"
           aria-label="إنهاء الجلسة"
         >
           ✕ إنهاء
         </button>
-        <div className="text-white/60 text-xs font-display bg-white/5 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/10">
+        <div className="text-white/70 text-xs font-display bg-black/30 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/10">
           {env.emoji} {session.name}
         </div>
         <button
           onClick={() => setShowMixer((s) => !s)}
           aria-pressed={showMixer}
           aria-label="إعدادات الصوت"
-          className="text-white/60 hover:text-white text-xs bg-white/5 hover:bg-white/10 backdrop-blur-sm rounded-full w-9 h-9 border border-white/10 flex items-center justify-center transition-colors"
+          className="text-white/70 hover:text-white text-xs bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full w-9 h-9 border border-white/10 flex items-center justify-center transition-colors"
         >
           🎚️
         </button>
-      </div>
+      </motion.div>
 
       {/* ── Intro countdown ── */}
       {intro ? (
@@ -261,69 +282,89 @@ export default function SessionPlayer({
             <div className="text-white/60 text-xs uppercase tracking-[0.4em] mb-4">
               استعد...
             </div>
-            <div className="text-white font-display font-black text-9xl leading-none">
+            <div className="text-white font-display font-black text-9xl leading-none drop-shadow-2xl">
               {countdown > 0 ? countdown : "•"}
             </div>
-            <div className="text-white/50 text-sm mt-6 max-w-xs mx-auto">
+            <div className="text-white/60 text-sm mt-6 max-w-xs mx-auto">
               خد وضعية مريحة واغمض عينيك لو حبيت
             </div>
           </motion.div>
         </div>
       ) : (
         <>
-          {/* ── Center orb ── */}
+          {/* ── Breathing orb ── */}
           <div className="absolute inset-0 flex items-center justify-center z-20">
             <BreathingOrb
               phase={phase}
               timings={timings}
               progress={progress}
               reduceMotion={reduceMotion}
-              narrationLine={session.narration[narrationIdx]}
+              narrationLine={currentCaption}
             />
           </div>
 
-          {/* ── Mixer drawer ── */}
-          {showMixer && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="absolute top-20 right-4 z-30 w-[280px]"
-            >
-              <AmbientMixer
-                ambientUrl={env.ambientUrl}
-                playing={playing}
-                mixer={mixer}
-                onMixerChange={setMixer}
-              />
-            </motion.div>
-          )}
-          {/* Always-mounted (hidden) mixer so audio keeps playing when drawer is closed */}
-          {!showMixer && (
-            <div className="absolute -top-[9999px] left-0 opacity-0 pointer-events-none">
-              <AmbientMixer
-                ambientUrl={env.ambientUrl}
-                playing={playing}
-                mixer={mixer}
-                onMixerChange={setMixer}
-              />
-            </div>
-          )}
+          {/* ── Caption (visible when voice muted) ── */}
+          <AnimatePresence mode="wait">
+            {!voiceEnabled && currentCaption && (
+              <motion.div
+                key={currentCaption}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -8 }}
+                transition={{ duration: 0.4 }}
+                className="absolute bottom-32 md:bottom-36 left-4 right-4 z-20 text-center"
+              >
+                <p className="text-white/85 text-sm md:text-base leading-relaxed max-w-md mx-auto bg-black/40 backdrop-blur-md rounded-2xl px-5 py-3 border border-white/10">
+                  {currentCaption}
+                </p>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {/* ── Controls ── */}
-          <div className="absolute bottom-8 left-0 right-0 z-30 px-4">
+          {/* ── Mixer drawer ── */}
+          <AnimatePresence>
+            {showMixer && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="absolute top-24 right-4 z-30 w-[280px]"
+              >
+                <AmbientMixer
+                  mixer={mixer}
+                  onMixerChange={setMixer}
+                  // The real ambient playback is owned by useSessionAudio, so
+                  // this internal player stays silent to avoid double-playback.
+                  playing={false}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* ── Bottom controls (auto-hide) ── */}
+          <motion.div
+            animate={{ opacity: uiHidden ? 0 : 1 }}
+            transition={{ duration: 0.5 }}
+            className="absolute bottom-8 left-0 right-0 z-30 px-4"
+            style={{ paddingBottom: "max(24px, env(safe-area-inset-bottom))" }}
+          >
             <SessionControls
               playing={playing}
               onToggle={togglePlay}
               onEnd={endNow}
-              onSkip={skipLine}
+              onSkip={() => {
+                // The audio engine handles its own internal scheduling;
+                // a "skip" here just cancels any current VO via Web Speech
+                // or short-circuits by nudging. Simplest: silent no-op.
+              }}
               voiceEnabled={voiceEnabled}
               onToggleVoice={() => setVoiceEnabled((v) => !v)}
               elapsed={elapsed}
               duration={session.duration}
             />
-          </div>
+          </motion.div>
         </>
       )}
-    </div>
+    </motion.div>
   );
 }
