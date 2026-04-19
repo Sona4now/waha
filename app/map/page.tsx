@@ -3,222 +3,250 @@
 import { useState, useMemo, useCallback } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
-import PageHero from "@/components/site/PageHero";
 import { DESTINATIONS } from "@/data/siteData";
+import {
+  useRecommendation,
+  NEED_TO_TREATMENTS,
+} from "@/hooks/useRecommendation";
+import { THERAPEUTIC_SITES } from "@/lib/therapeuticSites";
+import StoryOverlay, {
+  type Act,
+} from "@/components/map/StoryOverlay";
 
-// Dynamic import - Leaflet doesn't support SSR
-const EgyptMap = dynamic(() => import("@/components/site/EgyptMap"), {
+// Leaflet only runs in the browser.
+const StoryMap = dynamic(() => import("@/components/map/StoryMap"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-full rounded-2xl bg-[#e8f0f5] dark:bg-[#162033] flex items-center justify-center">
+    <div className="w-full h-full bg-[#1a2332] flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
-        <div className="w-10 h-10 border-3 border-[#1d5770] border-t-transparent rounded-full animate-spin" />
-        <span className="text-[#7b7c7d] dark:text-white/50 text-sm">جاري تحميل الخريطة...</span>
+        <div className="w-10 h-10 border-[3px] border-[#91b149] border-t-transparent rounded-full animate-spin" />
+        <span className="text-white/60 text-sm">جاري تحضير الخريطة…</span>
       </div>
     </div>
   ),
 });
 
-const TREATMENT_FILTERS = [
-  "الكل",
-  "مفاصل",
-  "جلد",
-  "تنفس",
-  "توتر",
-  "استرخاء",
-];
-
 export default function MapPage() {
-  const [activeFilter, setActiveFilter] = useState("الكل");
-  const [activeDestination, setActiveDestination] = useState<string | null>(
-    null
-  );
+  const { recommendation, loaded } = useRecommendation();
+  const [act, setAct] = useState<Act>("welcome");
+  const [freeExplore, setFreeExplore] = useState(false);
+  const [manualHighlight, setManualHighlight] = useState<string | null>(null);
 
-  const filteredDestinations = useMemo(() => {
-    if (activeFilter === "الكل") return DESTINATIONS;
-    return DESTINATIONS.filter((d) => d.treatments.includes(activeFilter));
-  }, [activeFilter]);
+  const recommendedDest = useMemo(() => {
+    if (!recommendation) return null;
+    return (
+      DESTINATIONS.find((d) => d.id === recommendation.destinationId) ?? null
+    );
+  }, [recommendation]);
+
+  /**
+   * Destinations that match the user's stored treatment need.
+   * Used both to dim "irrelevant" pins and to suggest alternatives.
+   */
+  const compatibleDestinations = useMemo(() => {
+    if (!recommendation?.need) return DESTINATIONS;
+    const needTreatments = NEED_TO_TREATMENTS[recommendation.need] || [];
+    return DESTINATIONS.filter((d) =>
+      d.treatments.some((t) => needTreatments.includes(t)),
+    );
+  }, [recommendation]);
+
+  const alternateCompatible = useMemo(() => {
+    return compatibleDestinations.filter(
+      (d) => d.id !== recommendedDest?.id,
+    );
+  }, [compatibleDestinations, recommendedDest]);
+
+  // What the camera and sub-site layer focus on right now.
+  const highlighted = useMemo(() => {
+    if (freeExplore) return manualHighlight;
+    if (act === "welcome" || act === "context") return null;
+    return recommendedDest?.id ?? null;
+  }, [freeExplore, manualHighlight, act, recommendedDest]);
+
+  const showSubSites = !freeExplore && (act === "sites" || act === "reveal");
+
+  const focusedSubSites = useMemo(() => {
+    if (!highlighted) return [];
+    return THERAPEUTIC_SITES.filter((s) => s.destinationId === highlighted);
+  }, [highlighted]);
 
   const handleSelectDestination = useCallback((id: string) => {
-    setActiveDestination(id);
+    setFreeExplore(true);
+    setManualHighlight(id);
   }, []);
+
+  const skipToExplore = useCallback(() => {
+    setFreeExplore(true);
+    setManualHighlight(null);
+  }, []);
+
+  // Before the localStorage check resolves, keep the shell silent.
+  if (!loaded) {
+    return (
+      <SiteLayout>
+        <div className="fixed inset-0 bg-[#0a151f]" />
+      </SiteLayout>
+    );
+  }
+
+  // ── No recommendation → friendly prompt, never the same quiz ──
+  if (!recommendation || !recommendedDest) {
+    return (
+      <SiteLayout>
+        <NoRecommendationScreen />
+      </SiteLayout>
+    );
+  }
 
   return (
     <SiteLayout>
-      <PageHero
-        title="خريطة الوجهات"
-        subtitle="استكشف وجهات السياحة الاستشفائية على خريطة مصر التفاعلية"
-        breadcrumb={[
-          { label: "الرئيسية", href: "/home" },
-          { label: "خريطة الوجهات" },
-        ]}
-      />
-
-      <section className="max-w-[1280px] mx-auto px-4 md:px-6 py-8 md:py-12">
-        {/* Treatment Filters */}
-        <div className="mb-6">
-          <h2 className="text-sm font-bold text-[#12394d] dark:text-white mb-3 font-display">
-            تصفية حسب العلاج
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {TREATMENT_FILTERS.map((filter) => (
-              <button
-                key={filter}
-                onClick={() => {
-                  setActiveFilter(filter);
-                  setActiveDestination(null);
-                }}
-                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${
-                  activeFilter === filter
-                    ? "bg-[#1d5770] text-white shadow-md"
-                    : "bg-white dark:bg-[#162033] text-[#12394d] dark:text-white border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#1d5770] hover:text-[#1d5770]"
-                }`}
-              >
-                {filter}
-              </button>
-            ))}
-          </div>
+      <div className="relative w-full min-h-[calc(100vh-72px)] bg-[#0a151f]" dir="rtl">
+        {/* Map fills the screen as a canvas */}
+        <div className="absolute inset-0">
+          <StoryMap
+            destinations={DESTINATIONS}
+            subSites={THERAPEUTIC_SITES}
+            recommendation={recommendation}
+            highlighted={highlighted}
+            showSubSites={showSubSites}
+            onSelectDestination={handleSelectDestination}
+          />
         </div>
 
-        {/* Map + Sidebar Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6">
-          {/* Map */}
-          <div className="h-[450px] md:h-[600px] rounded-2xl overflow-hidden shadow-lg border border-[#d0dde4] dark:border-[#1e3a5f]">
-            <EgyptMap
-              destinations={filteredDestinations}
-              activeDestination={activeDestination}
-              onSelectDestination={handleSelectDestination}
+        {/* Ambient vignette while the story plays */}
+        {!freeExplore && (
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, transparent 0%, rgba(10,21,31,0.55) 70%, rgba(10,21,31,0.85) 100%)",
+            }}
+          />
+        )}
+
+        {/* Top bar */}
+        <div className="absolute top-4 right-4 left-4 z-[1000] flex items-center justify-between pointer-events-none">
+          <Link
+            href="/home"
+            className="pointer-events-auto inline-flex items-center gap-2 bg-[#12394d]/80 backdrop-blur px-3 py-1.5 rounded-full text-white text-xs font-bold border border-white/10 hover:bg-[#12394d] no-underline transition-colors"
+          >
+            ← الرئيسية
+          </Link>
+          {!freeExplore && (
+            <button
+              onClick={skipToExplore}
+              className="pointer-events-auto bg-[#12394d]/80 backdrop-blur px-3 py-1.5 rounded-full text-white/70 hover:text-white text-xs font-bold border border-white/10 transition-colors"
+            >
+              تخطي القصة
+            </button>
+          )}
+          {freeExplore && (
+            <button
+              onClick={() => {
+                setFreeExplore(false);
+                setManualHighlight(null);
+                setAct("reveal");
+              }}
+              className="pointer-events-auto bg-[#91b149]/90 px-3 py-1.5 rounded-full text-white text-xs font-bold border border-white/10 transition-colors"
+            >
+              ارجع لرحلتك
+            </button>
+          )}
+        </div>
+
+        {/* Narrative overlay (bottom-right on desktop, bottom on mobile) */}
+        {!freeExplore && (
+          <div className="absolute bottom-4 right-4 left-4 md:left-auto md:right-6 md:bottom-6 md:max-w-sm z-[1000] pointer-events-none">
+            <StoryOverlay
+              act={act}
+              onActChange={setAct}
+              recommendation={recommendation}
+              destination={recommendedDest}
+              compatibleDestinations={alternateCompatible}
+              focusedSubSites={focusedSubSites}
+              onSkip={skipToExplore}
             />
           </div>
+        )}
 
-          {/* Sidebar */}
-          <div className="bg-white dark:bg-[#162033] rounded-2xl border border-[#d0dde4] dark:border-[#1e3a5f] shadow-sm overflow-hidden">
-            {/* Header */}
-            <div className="bg-[#12394d] px-5 py-4">
-              <h3 className="text-white font-bold font-display text-lg">
-                الوجهات
-              </h3>
-              <p className="text-white/50 text-xs mt-0.5">
-                {filteredDestinations.length} وجهة
-                {activeFilter !== "الكل" && ` · ${activeFilter}`}
-              </p>
+        {/* Free-explore mini-panel */}
+        {freeExplore && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="absolute bottom-4 right-4 left-4 md:left-auto md:right-6 md:max-w-sm z-[1000] bg-[#12394d]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_60px_-12px_rgba(0,0,0,0.5)]"
+          >
+            <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
+              وضع الاستكشاف الحر
             </div>
-
-            {/* Destination List */}
-            <div className="max-h-[350px] md:max-h-[508px] overflow-y-auto">
-              {filteredDestinations.map((dest) => (
-                <button
-                  key={dest.id}
-                  onClick={() => handleSelectDestination(dest.id)}
-                  className={`w-full flex items-center gap-3 px-5 py-4 text-right transition-all duration-200 border-b border-[#f0f0f0] dark:border-[#1e3a5f] hover:bg-[#f5f8fa] dark:hover:bg-[#0d1b2a] group ${
-                    activeDestination === dest.id
-                      ? "bg-[#e4edf2] dark:bg-[#0d1b2a] border-r-4 border-r-[#1d5770]"
-                      : ""
-                  }`}
-                >
-                  {/* Image thumbnail */}
-                  <div
-                    className="w-14 h-14 rounded-xl bg-cover bg-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow"
-                    style={{ backgroundImage: `url('${dest.image}')` }}
-                  />
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-bold text-[#12394d] dark:text-white font-display">
-                        {dest.name}
-                      </span>
-                      <span
-                        className="text-xs px-2 py-0.5 rounded-full"
-                        style={{
-                          background: `${dest.color}15`,
-                          color: dest.color,
-                        }}
-                      >
-                        {dest.envIcon} {dest.environment}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {dest.treatments.slice(0, 3).map((t) => (
-                        <span
-                          key={t}
-                          className="text-[10px] text-[#7b7c7d] dark:text-white/50 bg-[#f5f8fa] dark:bg-[#0a151f] px-1.5 py-0.5 rounded"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Arrow */}
-                  <svg
-                    className="w-4 h-4 text-[#d0dde4] group-hover:text-[#1d5770] transition-colors flex-shrink-0"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M15 19l-7-7 7-7"
-                    />
-                  </svg>
-                </button>
-              ))}
-
-              {filteredDestinations.length === 0 && (
-                <div className="p-8 text-center">
-                  <p className="text-[#7b7c7d] dark:text-white/50 text-sm mb-3">
-                    لا توجد وجهات تطابق هذا الفلتر
-                  </p>
-                  <button
-                    onClick={() => setActiveFilter("الكل")}
-                    className="text-[#1d5770] text-sm font-bold hover:underline"
-                  >
-                    عرض الكل
-                  </button>
+            {manualHighlight ? (
+              <>
+                <div className="font-display font-black text-white text-lg mb-1">
+                  {DESTINATIONS.find((d) => d.id === manualHighlight)?.name}
                 </div>
-              )}
-            </div>
-
-            {/* Footer CTA */}
-            {activeDestination && (
-              <div className="p-4 border-t border-[#f0f0f0] dark:border-[#1e3a5f] bg-[#f5f8fa] dark:bg-[#0d1b2a]">
+                <p className="text-white/60 text-xs leading-relaxed mb-3">
+                  {DESTINATIONS.find((d) => d.id === manualHighlight)?.pitch ||
+                    DESTINATIONS.find((d) => d.id === manualHighlight)?.description}
+                </p>
                 <Link
-                  href={`/destination/${activeDestination}`}
-                  className="block w-full text-center py-3 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-sm rounded-full transition-all duration-300 no-underline"
+                  href={`/destination/${manualHighlight}`}
+                  className="block w-full py-2.5 bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white font-bold text-sm rounded-full no-underline text-center hover:shadow-[0_6px_18px_rgba(145,177,73,0.4)] transition-shadow"
                 >
-                  اكتشف{" "}
-                  {DESTINATIONS.find((d) => d.id === activeDestination)?.name}
+                  اكتشف المزيد
                 </Link>
-              </div>
+              </>
+            ) : (
+              <p className="text-white/60 text-xs leading-relaxed">
+                اضغط على أي pin لتعرف أكتر عن الوجهة.
+              </p>
             )}
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-5 text-xs text-[#7b7c7d] dark:text-white/50">
-          <span className="font-semibold text-[#12394d] dark:text-white">دليل الألوان:</span>
-          {[
-            { label: "بحر", color: "#0e7490", icon: "🌊" },
-            { label: "صحراء", color: "#b45309", icon: "🏜️" },
-            { label: "واحة", color: "#065f46", icon: "🌴" },
-            { label: "جبال", color: "#44403c", icon: "⛰️" },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center gap-1.5">
-              <span
-                className="w-3.5 h-3.5 rounded-full border-2 border-white shadow-sm"
-                style={{ backgroundColor: item.color }}
-              />
-              <span>
-                {item.icon} {item.label}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
+          </motion.div>
+        )}
+      </div>
     </SiteLayout>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────
+   Fallback shown when the user hasn't completed the intro yet
+   ───────────────────────────────────────────────────────── */
+
+function NoRecommendationScreen() {
+  return (
+    <div
+      className="min-h-[calc(100vh-72px)] bg-[#070d15] flex items-center justify-center px-4 py-16"
+      dir="rtl"
+    >
+      <div className="max-w-md text-center">
+        <div className="text-[10px] uppercase tracking-[0.4em] text-[#91b149] font-bold mb-3">
+          Your Healing Map
+        </div>
+        <div className="text-6xl mb-6">🗺️</div>
+        <h1 className="font-display text-3xl font-black text-white mb-3">
+          الخريطة بتحكي قصتك
+        </h1>
+        <p className="text-white/60 text-sm leading-relaxed mb-8">
+          عشان نوريك الخريطة بشكل مخصص، محتاجين نعرف إحساسك الأول.
+          خد الرحلة القصيرة (دقيقتين) وهنحكيلك القصة من جديد.
+        </p>
+        <div className="flex flex-col gap-3 max-w-xs mx-auto">
+          <Link
+            href="/"
+            className="w-full py-3 bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white font-bold rounded-full no-underline hover:shadow-[0_8px_24px_rgba(145,177,73,0.4)] transition-shadow"
+          >
+            ابدأ الرحلة
+          </Link>
+          <Link
+            href="/destinations"
+            className="w-full py-3 bg-white/10 hover:bg-white/15 text-white font-bold rounded-full no-underline border border-white/10 transition-colors"
+          >
+            تصفح كل الوجهات يدوياً
+          </Link>
+        </div>
+      </div>
+    </div>
   );
 }
