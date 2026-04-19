@@ -3,8 +3,11 @@
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
-// Paths that have their own heavy animations — skip the global transition
-const SKIP_PATHS = ["/", "/gate"];
+// Paths that have their own heavy animations / full-screen fixed layouts.
+// The global transition uses `filter: blur()` which breaks `position:fixed`
+// children (they get contained by the transformed parent instead of the
+// viewport) — so any full-screen experience needs to opt out here.
+const SKIP_PATHS = ["/", "/gate", "/therapy-room", "/map"];
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();

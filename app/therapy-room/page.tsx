@@ -56,6 +56,7 @@ export default function TherapyRoomPage() {
 
   const pickSession = useCallback(
     (session: Session) => {
+      console.log("[therapy-room] pickSession called:", session.id);
       setActiveSession(session);
       setActiveJourney(null);
       setActiveJourneyDay(null);

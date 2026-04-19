@@ -142,43 +142,49 @@ export default function ImmersiveEntry({
             </h1>
           </motion.div>
 
-          {/* The breathing orb as a tap target */}
-          <motion.button
+          {/* The breathing orb as a tap target.
+              Using a plain <button> (not motion.button) because framer-motion's
+              pointer handling was swallowing clicks from programmatic dispatch
+              (affects automated testing + some Android WebViews). The entrance
+              animation is applied via an inert motion.div wrapper. */}
+          <motion.div
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 1.1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            whileTap={{ scale: 0.92 }}
-            onClick={onStart}
-            className="relative mx-auto w-48 h-48 md:w-56 md:h-56 rounded-full mb-8 focus:outline-none focus:ring-4 focus:ring-[#91b149]/40 focus:ring-offset-0"
-            aria-label={`ابدأ جلسة ${suggestedSession.name}`}
+            className="mx-auto w-48 h-48 md:w-56 md:h-56 mb-8"
           >
-            {/* Pulsing outer ring — breathes at 4s in / 4s out to invite breath sync */}
-            <motion.div
-              animate={{
-                scale: orbBreath === "in" ? 1.15 : 0.92,
-                opacity: orbBreath === "in" ? 0.7 : 0.3,
-              }}
-              transition={{ duration: 4, ease: "easeInOut" }}
-              className="absolute inset-0 rounded-full border-2 border-[#91b149]/60 pointer-events-none"
-            />
-            <motion.div
-              animate={{
-                scale: orbBreath === "in" ? 1.08 : 0.96,
-              }}
-              transition={{ duration: 4, ease: "easeInOut" }}
-              className="absolute inset-4 rounded-full bg-gradient-to-br from-[#91b149] to-[#5d7a2d] shadow-[0_8px_40px_rgba(145,177,73,0.5)] pointer-events-none"
-            />
-            {/* Center label — pointer-events:none so clicks pass through to button */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-[#0a1a0a] font-display pointer-events-none">
-              <span className="text-3xl mb-1" aria-hidden="true">
-                {suggestedSession.icon}
-              </span>
-              <span className="text-xs font-bold">ابدأ</span>
-              <span className="text-[10px] opacity-70 mt-0.5">
-                {Math.round(suggestedSession.duration / 60)} دقيقة
-              </span>
-            </div>
-          </motion.button>
+            <button
+              type="button"
+              onClick={onStart}
+              className="relative w-full h-full rounded-full active:scale-[0.96] transition-transform duration-200 focus:outline-none focus:ring-4 focus:ring-[#91b149]/40"
+              aria-label={`ابدأ جلسة ${suggestedSession.name}`}
+            >
+              {/* Pulsing outer ring — breathes at 4s in / 4s out to invite breath sync */}
+              <motion.div
+                animate={{
+                  scale: orbBreath === "in" ? 1.15 : 0.92,
+                  opacity: orbBreath === "in" ? 0.7 : 0.3,
+                }}
+                transition={{ duration: 4, ease: "easeInOut" }}
+                className="absolute inset-0 rounded-full border-2 border-[#91b149]/60 pointer-events-none"
+              />
+              <motion.div
+                animate={{ scale: orbBreath === "in" ? 1.08 : 0.96 }}
+                transition={{ duration: 4, ease: "easeInOut" }}
+                className="absolute inset-4 rounded-full bg-gradient-to-br from-[#91b149] to-[#5d7a2d] shadow-[0_8px_40px_rgba(145,177,73,0.5)] pointer-events-none"
+              />
+              {/* Center label — pointer-events:none so clicks pass through */}
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-[#0a1a0a] font-display pointer-events-none">
+                <span className="text-3xl mb-1" aria-hidden="true">
+                  {suggestedSession.icon}
+                </span>
+                <span className="text-xs font-bold">ابدأ</span>
+                <span className="text-[10px] opacity-70 mt-0.5">
+                  {Math.round(suggestedSession.duration / 60)} دقيقة
+                </span>
+              </div>
+            </button>
+          </motion.div>
 
           {/* Session suggestion label */}
           <motion.p
