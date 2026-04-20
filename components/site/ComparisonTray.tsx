@@ -246,16 +246,20 @@ export function CompareButton({ id }: { id: string }) {
     toggle(id);
   }
 
+  // Desktop hover-expand: the button starts at 36px (icon only) and widens
+  // to ~92px on group hover revealing a "قارن" label. A plain `+` glyph was
+  // ambiguous — users didn't know it meant "compare". The balance/scale
+  // icon + label makes the affordance unmistakable at first glance.
   return (
     <button
       onClick={handleClick}
       disabled={isFull}
-      className={`absolute top-3 left-3 z-10 w-9 h-9 rounded-full flex items-center justify-center transition-all duration-300 backdrop-blur-md ${
+      className={`absolute top-3 left-3 z-10 h-9 rounded-full flex items-center justify-center gap-1.5 overflow-hidden transition-all duration-300 backdrop-blur-md w-9 px-0 md:group-hover:w-[92px] md:group-hover:px-3 ${
         isAdded
-          ? "bg-[#91b149] text-white scale-110 shadow-lg"
+          ? "bg-[#91b149] text-white scale-110 shadow-lg md:group-hover:scale-100 md:group-hover:w-[108px]"
           : isFull
             ? "bg-black/40 text-white/40 cursor-not-allowed"
-            : "bg-white/90 dark:bg-[#0d1b2a]/90 text-[#1d5770] dark:text-white hover:bg-[#91b149] hover:text-white hover:scale-110"
+            : "bg-white/90 dark:bg-[#0d1b2a]/90 text-[#1d5770] dark:text-white md:group-hover:bg-[#91b149] md:group-hover:text-white"
       }`}
       title={
         isAdded
@@ -267,32 +271,47 @@ export function CompareButton({ id }: { id: string }) {
       aria-label={isAdded ? "إزالة من المقارنة" : "أضف للمقارنة"}
     >
       {isAdded ? (
-        <svg
-          width="14"
-          height="14"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="3"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polyline points="20 6 9 17 4 12" />
-        </svg>
+        <>
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          <span className="hidden md:group-hover:inline text-[11px] font-bold whitespace-nowrap">
+            مُضاف
+          </span>
+        </>
       ) : (
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
+        <>
+          {/* Balance / scales-of-justice icon = "compare". Recognizable in RTL. */}
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 3v18" />
+            <path d="M5 7h14" />
+            <path d="M8 7l-3 7a3 3 0 0 0 6 0L8 7" />
+            <path d="M16 7l-3 7a3 3 0 0 0 6 0l-3-7" />
+          </svg>
+          <span className="hidden md:group-hover:inline text-[11px] font-bold whitespace-nowrap">
+            قارن
+          </span>
+        </>
       )}
     </button>
   );

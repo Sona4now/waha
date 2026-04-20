@@ -1,14 +1,17 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import Link from "next/link";
-import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
-import { CompareButton } from "@/components/site/ComparisonTray";
 import Reveal from "@/components/site/Reveal";
 import EmptyState from "@/components/site/EmptyState";
-import { DESTINATIONS } from "@/data/siteData";
+import DestinationCard from "@/components/site/DestinationCard";
+import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
+import {
+  useRecommendation,
+  NEED_TO_TREATMENTS,
+  type Recommendation,
+} from "@/hooks/useRecommendation";
 
 /* ── Filter definitions ─────────────────────────────────── */
 const TREATMENT_FILTERS = [
@@ -42,6 +45,7 @@ const DURATION_FILTERS = [
 ];
 
 const SORT_OPTIONS = [
+  { key: "relevance", label: "الأنسب لحالتك" },
   { key: "distance", label: "الأقرب أولاً" },
   { key: "cost", label: "الأرخص أولاً" },
   { key: "duration", label: "الأقصر أولاً" },
@@ -62,6 +66,34 @@ function parseDuration(s?: string): number {
   return match ? parseInt(match[0], 10) : 0;
 }
 
+/**
+ * Higher score = more relevant to the user's stored recommendation.
+ *   · +10 if this destination IS the one the intro matched
+ *   · +3 per treatment overlap with the need's treatment set
+ *   · +2 for environment match (normalizes "mountains" ↔ "mountain")
+ * Returns 0 when no recommendation exists (sort becomes a stable no-op).
+ */
+function relevanceScore(
+  dest: DestinationFull,
+  rec: Recommendation | null,
+): number {
+  if (!rec) return 0;
+  let score = 0;
+  if (rec.destinationId === dest.id) score += 10;
+  if (rec.environment && dest.envClass) {
+    const destEnv = dest.envClass.replace(/^env-/, "");
+    const recEnv =
+      rec.environment === "mountains" ? "mountain" : rec.environment;
+    if (destEnv === recEnv) score += 2;
+  }
+  if (rec.need) {
+    for (const w of NEED_TO_TREATMENTS[rec.need] ?? []) {
+      if (dest.treatments?.some((t) => t.includes(w))) score += 3;
+    }
+  }
+  return score;
+}
+
 /* ── Component ──────────────────────────────────────────── */
 export default function DestinationsPage() {
   const [treatment, setTreatment] = useState("all");
@@ -70,6 +102,25 @@ export default function DestinationsPage() {
   const [duration, setDuration] = useState("all");
   const [sort, setSort] = useState("distance");
   const [showFilters, setShowFilters] = useState(false);
+  const [recoBannerDismissed, setRecoBannerDismissed] = useState(false);
+
+  // Reads /public intro outcome from localStorage (client-only).
+  // `loaded` goes true on the first client effect — before that, we render
+  // the default "distance" sort and no banner. Avoids hydration mismatch.
+  const { recommendation, loaded } = useRecommendation();
+
+  // One-shot: apply smart defaults once the recommendation hydrates.
+  // Intentionally narrow deps → fires once per load, never overrides a
+  // user's manual filter/sort change.
+  useEffect(() => {
+    if (!loaded || !recommendation) return;
+    setSort((prev) => (prev === "distance" ? "relevance" : prev));
+    if (recommendation.need && treatment === "all") {
+      const primary = NEED_TO_TREATMENTS[recommendation.need]?.[0];
+      if (primary) setTreatment(primary);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded, recommendation]);
 
   const filtered = useMemo(() => {
     let result = DESTINATIONS.filter((dest) => {
@@ -108,6 +159,13 @@ export default function DestinationsPage() {
 
     // Sorting
     result = [...result].sort((a, b) => {
+      if (sort === "relevance") {
+        const diff =
+          relevanceScore(b, recommendation) - relevanceScore(a, recommendation);
+        if (diff !== 0) return diff;
+        // Stable tiebreak — nearer first.
+        return (a.distanceKm ?? 999) - (b.distanceKm ?? 999);
+      }
       if (sort === "distance") return (a.distanceKm ?? 999) - (b.distanceKm ?? 999);
       if (sort === "cost") return parseCost(a.costFrom) - parseCost(b.costFrom);
       if (sort === "duration") return parseDuration(a.duration) - parseDuration(b.duration);
@@ -115,7 +173,7 @@ export default function DestinationsPage() {
     });
 
     return result;
-  }, [treatment, distance, budget, duration, sort]);
+  }, [treatment, distance, budget, duration, sort, recommendation]);
 
   const activeFilterCount =
     (treatment !== "all" ? 1 : 0) +
@@ -164,6 +222,36 @@ export default function DestinationsPage() {
               </div>
             </div>
           </Reveal>
+
+          {/* ── Recommendation banner — shows only when we actually applied
+                 the smart default so the user knows why a chip is pre-selected.
+                 Auto-hides if they pick a different treatment manually. ── */}
+          {loaded &&
+            recommendation?.need &&
+            !recoBannerDismissed &&
+            treatment === NEED_TO_TREATMENTS[recommendation.need]?.[0] && (
+              <Reveal delay={0.05}>
+                <div className="mb-5 flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-[#f0f7ed] dark:bg-[#91b149]/10 border border-[#91b149]/30">
+                  <p className="text-xs md:text-sm text-[#12394d] dark:text-white">
+                    <span aria-hidden="true">✦ </span>
+                    فلترنا لك على{" "}
+                    <strong className="text-[#91b149]">
+                      {NEED_TO_TREATMENTS[recommendation.need]?.[0]}
+                    </strong>{" "}
+                    بناء على رحلتك
+                  </p>
+                  <button
+                    onClick={() => {
+                      setRecoBannerDismissed(true);
+                      setTreatment("all");
+                    }}
+                    className="text-xs font-bold text-[#1d5770] dark:text-[#91b149] hover:underline whitespace-nowrap"
+                  >
+                    غيّر
+                  </button>
+                </div>
+              </Reveal>
+            )}
 
           {/* ── Advanced filters toggle ── */}
           <Reveal delay={0.1}>
@@ -297,116 +385,21 @@ export default function DestinationsPage() {
             </div>
           </Reveal>
 
-          {/* ── Destinations grid ── */}
+          {/* ── Destinations grid ──
+               Mobile (1 col): horizontal cards, tighter gap.
+               Desktop (2-3 cols): vertical cards, original gap. */}
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
               {filtered.map((dest, i) => (
-                <Reveal key={dest.id} delay={i * 0.08}>
-                  <div className="relative group h-full">
-                    <CompareButton id={dest.id} />
-                    {/* Outer glow ring — appears on hover */}
-                    <div className="pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#91b149]/40 via-transparent to-[#1d5770]/40 blur-[2px]" />
-                    <Link
-                      href={`/destination/${dest.id}`}
-                      className="relative flex flex-col bg-white dark:bg-[#162033] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl dark:hover:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.6)] transition-all duration-500 hover:-translate-y-2 border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#91b149]/60 h-full no-underline"
-                    >
-                      {/* Image */}
-                      <div className="relative h-52 overflow-hidden">
-                        <Image
-                          src={dest.image}
-                          alt={`${dest.name} — وجهة استشفائية`}
-                          fill
-                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/25 to-transparent transition-opacity duration-500" />
-
-                        {/* Glassmorphism hover overlay with CTA */}
-                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-400 bg-[#0a151f]/30 backdrop-blur-[2px]">
-                          <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/90 text-[#12394d] font-bold text-sm shadow-xl backdrop-blur-md transform translate-y-2 group-hover:translate-y-0 transition-transform duration-400">
-                            اكتشف المزيد
-                            <span className="text-base leading-none">←</span>
-                          </span>
-                        </div>
-
-                        {/* Environment badge */}
-                        <span className="absolute top-3 right-3 text-xs font-bold px-3 py-1.5 rounded-full text-white bg-[#91b149] shadow-lg z-[1]">
-                          {dest.envIcon} {dest.environment}
-                        </span>
-
-                        {/* Distance chip (left) */}
-                        {dest.distanceKm !== undefined && (
-                          <span className="absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full text-white bg-black/50 backdrop-blur-sm z-[1]">
-                            📍 {dest.distanceKm} كم
-                          </span>
-                        )}
-
-                        {/* Name overlay at bottom */}
-                        <div className="absolute bottom-3 right-4 left-4 z-[1]">
-                          <h3 className="text-2xl font-bold text-white font-display drop-shadow-md">
-                            {dest.name}
-                          </h3>
-                        </div>
-                      </div>
-
-                      {/* Body */}
-                      <div className="p-5 flex-1 flex flex-col">
-                        {/* Pitch line */}
-                        {dest.pitch ? (
-                          <p className="text-sm font-bold text-[#12394d] dark:text-white leading-snug mb-3 line-clamp-2">
-                            ✨ {dest.pitch}
-                          </p>
-                        ) : (
-                          <p className="text-sm leading-relaxed mb-3 line-clamp-2 text-[#7b7c7d] dark:text-white/60">
-                            {dest.description}
-                          </p>
-                        )}
-
-                        {/* Quick facts bar */}
-                        <div className="flex items-center gap-3 mb-4 text-[10px] text-[#7b7c7d] dark:text-white/50 flex-wrap">
-                          {dest.duration && (
-                            <span className="inline-flex items-center gap-1">
-                              ⏱️ {dest.duration}
-                            </span>
-                          )}
-                          {dest.costFrom && (
-                            <span className="inline-flex items-center gap-1">
-                              💰 {dest.costFrom}
-                            </span>
-                          )}
-                          {dest.difficulty && (
-                            <span className="inline-flex items-center gap-1">
-                              ⭐ {dest.difficulty}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Treatments */}
-                        {dest.treatments && dest.treatments.length > 0 && (
-                          <div className="flex flex-wrap gap-1.5 mt-auto">
-                            {dest.treatments.map((t, idx) => (
-                              <span
-                                key={idx}
-                                className="text-[10px] px-2 py-0.5 rounded-full bg-[#f0f7ed] dark:bg-[#91b149]/15 text-[#91b149] font-bold transition-all duration-300 hover:bg-[#91b149] hover:text-white hover:scale-105 border border-transparent hover:border-[#91b149]/40"
-                              >
-                                {t}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* View details CTA */}
-                        <div className="mt-4 pt-4 border-t border-[#d0dde4] dark:border-[#1e3a5f] flex items-center justify-between">
-                          <span className="text-xs font-bold text-[#1d5770] dark:text-[#91b149]">
-                            اكتشف المزيد
-                          </span>
-                          <span className="text-[#1d5770] dark:text-[#91b149] group-hover:-translate-x-1 transition-transform">
-                            ←
-                          </span>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
+                <Reveal key={dest.id} delay={i * 0.06}>
+                  <DestinationCard
+                    dest={dest}
+                    isRecommended={
+                      !!recommendation &&
+                      (dest.id === recommendation.destinationId ||
+                        relevanceScore(dest, recommendation) >= 3)
+                    }
+                  />
                 </Reveal>
               ))}
             </div>
