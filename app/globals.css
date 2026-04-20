@@ -33,7 +33,7 @@
   }
 
   body {
-    font-family: "Cairo", "Noto Naskh Arabic", sans-serif;
+    font-family: var(--font-cairo), "Cairo", "Noto Naskh Arabic", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -48,7 +48,7 @@
 /* ---- Custom utility classes ---- */
 @layer utilities {
   .font-display {
-    font-family: "Reem Kufi", "Cairo", sans-serif;
+    font-family: var(--font-reem-kufi), "Reem Kufi", var(--font-cairo), "Cairo", sans-serif;
   }
 
   .ken-burns {
@@ -208,7 +208,7 @@ body:has(.map-shell) > div.min-h-screen {
 }
 
 .leaflet-container {
-  font-family: "Cairo", sans-serif !important;
+  font-family: var(--font-cairo), "Cairo", sans-serif !important;
 }
 
 /* ---- Print styles ---- */

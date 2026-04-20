@@ -1,18 +1,38 @@
-"use client";
-
+import dynamic from "next/dynamic";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
-import ChatWidget from "./ChatWidget";
 import BottomNav from "./BottomNav";
-import SearchCommand from "./SearchCommand";
-import ComparisonTray from "./ComparisonTray";
-import SmartWelcome from "./SmartWelcome";
-import ToastContainer from "./Toast";
 import ReadingProgress from "./ReadingProgress";
-import WellnessTip from "./WellnessTip";
-import AchievementListener from "./AchievementListener";
-import VisitTracker from "./VisitTracker";
-import CursorFollower from "./CursorFollower";
+
+/**
+ * Widgets that are NOT on the critical path.
+ * Lazy-loaded on the client after hydration so they don't bloat the
+ * initial JS bundle. `ssr: false` means they render nothing on the
+ * server → zero markup cost, zero initial JS cost.
+ *
+ * Heuristic for what goes here:
+ *   - Floats, toasts, drawers, command palettes
+ *   - Anything that only renders in response to a user gesture or timer
+ *   - Anything gated on browser APIs (matchMedia, localStorage, geolocation)
+ */
+const ChatWidget = dynamic(() => import("./ChatWidget"), { ssr: false });
+const SearchCommand = dynamic(() => import("./SearchCommand"), { ssr: false });
+const ComparisonTray = dynamic(() => import("./ComparisonTray"), { ssr: false });
+const SmartWelcome = dynamic(() => import("./SmartWelcome"), { ssr: false });
+const ToastContainer = dynamic(() => import("./Toast"), { ssr: false });
+const WellnessTip = dynamic(() => import("./WellnessTip"), { ssr: false });
+const AchievementListener = dynamic(
+  () => import("./AchievementListener"),
+  { ssr: false },
+);
+const VisitTracker = dynamic(() => import("./VisitTracker"), { ssr: false });
+// DesktopOnlyCursor is a tiny (~20-line) shell that gates CursorFollower
+// behind `(hover: hover) and (pointer: fine)` — so touch devices never
+// download the motion-spring code path at all.
+const DesktopOnlyCursor = dynamic(
+  () => import("./DesktopOnlyCursor"),
+  { ssr: false },
+);
 
 export default function SiteLayout({
   children,
@@ -35,8 +55,9 @@ export default function SiteLayout({
       <ReadingProgress />
       <main id="main-content">{children}</main>
       <Footer />
-      <ChatWidget />
       <BottomNav />
+      {/* — Lazy widgets — */}
+      <ChatWidget />
       <SearchCommand />
       <ComparisonTray />
       <SmartWelcome />
@@ -44,7 +65,7 @@ export default function SiteLayout({
       <WellnessTip />
       <AchievementListener />
       <VisitTracker />
-      <CursorFollower />
+      <DesktopOnlyCursor />
     </div>
   );
 }

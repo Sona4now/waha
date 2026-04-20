@@ -1,9 +1,34 @@
 import type { Metadata, Viewport } from "next";
+import { Cairo, Reem_Kufi } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/lib/siteMeta";
+
+/**
+ * Self-hosted Arabic fonts via next/font.
+ * - Weights trimmed to what we actually use (inspect with Lighthouse if bloated).
+ * - `display: swap` → text is immediately visible in a system font, then
+ *   restyled when the webfont arrives. No FOIT.
+ * - `preload: true` for the primary body font only; Reem Kufi is display-only.
+ * - CSS variables so Tailwind can reach them via `font-[var(--font-cairo)]`.
+ */
+const cairo = Cairo({
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  preload: true,
+  variable: "--font-cairo",
+});
+
+const reemKufi = Reem_Kufi({
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  preload: false, // display font — not on critical path
+  variable: "--font-reem-kufi",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -73,19 +98,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ar" dir="rtl" className="h-full">
+    <html
+      lang="ar"
+      dir="rtl"
+      className={`h-full ${cairo.variable} ${reemKufi.variable}`}
+    >
       <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Cairo:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-        <link rel="apple-touch-icon" href="/logo.png" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
         {/* JSON-LD structured data */}
         <script
           type="application/ld+json"
