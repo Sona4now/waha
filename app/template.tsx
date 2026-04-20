@@ -3,11 +3,8 @@
 import { motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 
-// Paths that have their own heavy animations / full-screen fixed layouts.
-// The global transition uses `filter: blur()` which breaks `position:fixed`
-// children (they get contained by the transformed parent instead of the
-// viewport) — so any full-screen experience needs to opt out here.
-const SKIP_PATHS = ["/", "/gate", "/therapy-room", "/map"];
+// Paths that ship their own heavy page-level animations.
+const SKIP_PATHS = ["/", "/gate"];
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -16,15 +13,17 @@ export default function Template({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
   }
 
+  // Opacity-only transition so `position: fixed` children (BottomNav,
+  // ChatWidget, Toasts, etc.) are positioned relative to the viewport,
+  // not this wrapper. `filter` and `transform` both create a containing
+  // block per CSS spec — even `filter: blur(0px)` does — so those would
+  // break any fixed layout on every route. Opacity is safe.
   return (
     <motion.div
       key={pathname}
-      initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      transition={{
-        duration: 0.4,
-        ease: [0.22, 1, 0.36, 1],
-      }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
