@@ -1,13 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { Session, VoClip } from "@/lib/meditation/sessions";
 import {
-  getSessionAudioTrack,
-  getVoClipPath,
-  CHIMES,
-  type Session,
-  type VoClip,
-} from "@/lib/meditation/sessions";
+  startAmbient,
+  type AmbientController,
+} from "@/lib/meditation/proceduralAmbient";
+import {
+  playStartChime,
+  playEndChime,
+} from "@/lib/meditation/chimes";
 
 interface Opts {
   session: Session;
@@ -15,7 +17,7 @@ interface Opts {
   playing: boolean;
   /** Current elapsed seconds into the session. */
   elapsed: number;
-  /** Whether intro countdown is still running (don't play audio yet). */
+  /** Whether intro countdown is still running (don't start audio yet). */
   intro: boolean;
   /** User mute toggle for voice. */
   voiceEnabled: boolean;
@@ -23,29 +25,29 @@ interface Opts {
   volumeAmbient: number;
   volumeChimes: number;
   volumeVoice: number;
-  /** Fallback TTS speaker — used if the MP3 for a clip 404s or fails. */
-  fallbackSpeak?: (text: string) => void;
+  /** Speaks the current VO line. Supplied by SessionPlayer using the
+   *  Web Speech narrator hook. */
+  speak: (text: string) => void;
+  stopSpeech: () => void;
 }
 
 interface Return {
   currentClipIdx: number;
-  voActive: boolean;
-  audioMissing: boolean;
   playStart: () => void;
   playEnd: () => void;
-  skipToNextClip: () => void;
 }
 
 /**
- * Three-layer audio engine for a meditation session.
+ * Fully-procedural 3-layer audio engine. Zero network, zero assets.
  *
- *   1. Ambient music — loops continuously, ducks to 40% while VO plays.
- *   2. VO clips      — scheduled against `elapsed`; play at clip.at seconds.
- *   3. Chimes        — one-shot bells for start/end transitions.
+ *   1. Ambient  — Web Audio synthesized per env (see `proceduralAmbient.ts`).
+ *                 Loops forever while the session is playing; auto-ducks
+ *                 while VO is speaking.
+ *   2. VO clips — Scheduled against `elapsed`; spoken via Web Speech API
+ *                 (passed in via `speak`). Captions come from clip.text.
+ *   3. Chimes   — Sine-wave bells synthesized on demand (`chimes.ts`).
  *
- * - Each layer is its own HTMLAudioElement (reused across clips).
- * - If a VO clip 404s, the optional `fallbackSpeak` (Web Speech) kicks in.
- * - Respects `playing` / `voiceEnabled` — all layers coordinate.
+ * No files are loaded. The app works offline from the first minute.
  */
 export function useSessionAudio({
   session,
@@ -56,204 +58,100 @@ export function useSessionAudio({
   volumeAmbient,
   volumeChimes,
   volumeVoice,
-  fallbackSpeak,
+  speak,
+  stopSpeech,
 }: Opts): Return {
-  const ambientRef = useRef<HTMLAudioElement | null>(null);
-  const voRef = useRef<HTMLAudioElement | null>(null);
-  const startChimeRef = useRef<HTMLAudioElement | null>(null);
-  const endChimeRef = useRef<HTMLAudioElement | null>(null);
-
+  const ambientRef = useRef<AmbientController | null>(null);
   const [currentClipIdx, setCurrentClipIdx] = useState(-1);
-  const [voActive, setVoActive] = useState(false);
-  const [audioMissing, setAudioMissing] = useState(false);
   const playedClipsRef = useRef<Set<string>>(new Set());
+  const voActiveRef = useRef(false);
 
-  const ambientUrl = useMemo(() => getSessionAudioTrack(session), [session]);
-
-  // ─── Initialize audio elements once per session ──────────
+  // ─── Start / stop ambient based on playing state ──────────
   useEffect(() => {
-    const ambient = new Audio();
-    ambient.src = ambientUrl;
-    ambient.loop = true;
-    ambient.preload = "auto";
-    ambient.volume = 0;
-    ambient.addEventListener("error", () => setAudioMissing(true));
-    ambientRef.current = ambient;
-
-    const vo = new Audio();
-    vo.preload = "auto";
-    vo.volume = 0;
-    voRef.current = vo;
-
-    const startChime = new Audio();
-    startChime.src = CHIMES.start;
-    startChime.preload = "auto";
-    startChimeRef.current = startChime;
-
-    const endChime = new Audio();
-    endChime.src = CHIMES.end;
-    endChime.preload = "auto";
-    endChimeRef.current = endChime;
-
-    // Pre-warm the first few VO clips so onset is instant
-    session.voClips.slice(0, 2).forEach((c) => {
-      const preload = new Audio();
-      preload.src = getVoClipPath(c.id);
-      preload.preload = "auto";
-    });
-
-    // Reset per-session state
-    playedClipsRef.current = new Set();
-    setCurrentClipIdx(-1);
-    setVoActive(false);
-
-    return () => {
-      [ambient, vo, startChime, endChime].forEach((a) => {
-        try {
-          a.pause();
-          a.src = "";
-        } catch {
-          /* ignore */
-        }
-      });
-    };
-  }, [ambientUrl, session.voClips]);
-
-  // ─── Play/pause ambient based on master toggle ───────────
-  useEffect(() => {
-    const ambient = ambientRef.current;
-    if (!ambient) return;
+    // Tear down when we enter a paused state or the intro countdown.
     if (intro || !playing) {
-      ambient.pause();
+      ambientRef.current?.stop();
+      ambientRef.current = null;
       return;
     }
-    // iOS requires a user gesture; play() may reject silently — that's fine.
-    ambient.play().catch(() => {
-      /* browser blocked autoplay */
-    });
-  }, [playing, intro]);
-
-  // ─── Ambient volume with ducking while VO plays ──────────
-  useEffect(() => {
-    const ambient = ambientRef.current;
-    if (!ambient) return;
-    const base = Math.max(0, Math.min(1, volumeAmbient / 100));
-    ambient.volume = voActive ? base * 0.4 : base;
-  }, [volumeAmbient, voActive]);
-
-  // ─── VO volume ───────────────────────────────────────────
-  useEffect(() => {
-    const vo = voRef.current;
-    if (!vo) return;
-    vo.volume = voiceEnabled ? Math.max(0, Math.min(1, volumeVoice / 100)) : 0;
-  }, [volumeVoice, voiceEnabled]);
-
-  // ─── Chime volumes ───────────────────────────────────────
-  useEffect(() => {
-    const v = Math.max(0, Math.min(1, volumeChimes / 100));
-    if (startChimeRef.current) startChimeRef.current.volume = v;
-    if (endChimeRef.current) endChimeRef.current.volume = v;
-  }, [volumeChimes]);
-
-  // ─── Pause/resume VO when master play toggles ────────────
-  useEffect(() => {
-    const vo = voRef.current;
-    if (!vo || !voActive) return;
-    if (!playing) {
-      vo.pause();
-    } else {
-      vo.play().catch(() => {});
+    // Start if not running. Volume applied at construction.
+    if (!ambientRef.current) {
+      ambientRef.current = startAmbient(session.env, volumeAmbient / 100);
     }
-  }, [playing, voActive]);
+    return () => {
+      // Cleanup on unmount of the whole hook
+      ambientRef.current?.stop();
+      ambientRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [playing, intro, session.env]);
 
-  const playClip = useCallback(
-    (clip: VoClip) => {
-      const vo = voRef.current;
-      if (!vo) return;
+  // ─── Update ambient volume (also handles VO-ducking) ───────
+  useEffect(() => {
+    if (!ambientRef.current) return;
+    const base = Math.max(0, Math.min(1, volumeAmbient / 100));
+    ambientRef.current.setVolume(voActiveRef.current ? base * 0.4 : base);
+  }, [volumeAmbient]);
 
-      const url = getVoClipPath(clip.id);
-      vo.src = url;
+  // ─── Reset per-session state when the session changes ──────
+  useEffect(() => {
+    playedClipsRef.current = new Set();
+    setCurrentClipIdx(-1);
+    voActiveRef.current = false;
+  }, [session.id]);
 
-      const onEnd = () => {
-        setVoActive(false);
-        vo.removeEventListener("ended", onEnd);
-        vo.removeEventListener("error", onError);
-      };
-      const onError = () => {
-        setVoActive(false);
-        setAudioMissing(true);
-        if (fallbackSpeak) fallbackSpeak(clip.text);
-        vo.removeEventListener("ended", onEnd);
-        vo.removeEventListener("error", onError);
-      };
-
-      vo.addEventListener("ended", onEnd);
-      vo.addEventListener("error", onError);
-
-      setVoActive(true);
-      vo.play().catch(onError);
-    },
-    [fallbackSpeak],
-  );
-
-  // ─── VO clip scheduler — triggers next clip at `elapsed` ──
+  // ─── VO scheduler — fires matching clip at `elapsed` ───────
   useEffect(() => {
     if (intro || !playing) return;
-    const vo = voRef.current;
-    if (!vo) return;
 
     const due = session.voClips.findIndex(
       (c) => c.at <= elapsed && !playedClipsRef.current.has(c.id),
     );
     if (due < 0) return;
 
-    const clip = session.voClips[due];
+    const clip: VoClip = session.voClips[due];
     playedClipsRef.current.add(clip.id);
     setCurrentClipIdx(due);
 
-    if (!voiceEnabled) {
-      // Keep caption index in sync even when muted.
-      return;
-    }
+    if (!voiceEnabled) return; // caption-only mode
 
-    playClip(clip);
-  }, [elapsed, intro, playing, voiceEnabled, session.voClips, playClip]);
-
-  const skipToNextClip = useCallback(() => {
-    if (intro) return;
-    const vo = voRef.current;
-    if (vo) vo.pause();
-    const next = currentClipIdx + 1;
-    if (next >= session.voClips.length) {
-      setVoActive(false);
-      return;
+    // Duck ambient, speak, restore when done
+    if (ambientRef.current) {
+      const base = volumeAmbient / 100;
+      ambientRef.current.setVolume(base * 0.4);
     }
-    const clip = session.voClips[next];
-    playedClipsRef.current.add(clip.id);
-    setCurrentClipIdx(next);
-    if (voiceEnabled) playClip(clip);
-  }, [intro, currentClipIdx, session.voClips, voiceEnabled, playClip]);
+    voActiveRef.current = true;
+
+    speak(clip.text);
+
+    // Estimate speech duration from text length (~120 wpm ~= 2 words/sec ~=
+    // 10 chars/sec for Arabic). Restore ambient + unset voActive after.
+    const estMs = Math.max(3000, (clip.text.length / 10) * 1000);
+    const restoreTimer = setTimeout(() => {
+      voActiveRef.current = false;
+      if (ambientRef.current) {
+        const base = volumeAmbient / 100;
+        ambientRef.current.setVolume(base);
+      }
+    }, estMs);
+    return () => clearTimeout(restoreTimer);
+  }, [elapsed, intro, playing, voiceEnabled, session.voClips, speak, volumeAmbient]);
+
+  // ─── Stop speech when pause/disable toggles ────────────────
+  useEffect(() => {
+    if (!playing || !voiceEnabled) {
+      stopSpeech();
+      voActiveRef.current = false;
+    }
+  }, [playing, voiceEnabled, stopSpeech]);
 
   const playStart = useCallback(() => {
-    const chime = startChimeRef.current;
-    if (!chime) return;
-    chime.currentTime = 0;
-    chime.play().catch(() => {});
-  }, []);
+    playStartChime(volumeChimes / 100);
+  }, [volumeChimes]);
 
   const playEnd = useCallback(() => {
-    const chime = endChimeRef.current;
-    if (!chime) return;
-    chime.currentTime = 0;
-    chime.play().catch(() => {});
-  }, []);
+    playEndChime(volumeChimes / 100);
+  }, [volumeChimes]);
 
-  return {
-    currentClipIdx,
-    voActive,
-    audioMissing,
-    playStart,
-    playEnd,
-    skipToNextClip,
-  };
+  return { currentClipIdx, playStart, playEnd };
 }

@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { AMBIENT_TRACKS, resolveAmbientUrl, type AmbientKey } from "@/lib/meditation/audioAssets";
-
 export interface MixerState {
   ambient: number; // 0-100
   chimes: number;
@@ -10,92 +7,22 @@ export interface MixerState {
 }
 
 interface Props {
-  /** Ambient URL (direct) — if provided, takes priority. */
-  ambientUrl?: string;
-  /** Or pick from the registry by key (preferred). */
-  ambientKey?: AmbientKey;
-  /** Whether audio should be playing (respects pause state). */
-  playing: boolean;
   mixer: MixerState;
   onMixerChange: (next: MixerState) => void;
 }
 
 /**
- * Renders a hidden <audio> loop for the ambient track + three volume sliders.
+ * Pure UI mixer — three sliders wired to parent state.
  *
- * The ambient audio source resolves lazily — if the project has a file at
- * /public/meditation/ambient/… we use it; otherwise we fall back to the
- * registered CDN preview so the app stays audible while the user ships
- * final recordings.
+ * Audio playback is entirely owned by `useSessionAudio` (procedural ambient
+ * via Web Audio API + Web Speech narrator + synthesized chimes). This
+ * component is just controls; changing a slider updates `mixer.*` in parent
+ * state and each audio layer reacts to its own value.
+ *
+ * Deliberately stateless + no AudioContext — this is safe to mount/unmount
+ * without affecting what the user is hearing.
  */
-export default function AmbientMixer({
-  ambientUrl,
-  ambientKey,
-  playing,
-  mixer,
-  onMixerChange,
-}: Props) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [resolvedUrl, setResolvedUrl] = useState<string | null>(null);
-
-  // Resolve URL from either direct prop or the registry (with fallback).
-  useEffect(() => {
-    let cancelled = false;
-    async function resolve() {
-      if (ambientUrl) {
-        setResolvedUrl(ambientUrl);
-        return;
-      }
-      if (ambientKey) {
-        const track = AMBIENT_TRACKS[ambientKey];
-        const url = await resolveAmbientUrl(track);
-        if (!cancelled) setResolvedUrl(url);
-      }
-    }
-    resolve();
-    return () => {
-      cancelled = true;
-    };
-  }, [ambientUrl, ambientKey]);
-
-  // Load/swap the source whenever it changes.
-  useEffect(() => {
-    if (!audioRef.current) {
-      const a = new Audio();
-      a.loop = true;
-      a.preload = "auto";
-      audioRef.current = a;
-    }
-    const a = audioRef.current;
-    if (resolvedUrl && a.src !== resolvedUrl) {
-      a.src = resolvedUrl;
-      a.load();
-    }
-    return () => {
-      a.pause();
-    };
-  }, [resolvedUrl]);
-
-  // Volume follows slider — divided by 100 to produce a 0..1 gain.
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = Math.max(0, Math.min(1, mixer.ambient / 100));
-    }
-  }, [mixer.ambient]);
-
-  // Play / pause reacts to parent state.
-  useEffect(() => {
-    const a = audioRef.current;
-    if (!a || !resolvedUrl) return;
-    if (playing) {
-      a.play().catch(() => {
-        /* autoplay blocked — user can retry via a gesture */
-      });
-    } else {
-      a.pause();
-    }
-  }, [playing, resolvedUrl]);
-
+export default function AmbientMixer({ mixer, onMixerChange }: Props) {
   function patch(p: Partial<MixerState>) {
     onMixerChange({ ...mixer, ...p });
   }

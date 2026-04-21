@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   getSession,
   getTimings,
-  getSessionVideoTrack,
   type Session,
 } from "@/lib/meditation/sessions";
 import { getEnvironment } from "@/lib/meditation/environments";
@@ -16,7 +15,6 @@ import { useVoiceNarrator } from "@/hooks/meditation/useVoiceNarrator";
 import BreathingOrb from "./BreathingOrb";
 import SessionControls from "./SessionControls";
 import AmbientMixer, { type MixerState } from "./AmbientMixer";
-import VideoBackdrop from "./VideoBackdrop";
 
 interface Props {
   sessionId: string;
@@ -63,8 +61,6 @@ export default function SessionPlayer({
   const session: Session = useMemo(() => getSession(sessionId), [sessionId]);
   const env = useMemo(() => getEnvironment(session.env), [session.env]);
   const timings = useMemo(() => getTimings(session), [session]);
-  const videoUrl = useMemo(() => getSessionVideoTrack(session), [session]);
-
   const [playing, setPlaying] = useState(true);
   const [countdown, setCountdown] = useState(3);
   const [intro, setIntro] = useState(true);
@@ -116,8 +112,9 @@ export default function SessionPlayer({
     });
   }, [voiceEnabled, mixer, onSettingsChange]);
 
-  // Web Speech fallback narrator — called by useSessionAudio if an MP3 fails
-  const { speak: fallbackSpeak } = useVoiceNarrator({
+  // Web Speech narrator — primary narration source (we don't ship MP3 VO
+  // files; everything runs locally through the browser's TTS).
+  const { speak, stop: stopSpeech, unlock: unlockSpeech } = useVoiceNarrator({
     enabled: voiceEnabled,
     volume: mixer.voice / 100,
   });
@@ -139,7 +136,7 @@ export default function SessionPlayer({
     },
   });
 
-  // Full 3-layer audio engine — ambient loop + timed VO + chimes
+  // Fully-procedural 3-layer audio engine. Zero files, zero network.
   const { currentClipIdx, playStart, playEnd } = useSessionAudio({
     session,
     playing,
@@ -149,15 +146,23 @@ export default function SessionPlayer({
     volumeAmbient: mixer.ambient,
     volumeChimes: mixer.chimes,
     volumeVoice: mixer.voice,
-    fallbackSpeak,
+    speak,
+    stopSpeech,
   });
 
   const currentCaption =
     currentClipIdx >= 0 ? session.voClips[currentClipIdx]?.text ?? "" : "";
 
-  // 3-2-1 intro countdown
+  // 3-2-1 intro countdown.
+  // The intro exists partly as UX (deep breath before we begin) and partly
+  // to unlock the browser audio pipeline from the user's original tap —
+  // iOS Safari drops the first speech/audio attempt otherwise.
   useEffect(() => {
     if (!intro) return;
+    if (countdown === 3) {
+      // We're still in the same tick as the "Start" tap → warm up speech.
+      unlockSpeech();
+    }
     if (countdown <= 0) {
       setIntro(false);
       if (!startChimePlayed.current) {
@@ -168,7 +173,7 @@ export default function SessionPlayer({
     }
     const t = setTimeout(() => setCountdown((c) => c - 1), 1000);
     return () => clearTimeout(t);
-  }, [intro, countdown, playStart]);
+  }, [intro, countdown, playStart, unlockSpeech]);
 
   // Haptic on breath phase change
   const vibratedPhaseRef = useRef<string>("");
@@ -212,21 +217,16 @@ export default function SessionPlayer({
       dir="rtl"
       aria-label={`جلسة ${session.name}`}
     >
-      {/* ── Video backdrop (or gradient fallback) ── */}
-      <VideoBackdrop
-        videoUrl={videoUrl}
-        fallbackGradient={env.gradients[gradientKey]}
-        overlayOpacity={intro ? 0.55 : 0.35}
-        playing={playing}
-      />
-
-      {/* ── Cross-fade gradient for time-of-session cue (when no video) ── */}
+      {/* ── Cross-fade gradient backdrop ──
+           The gradient shifts slowly across the session (dawn → day → sunset
+           → night) giving a sense of time passing without needing any video
+           files. This is the whole visual layer — no assets loaded. */}
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
         {(["dawn", "day", "sunset", "night"] as const).map((g) => (
           <div
             key={g}
             className={`absolute inset-0 bg-gradient-to-b ${env.gradients[g]} transition-opacity duration-[4000ms] ease-in-out`}
-            style={{ opacity: g === gradientKey ? 0.45 : 0 }}
+            style={{ opacity: g === gradientKey ? 1 : 0 }}
           />
         ))}
       </div>
@@ -303,18 +303,27 @@ export default function SessionPlayer({
             />
           </div>
 
-          {/* ── Caption (visible when voice muted) ── */}
+          {/* ── Caption (always visible) ──
+               Narration is delivered via Web Speech which varies by browser;
+               the caption is the guaranteed reliable channel. Tint is subtle
+               when voice is on (redundant with audio) and stronger when muted. */}
           <AnimatePresence mode="wait">
-            {!voiceEnabled && currentCaption && (
+            {currentCaption && (
               <motion.div
                 key={currentCaption}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
                 transition={{ duration: 0.4 }}
-                className="absolute bottom-32 md:bottom-36 left-4 right-4 z-20 text-center"
+                className="absolute bottom-32 md:bottom-36 left-4 right-4 z-20 text-center pointer-events-none"
               >
-                <p className="text-white/85 text-sm md:text-base leading-relaxed max-w-md mx-auto bg-black/40 backdrop-blur-md rounded-2xl px-5 py-3 border border-white/10">
+                <p
+                  className={`text-sm md:text-base leading-relaxed max-w-md mx-auto backdrop-blur-md rounded-2xl px-5 py-3 border transition-colors ${
+                    voiceEnabled
+                      ? "bg-black/25 border-white/10 text-white/75"
+                      : "bg-black/45 border-white/15 text-white/90"
+                  }`}
+                >
                   {currentCaption}
                 </p>
               </motion.div>
@@ -333,9 +342,6 @@ export default function SessionPlayer({
                 <AmbientMixer
                   mixer={mixer}
                   onMixerChange={setMixer}
-                  // The real ambient playback is owned by useSessionAudio, so
-                  // this internal player stays silent to avoid double-playback.
-                  playing={false}
                 />
               </motion.div>
             )}
