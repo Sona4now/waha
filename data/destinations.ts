@@ -67,4 +67,24 @@ export const destinations: Record<string, Destination> = {
     panorama:
       "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&q=80",
   },
+  "wadi-degla": {
+    id: "wadi-degla",
+    name: "وادي دجلة",
+    subtitle: "صمت الصحراء على أطراف المدينة",
+    poem: "قريب جداً، وكأنه بعيد عن كل شيء.",
+    gradient: "from-stone-900 via-zinc-900 to-neutral-900",
+    color: "#78716c",
+    panorama:
+      "https://images.unsplash.com/photo-1547036967-23d11aacaee0?w=1920&q=80",
+  },
+  "shagie-farms": {
+    id: "shagie-farms",
+    name: "مزارع شجيع",
+    subtitle: "حيث الشفاء يبدأ من الأرض",
+    poem: "في ظل الأشجار، يتعلم الجسد أن يتنفس ببطء.",
+    gradient: "from-lime-950 via-emerald-900 to-green-900",
+    color: "#3f6212",
+    panorama:
+      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1920&q=80",
+  },
 };

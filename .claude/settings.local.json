@@ -213,7 +213,13 @@
       "Bash(/usr/bin/grep -n \"progress}\\\\|remaining\\\\|narrationLine\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/meditation/SessionPlayer.tsx)",
       "Bash(/usr/bin/grep -n \"breathCycles\\\\|useBreathCycle\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/meditation/SessionPlayer.tsx)",
       "Bash(/usr/bin/grep -n \"Sleep mode indicator\\\\|setUiHidden\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/meditation/SessionPlayer.tsx)",
-      "Bash(/usr/bin/grep -n \"onClick={\\(\\) => onSelect\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/meditation/MoodCheckIn.tsx)"
+      "Bash(/usr/bin/grep -n \"onClick={\\(\\) => onSelect\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/meditation/MoodCheckIn.tsx)",
+      "Bash(/usr/bin/curl -sL -o /dev/null -w \"therapy: %{http_code}\\\\nhistory: %{http_code}\\\\nmap: %{http_code}\\\\n\" https://wahaeg.com/therapy-room https://wahaeg.com/therapy-room/history https://wahaeg.com/map)",
+      "Bash(/usr/bin/grep -n \"وادي دجلة\\\\|مزارع شجيع\\\\|shagie\\\\|wadi-degla\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/api/chat/route.ts)",
+      "Bash(/usr/bin/grep -n \"سفاجا\\\\|سيوة\\\\|سيناء\\\\|الفيوم\\\\|الواحات\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/api/chat/route.ts)",
+      "Bash(/usr/bin/grep -c \"content: \\\\[\\\\|content: \\\\[$\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)",
+      "Bash(/usr/bin/grep -n \"id:.*\\\\\"\\\\\\(therapeutic-tourism-egypt\\\\|black-sand-safaga\\\\|siwa-sulfur-springs\\\\|mountain-therapy-sinai\\\\|best-time-visit\\\\|stress-relief-nature\\\\\\)\\\\\"\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)",
+      "Bash(/usr/bin/grep -n \"export interface BlogPost\\\\|export type BlogPost\\\\|content?:\\\\|BlogSection\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)"
     ]
   }
 }
