@@ -222,7 +222,9 @@
       "Bash(/usr/bin/grep -n \"export interface BlogPost\\\\|export type BlogPost\\\\|content?:\\\\|BlogSection\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)",
       "Bash(/usr/bin/grep -n \"CompareButton\\\\|DestinationCard\\\\|FavoriteButton\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/site/DestinationCard.tsx /Users/youseffouad1icloud.com/Desktop/mahaaa/app/destinations/page.tsx)",
       "Bash(/usr/bin/grep -n \"href=.*blog/\\\\|BLOG_POSTS\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/blog/page.tsx)",
-      "Bash(/usr/bin/grep -n \"bestMonths\\\\|okMonths\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)"
+      "Bash(/usr/bin/grep -n \"bestMonths\\\\|okMonths\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)",
+      "Bash(/usr/bin/curl -sL -o /dev/null -w \"home: %{http_code}\\\\nfavorites: %{http_code}\\\\ncalendar: %{http_code}\\\\nblog-article: %{http_code}\\\\nblog-article2: %{http_code}\\\\n\" https://wahaeg.com/home https://wahaeg.com/favorites https://wahaeg.com/calendar https://wahaeg.com/blog/therapeutic-tourism-egypt https://wahaeg.com/blog/black-sand-safaga)",
+      "Bash(/usr/bin/grep -rln \"useFavorites\\\\|FavoriteButton\\\\|/favorites\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app /Users/youseffouad1icloud.com/Desktop/mahaaa/components /Users/youseffouad1icloud.com/Desktop/mahaaa/hooks)"
     ]
   }
 }
