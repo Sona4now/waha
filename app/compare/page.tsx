@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
-import { DESTINATIONS } from "@/data/siteData";
+import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
 
 const COMPARISON_ROWS = [
   { key: "environment", label: "البيئة" },
@@ -46,7 +46,7 @@ function ComparePageInner() {
     });
   };
 
-  const selectedDestinations = DESTINATIONS.filter((d: any) =>
+  const selectedDestinations = DESTINATIONS.filter((d: DestinationFull) =>
     selected.includes(d.id ?? d.name)
   );
 
@@ -72,7 +72,7 @@ function ComparePageInner() {
             </p>
 
             <div className="flex flex-wrap justify-center gap-3">
-              {DESTINATIONS.map((dest: any) => {
+              {DESTINATIONS.map((dest: DestinationFull) => {
                 const destId = dest.id ?? dest.name;
                 const isSelected = selected.includes(destId);
                 return (
@@ -130,7 +130,7 @@ function ComparePageInner() {
                     <th className="px-6 py-4 font-display text-sm font-bold text-white border-l border-[#1d5770] w-36">
                       عنصر المقارنة
                     </th>
-                    {selectedDestinations.map((dest: any) => (
+                    {selectedDestinations.map((dest: DestinationFull) => (
                       <th
                         key={dest.id ?? dest.name}
                         className="px-6 py-4 font-display text-sm font-bold text-white border-l border-[#1d5770] last:border-l-0"
@@ -164,30 +164,41 @@ function ComparePageInner() {
                       <td className="px-6 py-4 font-display text-sm font-bold text-[#1d5770] border-l border-gray-200 dark:border-[#1e3a5f] whitespace-nowrap">
                         {row.label}
                       </td>
-                      {selectedDestinations.map((dest: any) => (
-                        <td
-                          key={dest.id ?? dest.name}
-                          className="px-6 py-4 text-sm text-[#12394d] dark:text-white/80 leading-relaxed border-l border-gray-200 dark:border-[#1e3a5f] last:border-l-0"
-                        >
-                          {row.key === "features" ? (
-                            <ul className="list-none space-y-1.5">
-                              {(dest[row.key] ?? []).map(
-                                (feature: string, i: number) => (
-                                  <li
-                                    key={i}
-                                    className="flex items-start gap-2"
-                                  >
-                                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#91b149]" />
-                                    <span>{feature}</span>
-                                  </li>
-                                )
-                              )}
-                            </ul>
-                          ) : (
-                            dest[row.key] ?? "—"
-                          )}
-                        </td>
-                      ))}
+                      {selectedDestinations.map((dest: DestinationFull) => {
+                        // COMPARISON_ROWS.key values don't all line up perfectly with DestinationFull
+                        // shape (some columns are arrays, some strings, some optional).
+                        // Pull the value with a dynamic lookup + narrow to a renderable type.
+                        const raw = (dest as unknown as Record<string, unknown>)[row.key];
+                        const isArray = Array.isArray(raw);
+                        return (
+                          <td
+                            key={dest.id ?? dest.name}
+                            className="px-6 py-4 text-sm text-[#12394d] dark:text-white/80 leading-relaxed border-l border-gray-200 dark:border-[#1e3a5f] last:border-l-0"
+                          >
+                            {row.key === "features" && isArray ? (
+                              <ul className="list-none space-y-1.5">
+                                {(raw as string[]).map(
+                                  (feature: string, i: number) => (
+                                    <li
+                                      key={i}
+                                      className="flex items-start gap-2"
+                                    >
+                                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[#91b149]" />
+                                      <span>{feature}</span>
+                                    </li>
+                                  ),
+                                )}
+                              </ul>
+                            ) : isArray ? (
+                              (raw as string[]).join("، ")
+                            ) : typeof raw === "string" ? (
+                              raw
+                            ) : (
+                              "—"
+                            )}
+                          </td>
+                        );
+                      })}
                     </tr>
                   ))}
                 </tbody>

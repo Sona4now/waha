@@ -8,6 +8,16 @@ interface Opts {
   durationSec: number;
   /** Fires once when elapsed reaches duration. */
   onComplete?: () => void;
+  /**
+   * Where to start the elapsed counter from. Used when resuming an
+   * interrupted session. Default 0.
+   */
+  initialElapsed?: number;
+  /**
+   * Called every second with the current elapsed value. Throttled to
+   * full-second ticks so it's cheap. Useful for persisting resume state.
+   */
+  onTick?: (elapsed: number) => void;
 }
 
 /**
@@ -16,12 +26,20 @@ interface Opts {
  *  - signals completion at `durationSec`
  *  - resets cleanly on `active=false`
  */
-export function useSessionTimer({ active, durationSec, onComplete }: Opts) {
-  const [elapsed, setElapsed] = useState(0);
+export function useSessionTimer({
+  active,
+  durationSec,
+  onComplete,
+  initialElapsed = 0,
+  onTick,
+}: Opts) {
+  const [elapsed, setElapsed] = useState(initialElapsed);
   const firedRef = useRef(false);
   const hiddenRef = useRef(false);
   const completeRef = useRef(onComplete);
+  const tickRef = useRef(onTick);
   completeRef.current = onComplete;
+  tickRef.current = onTick;
 
   // Track tab visibility so we can pause the tick without losing state.
   useEffect(() => {
@@ -34,7 +52,7 @@ export function useSessionTimer({ active, durationSec, onComplete }: Opts) {
 
   useEffect(() => {
     if (!active) {
-      setElapsed(0);
+      setElapsed(initialElapsed);
       firedRef.current = false;
       return;
     }
@@ -43,6 +61,12 @@ export function useSessionTimer({ active, durationSec, onComplete }: Opts) {
       if (hiddenRef.current) return;
       setElapsed((e) => {
         const next = e + 1;
+        // Tick callback — throttle to every 5 seconds so we're not hammering
+        // localStorage on every single tick, but still often enough to
+        // preserve progress if the tab closes.
+        if (tickRef.current && next % 5 === 0) {
+          tickRef.current(next);
+        }
         if (!firedRef.current && next >= durationSec) {
           firedRef.current = true;
           completeRef.current?.();
@@ -52,6 +76,7 @@ export function useSessionTimer({ active, durationSec, onComplete }: Opts) {
     }, 1000);
 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, durationSec]);
 
   const progress = durationSec > 0 ? Math.min(elapsed / durationSec, 1) : 0;

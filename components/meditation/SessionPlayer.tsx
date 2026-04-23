@@ -18,18 +18,27 @@ import AmbientMixer, { type MixerState } from "./AmbientMixer";
 
 interface Props {
   sessionId: string;
+  /** Seconds into the session to resume from (non-zero when the user
+   *  is continuing an interrupted session). */
+  resumeFromSec?: number;
   initialSettings: {
     voiceEnabled: boolean;
     volumeAmbient: number;
     volumeChimes: number;
     volumeVoice: number;
+    sleepTimer?: boolean;
+    skipIntro?: boolean;
   };
   onSettingsChange: (s: {
-    voiceEnabled: boolean;
-    volumeAmbient: number;
-    volumeChimes: number;
-    volumeVoice: number;
+    voiceEnabled?: boolean;
+    volumeAmbient?: number;
+    volumeChimes?: number;
+    volumeVoice?: number;
+    sleepTimer?: boolean;
+    skipIntro?: boolean;
   }) => void;
+  /** Called every ~5 seconds of playback for resume-state persistence. */
+  onTick?: (elapsed: number) => void;
   onComplete: (
     elapsed: number,
     fullyCompleted: boolean,
@@ -54,16 +63,22 @@ interface Props {
  */
 export default function SessionPlayer({
   sessionId,
+  resumeFromSec = 0,
   initialSettings,
   onSettingsChange,
+  onTick,
   onComplete,
 }: Props) {
   const session: Session = useMemo(() => getSession(sessionId), [sessionId]);
   const env = useMemo(() => getEnvironment(session.env), [session.env]);
   const timings = useMemo(() => getTimings(session), [session]);
+  // Short-circuit the intro for daily users who asked for it or for
+  // resumed sessions (already past the "get ready" moment).
+  const shouldSkipIntro =
+    !!initialSettings.skipIntro || resumeFromSec > 0;
   const [playing, setPlaying] = useState(true);
-  const [countdown, setCountdown] = useState(3);
-  const [intro, setIntro] = useState(true);
+  const [countdown, setCountdown] = useState(shouldSkipIntro ? 0 : 3);
+  const [intro, setIntro] = useState(!shouldSkipIntro);
   const [breathCycles, setBreathCycles] = useState(0);
   const [mixer, setMixer] = useState<MixerState>({
     ambient: initialSettings.volumeAmbient,
@@ -71,6 +86,7 @@ export default function SessionPlayer({
     voice: initialSettings.volumeVoice,
   });
   const [voiceEnabled, setVoiceEnabled] = useState(initialSettings.voiceEnabled);
+  const [sleepTimer, setSleepTimer] = useState(!!initialSettings.sleepTimer);
   const [showMixer, setShowMixer] = useState(false);
   const [uiHidden, setUiHidden] = useState(false);
   const startChimePlayed = useRef(false);
@@ -102,15 +118,16 @@ export default function SessionPlayer({
     return () => mq.removeEventListener?.("change", h);
   }, []);
 
-  // Persist settings
+  // Persist settings — user preferences stay for next session
   useEffect(() => {
     onSettingsChange({
       voiceEnabled,
       volumeAmbient: mixer.ambient,
       volumeChimes: mixer.chimes,
       volumeVoice: mixer.voice,
+      sleepTimer,
     });
-  }, [voiceEnabled, mixer, onSettingsChange]);
+  }, [voiceEnabled, mixer, sleepTimer, onSettingsChange]);
 
   // Web Speech narrator — primary narration source (we don't ship MP3 VO
   // files; everything runs locally through the browser's TTS).
@@ -130,14 +147,18 @@ export default function SessionPlayer({
   const { elapsed, progress } = useSessionTimer({
     active: playing && !intro,
     durationSec: session.duration,
+    initialElapsed: resumeFromSec,
+    onTick,
     onComplete: () => {
-      playEnd();
+      // In sleep mode, NEVER chime at end — the point is to not wake the user.
+      // The ambient keeps running inside useSessionAudio until it's torn down.
+      if (!sleepTimer) playEnd();
       onComplete(session.duration, true, breathCycles + 1);
     },
   });
 
   // Fully-procedural 3-layer audio engine. Zero files, zero network.
-  const { currentClipIdx, playStart, playEnd } = useSessionAudio({
+  const { currentClipIdx, playStart, playEnd, skipClip } = useSessionAudio({
     session,
     playing,
     elapsed,
@@ -303,6 +324,38 @@ export default function SessionPlayer({
             />
           </div>
 
+          {/* ── Breath counter — small, unobtrusive, above the orb ── */}
+          {breathCycles > 0 && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: uiHidden ? 0.3 : 0.7 }}
+              transition={{ duration: 0.4 }}
+              className="absolute top-[28%] left-1/2 -translate-x-1/2 z-20 text-center pointer-events-none"
+              aria-live="off"
+            >
+              <div className="text-white/50 text-[10px] uppercase tracking-[0.3em] font-bold mb-0.5">
+                الأنفاس
+              </div>
+              <div className="text-white/80 text-lg font-display font-black tabular-nums">
+                {breathCycles}
+              </div>
+            </motion.div>
+          )}
+
+          {/* ── Sleep mode indicator — small moon pill top-left ── */}
+          {sleepTimer && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: uiHidden ? 0.35 : 0.85 }}
+              transition={{ duration: 0.4 }}
+              className="absolute top-20 right-4 z-20 pointer-events-none"
+            >
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#91b149] bg-[#91b149]/15 border border-[#91b149]/30 rounded-full px-2.5 py-1 backdrop-blur-md">
+                🌙 وضع النوم
+              </span>
+            </motion.div>
+          )}
+
           {/* ── Caption (always visible) ──
                Narration is delivered via Web Speech which varies by browser;
                the caption is the guaranteed reliable channel. Tint is subtle
@@ -342,6 +395,8 @@ export default function SessionPlayer({
                 <AmbientMixer
                   mixer={mixer}
                   onMixerChange={setMixer}
+                  sleepTimer={sleepTimer}
+                  onSleepTimerChange={setSleepTimer}
                 />
               </motion.div>
             )}
@@ -358,11 +413,7 @@ export default function SessionPlayer({
               playing={playing}
               onToggle={togglePlay}
               onEnd={endNow}
-              onSkip={() => {
-                // The audio engine handles its own internal scheduling;
-                // a "skip" here just cancels any current VO via Web Speech
-                // or short-circuits by nudging. Simplest: silent no-op.
-              }}
+              onSkip={skipClip}
               voiceEnabled={voiceEnabled}
               onToggleVoice={() => setVoiceEnabled((v) => !v)}
               elapsed={elapsed}

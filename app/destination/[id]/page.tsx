@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import SiteLayout from "@/components/site/SiteLayout";
+import { showToast } from "@/components/site/Toast";
 import FAQ, { getFAQForDestination } from "@/components/site/FAQ";
 import QuickActions from "@/components/site/QuickActions";
 import Gallery, { getGalleryForDestination } from "@/components/site/Gallery";
@@ -836,7 +837,7 @@ export default function DestinationDetailPage() {
       }
     } else {
       await navigator.clipboard.writeText(url);
-      alert("تم نسخ الرابط!");
+      showToast("تم نسخ الرابط!", "success");
     }
   };
 

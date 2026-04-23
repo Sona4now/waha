@@ -190,7 +190,7 @@ export default function AdminPage() {
             <div>
               <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
                 <span className="w-2 h-2 rounded-full bg-[#91b149] animate-pulse" />
-                Admin Dashboard
+                لوحة الإدارة
               </div>
               <h1 className="text-3xl md:text-4xl font-bold font-display text-[#12394d] dark:text-white">
                 لوحة تحكم المشرفين
@@ -280,7 +280,7 @@ export default function AdminPage() {
                     >
                       <div className="flex items-start justify-between gap-4 mb-2">
                         <div className="flex items-center gap-2">
-                          <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-[#1d5770]/10 text-[#1d5770] dark:bg-[#91b149]/20 dark:text-[#91b149]">
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#1d5770]/10 text-[#1d5770] dark:bg-[#91b149]/20 dark:text-[#91b149]">
                             {item.pageTitle}
                           </span>
                         </div>

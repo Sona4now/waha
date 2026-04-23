@@ -5,11 +5,23 @@ import { useCallback, useEffect, useState } from "react";
 const STORAGE_KEY = "waaha_meditation_history";
 const SETTINGS_KEY = "waaha_meditation_settings";
 
+/**
+ * A recorded meditation session.
+ *
+ * `moodBefore` / `moodAfter` are the 1-5 values from the mood check-in flow
+ * (1 = awful, 5 = great). Both optional — legacy records + skipped
+ * check-ins stay null, so UI must handle missing values.
+ */
 export interface SessionRecord {
   sessionId: string;
   completedAt: number; // epoch ms
   durationSec: number; // actual elapsed time
   fullyCompleted: boolean;
+  breathCycles?: number; // completed inhale→exhale cycles
+  moodBefore?: number; // 1..5
+  moodAfter?: number; // 1..5
+  journeyId?: string; // if this session was a journey day
+  journeyDay?: number; // 1-indexed day inside the journey
 }
 
 export interface UserSettings {
@@ -19,6 +31,13 @@ export interface UserSettings {
   volumeVoice: number;
   lastSessionId?: string;
   favorites: string[];
+  /** When a session is marked as "sleep mode", suppress the end chime and
+   *  fade the ambient out over 20s. Default: off. */
+  sleepTimer: boolean;
+  /** User opted out of the 3-2-1 intro countdown (for returning meditators). */
+  skipIntro: boolean;
+  /** Show the mood check-in prompts before/after sessions. Default: on. */
+  moodCheckInEnabled: boolean;
 }
 
 export interface Stats {
@@ -34,6 +53,9 @@ const DEFAULT_SETTINGS: UserSettings = {
   volumeChimes: 60,
   volumeVoice: 100,
   favorites: [],
+  sleepTimer: false,
+  skipIntro: false,
+  moodCheckInEnabled: true,
 };
 
 function safeParse<T>(raw: string | null, fallback: T): T {

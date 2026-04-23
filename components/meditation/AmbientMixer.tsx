@@ -9,6 +9,10 @@ export interface MixerState {
 interface Props {
   mixer: MixerState;
   onMixerChange: (next: MixerState) => void;
+  /** Sleep-mode toggle — when on, the end chime is suppressed so it doesn't
+   *  wake a user who dozed off during the session. */
+  sleepTimer?: boolean;
+  onSleepTimerChange?: (v: boolean) => void;
 }
 
 /**
@@ -22,7 +26,12 @@ interface Props {
  * Deliberately stateless + no AudioContext — this is safe to mount/unmount
  * without affecting what the user is hearing.
  */
-export default function AmbientMixer({ mixer, onMixerChange }: Props) {
+export default function AmbientMixer({
+  mixer,
+  onMixerChange,
+  sleepTimer,
+  onSleepTimerChange,
+}: Props) {
   function patch(p: Partial<MixerState>) {
     onMixerChange({ ...mixer, ...p });
   }
@@ -74,6 +83,37 @@ export default function AmbientMixer({ mixer, onMixerChange }: Props) {
           </span>
         </div>
       ))}
+
+      {/* Sleep mode toggle — suppresses the end chime so it doesn't wake you up */}
+      {onSleepTimerChange && (
+        <button
+          type="button"
+          onClick={() => onSleepTimerChange(!sleepTimer)}
+          aria-pressed={!!sleepTimer}
+          className={`mt-2 flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+            sleepTimer
+              ? "bg-[#91b149]/20 border border-[#91b149]/40 text-[#91b149]"
+              : "bg-white/5 border border-white/10 text-white/70 hover:bg-white/10"
+          }`}
+        >
+          <span className="flex items-center gap-2">
+            <span className="text-base">🌙</span>
+            <span>وضع النوم</span>
+          </span>
+          <span
+            className={`relative inline-block w-9 h-5 rounded-full transition-colors ${
+              sleepTimer ? "bg-[#91b149]" : "bg-white/15"
+            }`}
+            aria-hidden="true"
+          >
+            <span
+              className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${
+                sleepTimer ? "right-0.5" : "right-[18px]"
+              }`}
+            />
+          </span>
+        </button>
+      )}
     </div>
   );
 }

@@ -487,7 +487,7 @@ function NoRecommendationScreen() {
     >
       <div className="max-w-md text-center">
         <div className="text-[10px] uppercase tracking-[0.4em] text-[#91b149] font-bold mb-3">
-          Your Healing Map
+          خريطة الشفاء
         </div>
         <div className="text-6xl mb-6">🗺️</div>
         <h1 className="font-display text-3xl font-black text-white mb-3">

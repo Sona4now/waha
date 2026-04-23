@@ -31,9 +31,9 @@ export const ACHIEVEMENTS: Achievement[] = [
   {
     id: "world-traveler",
     title: "رحّالة محترف",
-    description: "زرت كل الـ 5 وجهات",
+    description: "زرت كل الـ 7 وجهات",
     icon: "🌍",
-    condition: (s) => s.destinationsVisited.length >= 5,
+    condition: (s) => s.destinationsVisited.length >= 7,
   },
   {
     id: "reader",

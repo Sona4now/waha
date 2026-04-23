@@ -175,3 +175,64 @@ export function nextDayFor(journey: Journey, progress: JourneyProgress): number 
   // All days done — reset option
   return journey.days.length;
 }
+
+/**
+ * Journeys are meant to be a *daily* habit. After a user completes Day N,
+ * we lock Day N+1 until ~20h have passed. The 20h (not 24h) is intentional —
+ * it gives flexibility for someone who did yesterday's session at 10 PM and
+ * wants to do today's at 6 PM. Goes stricter than 24h and you create false
+ * friction; goes looser than 20h and users just blast through the program.
+ */
+const MIN_GAP_MS = 20 * 60 * 60 * 1000;
+
+export interface DayLockInfo {
+  /** Can the user start this day right now? */
+  unlocked: boolean;
+  /** Already completed? */
+  completed: boolean;
+  /** If locked, milliseconds until it unlocks (≥ 0). */
+  lockedForMs: number;
+  /** Human-readable label for the lock state, localized Arabic. */
+  label: string;
+}
+
+export function dayLockInfo(
+  journey: Journey,
+  day: number,
+  progress: JourneyProgress,
+): DayLockInfo {
+  const entry = progress[journey.id];
+  const completed = entry?.completedDays.includes(day) ?? false;
+  if (completed) {
+    return { unlocked: true, completed, lockedForMs: 0, label: "مكتمل ✓" };
+  }
+  // Day 1 is always unlocked.
+  if (day === 1) {
+    return { unlocked: true, completed: false, lockedForMs: 0, label: "ابدأ" };
+  }
+  // All earlier days must be complete first.
+  const prevDone = (entry?.completedDays ?? []).includes(day - 1);
+  if (!prevDone) {
+    return {
+      unlocked: false,
+      completed: false,
+      lockedForMs: Infinity,
+      label: `خلّص اليوم ${day - 1} الأول`,
+    };
+  }
+  // Earlier day is done — check how long ago.
+  const lastAtIso = entry?.lastDayAt;
+  const lastAt = lastAtIso ? new Date(lastAtIso).getTime() : 0;
+  const elapsed = Date.now() - lastAt;
+  if (elapsed >= MIN_GAP_MS) {
+    return { unlocked: true, completed: false, lockedForMs: 0, label: "ابدأ" };
+  }
+  const lockedForMs = MIN_GAP_MS - elapsed;
+  const hours = Math.ceil(lockedForMs / (60 * 60 * 1000));
+  return {
+    unlocked: false,
+    completed: false,
+    lockedForMs,
+    label: `متاح بعد ${hours} ساعة`,
+  };
+}

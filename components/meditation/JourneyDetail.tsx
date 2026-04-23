@@ -4,7 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import type { Journey, JourneyProgress } from "@/lib/meditation/journeys";
 import { SESSIONS } from "@/lib/meditation/sessions";
-import { nextDayFor } from "@/lib/meditation/journeys";
+import { nextDayFor, dayLockInfo } from "@/lib/meditation/journeys";
 
 interface Props {
   journey: Journey;
@@ -123,25 +123,26 @@ export default function JourneyDetail({
           </p>
           {journey.days.map((d, i) => {
             const session = SESSIONS.find((s) => s.id === d.sessionId);
-            const done = entry?.completedDays.includes(d.day) ?? false;
-            const current = d.day === nextDay;
-            const locked = !done && !current;
+            const lock = dayLockInfo(journey, d.day, progress);
+            const done = lock.completed;
+            const current = lock.unlocked && !done;
+            const locked = !lock.unlocked;
             return (
               <motion.button
                 key={d.day}
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.3, delay: 0.05 * i }}
-                onClick={() => !locked && onStartDay(d.day)}
-                disabled={locked}
+                onClick={() => lock.unlocked && onStartDay(d.day)}
+                disabled={!lock.unlocked}
                 className={`w-full flex items-center gap-4 p-4 rounded-xl border transition-all text-right ${
                   current
                     ? "bg-[#91b149]/15 border-[#91b149]/60 hover:bg-[#91b149]/20"
                     : done
                       ? "bg-[#12394d]/40 border-white/10 hover:bg-[#12394d]/60"
-                      : "bg-white/5 border-white/5 opacity-50 cursor-not-allowed"
+                      : "bg-white/5 border-white/5 opacity-60 cursor-not-allowed"
                 }`}
-                aria-label={`يوم ${d.day}: ${d.teaser}${locked ? " — مقفول" : ""}`}
+                aria-label={`يوم ${d.day}: ${d.teaser} — ${lock.label}`}
               >
                 {/* Day number / status badge */}
                 <div
@@ -165,6 +166,13 @@ export default function JourneyDetail({
                       {session.name} · {Math.round(session.duration / 60)} دقيقة
                     </div>
                   )}
+                  {/* Show the lock-state label so users know exactly when a
+                      day becomes available instead of just seeing a lock icon. */}
+                  {locked && (
+                    <div className="text-[#91b149]/80 text-[11px] font-bold mt-1">
+                      🔒 {lock.label}
+                    </div>
+                  )}
                 </div>
 
                 <span
@@ -177,7 +185,7 @@ export default function JourneyDetail({
                   }`}
                   aria-hidden="true"
                 >
-                  {locked ? "🔒" : "←"}
+                  {done ? "✓" : locked ? "🔒" : "←"}
                 </span>
               </motion.button>
             );

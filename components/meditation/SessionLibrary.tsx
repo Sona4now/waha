@@ -56,7 +56,7 @@ export default function SessionLibrary({
           className="text-center mb-10"
         >
           <div className="text-[10px] uppercase tracking-[0.5em] text-[#91b149] font-bold mb-3">
-            · Meditation Room ·
+            · غرفة التأمل ·
           </div>
           <h1 className="font-display text-4xl sm:text-5xl font-black text-white mb-3">
             غرفة التأمل

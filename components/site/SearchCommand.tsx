@@ -38,14 +38,14 @@ function buildIndex(): SearchItem[] {
     });
   });
 
-  // Blog posts
+  // Blog posts — link to the specific article, not the listing page.
   BLOG_POSTS.forEach((post) => {
     index.push({
       id: `blog-${post.id}`,
       title: post.title,
       subtitle: post.excerpt,
       category: "مقالة",
-      href: `/blog`,
+      href: `/blog/${post.id}`,
       icon: "📖",
       keywords: [post.title, post.excerpt, post.category],
     });

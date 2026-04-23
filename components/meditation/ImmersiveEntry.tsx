@@ -7,15 +7,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import type { Session } from "@/lib/meditation/sessions";
 import type { Journey, JourneyProgress } from "@/lib/meditation/journeys";
 import type { Stats } from "@/hooks/meditation/useSessionHistory";
+import type { ResumeState } from "@/hooks/meditation/useSessionResume";
 import { getEnvironment } from "@/lib/meditation/environments";
 import JourneyCard from "./JourneyCard";
 
 interface Props {
   suggestedSession: Session;
+  /** Short phrase explaining why this session was suggested (e.g.
+   *  "قبل النوم", "اليوم 3 من رحلتك"). Shown under the session name. */
+  suggestionReason?: string;
   journeys: Journey[];
   journeyProgress: JourneyProgress;
   stats: Stats;
   meditatedToday: boolean;
+  /** A half-finished session from the user's previous visit, if any.
+   *  When present we show a "continue?" prompt. */
+  resumable?: ResumeState | null;
+  onResume?: () => void;
   onStart: () => void;
   onOpenJourney: (j: Journey) => void;
   onOpenLibrary: () => void;
@@ -31,10 +39,13 @@ interface Props {
  */
 export default function ImmersiveEntry({
   suggestedSession,
+  suggestionReason,
   journeys,
   journeyProgress,
   stats,
   meditatedToday,
+  resumable,
+  onResume,
   onStart,
   onOpenJourney,
   onOpenLibrary,
@@ -186,23 +197,49 @@ export default function ImmersiveEntry({
             </button>
           </motion.div>
 
-          {/* Session suggestion label */}
+          {/* Session suggestion: name + "why this session" reason */}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.7 }}
-            className="text-white/70 text-sm mb-2"
+            className="text-white/70 text-sm mb-1"
           >
             {suggestedSession.name}
           </motion.p>
+          {suggestionReason && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.85 }}
+              className="text-[#91b149] text-[11px] font-bold mb-2"
+            >
+              ✦ {suggestionReason}
+            </motion.p>
+          )}
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.85 }}
+            transition={{ duration: 0.8, delay: 0.95 }}
             className="text-white/50 text-xs max-w-xs mx-auto mb-10"
           >
             {suggestedSession.subtitle}
           </motion.p>
+
+          {/* Resume banner — only when the user left a session unfinished */}
+          {resumable && onResume && (
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 1.0 }}
+              onClick={onResume}
+              className="mb-6 inline-flex items-center gap-2 bg-[#91b149]/15 hover:bg-[#91b149]/25 text-[#91b149] rounded-full px-4 h-9 text-xs font-bold border border-[#91b149]/30 transition-colors"
+            >
+              <span>▶</span>
+              <span>
+                كمّل من {Math.round(resumable.elapsed / 60) || 1} دقيقة
+              </span>
+            </motion.button>
+          )}
 
           {/* Secondary actions */}
           <motion.div
@@ -250,7 +287,7 @@ export default function ImmersiveEntry({
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
             <p className="text-[10px] uppercase tracking-[0.5em] text-[#91b149] font-bold mb-3">
-              Journeys
+              رحلات
             </p>
             <h2 className="font-display text-2xl md:text-3xl font-black text-white mb-2">
               رحلات متدرجة

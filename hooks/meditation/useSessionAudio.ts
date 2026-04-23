@@ -35,6 +35,8 @@ interface Return {
   currentClipIdx: number;
   playStart: () => void;
   playEnd: () => void;
+  /** Cancels the current VO clip and immediately triggers the next one. */
+  skipClip: () => void;
 }
 
 /**
@@ -153,5 +155,32 @@ export function useSessionAudio({
     playEndChime(volumeChimes / 100);
   }, [volumeChimes]);
 
-  return { currentClipIdx, playStart, playEnd };
+  /**
+   * Skip to the next unplayed clip. Cancels whatever TTS is speaking now
+   * and jumps to the next line in the session script. If everything has
+   * already played we just cancel and stay silent until the session ends.
+   */
+  const skipClip = useCallback(() => {
+    stopSpeech();
+    // Find the first clip that hasn't been played yet, regardless of `at`.
+    const nextIdx = session.voClips.findIndex(
+      (c) => !playedClipsRef.current.has(c.id),
+    );
+    if (nextIdx < 0) {
+      voActiveRef.current = false;
+      return;
+    }
+    const clip = session.voClips[nextIdx];
+    playedClipsRef.current.add(clip.id);
+    setCurrentClipIdx(nextIdx);
+    if (!voiceEnabled) return;
+    if (ambientRef.current) {
+      const base = volumeAmbient / 100;
+      ambientRef.current.setVolume(base * 0.4);
+    }
+    voActiveRef.current = true;
+    speak(clip.text);
+  }, [session.voClips, voiceEnabled, speak, stopSpeech, volumeAmbient]);
+
+  return { currentClipIdx, playStart, playEnd, skipClip };
 }
