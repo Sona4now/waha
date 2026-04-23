@@ -237,13 +237,13 @@ export default function TherapyRoomPage() {
     // keep the record for now; it'll be cleared on onComplete
   }, [resumable]);
 
-  if (!loaded || !resumeLoaded) {
-    return <div className="fixed inset-0 bg-[#070d15]" />;
-  }
-
   // Smart suggestion — time-aware, journey-aware, intro-aware.
-  // `rec` was reading localStorage on every render before memoization; now it
-  // re-reads only when the user enters the room, not on every React re-render.
+  // Both hooks below MUST run before any conditional early return, otherwise
+  // the hook count changes between renders (empty-shell → real UI) and React
+  // throws "Rendered more hooks than during the previous render". That's
+  // exactly what a previous refactor hit — the `!loaded` guard used to sit
+  // above these, and the memoized `rec` then "appeared" on the first real
+  // render, which crashed the component inside an ErrorBoundary.
   const rec = useMemo<{ need?: string } | null>(() => {
     if (typeof window === "undefined") return null;
     try {
@@ -253,11 +253,19 @@ export default function TherapyRoomPage() {
       return null;
     }
   }, []);
-  const suggestion = suggestSession({
-    journeyProgress,
-    lastSessionId: settings.lastSessionId,
-    need: rec?.need,
-  });
+  const suggestion = useMemo(
+    () =>
+      suggestSession({
+        journeyProgress,
+        lastSessionId: settings.lastSessionId,
+        need: rec?.need,
+      }),
+    [journeyProgress, settings.lastSessionId, rec],
+  );
+
+  if (!loaded || !resumeLoaded) {
+    return <div className="fixed inset-0 bg-[#070d15]" />;
+  }
 
   return (
     <AnimatePresence mode="wait">
