@@ -1,5 +1,6 @@
 "use client";
 
+import { useCallback } from "react";
 import { motion } from "framer-motion";
 
 export type Mood = 1 | 2 | 3 | 4 | 5;
@@ -40,6 +41,19 @@ export default function MoodCheckIn({
   onSkip,
   sessionName,
 }: Props) {
+  // Small haptic tap on selection — this is the moment the user commits
+  // to an emotion, a subtle confirmation vibration reinforces the choice.
+  const select = useCallback(
+    (m: Mood) => {
+      try {
+        navigator.vibrate?.(15);
+      } catch {
+        /* haptic not supported */
+      }
+      onSelect(m);
+    },
+    [onSelect],
+  );
   const title =
     phase === "before" ? "إزاي حاسس دلوقتي؟" : "دلوقتي إزاي حاسس؟";
   const subtitle =
@@ -79,7 +93,7 @@ export default function MoodCheckIn({
             return (
               <motion.button
                 key={m.value}
-                onClick={() => onSelect(m.value)}
+                onClick={() => select(m.value)}
                 initial={{ scale: 0.7, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.3 + i * 0.07 }}

@@ -1,11 +1,26 @@
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import type { Session } from "@/lib/meditation/sessions";
 import type { Stats } from "@/hooks/meditation/useSessionHistory";
 import type { Journey } from "@/lib/meditation/journeys";
+import Confetti from "./Confetti";
+
+/**
+ * Short, specific Arabic encouragements. Picked randomly per-session so
+ * returning users don't see the same line. Kept small (6 items) on purpose —
+ * a larger set dilutes the specificity.
+ */
+const MOTIVATIONAL_QUOTES = [
+  "اللي عملته ده أصعب من إنك تقعد ساعة في الجيم.",
+  "جسمك دلوقتي بيعمل reset. اديله لحظة.",
+  "كل مرة بتتأمل، بتبني عضلة في الصبر.",
+  "الهدوء مش هروب — ده قوة.",
+  "التنفس الواعي هو أقدم دواء في التاريخ.",
+  "3 دقايق بس كفاية إنك ترجع لنفسك.",
+];
 
 interface Props {
   session: Session;
@@ -99,6 +114,19 @@ export default function SessionSummary({
   const journeyDone =
     journey && journeyDay !== undefined && journeyDay >= journey.days.length;
 
+  // Pick a stable motivational quote for this mount (not on every render).
+  const quote = useMemo(
+    () =>
+      MOTIVATIONAL_QUOTES[
+        Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)
+      ],
+    [],
+  );
+
+  // Fire confetti when the user actually finished. Not for short-tap sessions
+  // or for mid-session ends — we reserve it for a real achievement moment.
+  const showConfetti = fullyCompleted || !!journeyDone;
+
   // Web Share API fallback → copy-to-clipboard
   const handleShare = useCallback(async () => {
     const text = journey
@@ -126,6 +154,7 @@ export default function SessionSummary({
       role="dialog"
       aria-label="ملخص الجلسة"
     >
+      <Confetti active={showConfetti} />
       <motion.div
         initial={{ scale: 0.85, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -151,6 +180,11 @@ export default function SessionSummary({
 
         {/* Mood delta — only if captured */}
         {hasMoodData && <MoodDelta before={moodBefore!} after={moodAfter!} />}
+
+        {/* Motivational quote — reinforces that the user did something real */}
+        <p className="text-white/60 text-xs leading-relaxed mb-5 px-2">
+          💬 {quote}
+        </p>
 
         <div className="grid grid-cols-3 gap-2.5 mb-5">
           <div className="bg-white/5 rounded-xl p-2.5">

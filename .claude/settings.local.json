@@ -208,7 +208,12 @@
       "Bash(/usr/bin/grep -n \"Admin Dashboard\\\\|text-\\\\[9px\\\\]\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/admin/page.tsx)",
       "Bash(/usr/bin/grep -n \"\\(dest: any\\)\\\\|: any\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/compare/page.tsx)",
       "Bash(/usr/bin/grep -n \"\\(d: any\\)\\\\|DestinationFull\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/compare/page.tsx)",
-      "Bash(/usr/bin/head -30)"
+      "Bash(/usr/bin/head -30)",
+      "Bash(/usr/bin/grep -n \"wave particle\\\\|env.waveColor\\\\|BreathingOrb\\\\|SessionControls\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/meditation/SessionPlayer.tsx)",
+      "Bash(/usr/bin/grep -n \"progress}\\\\|remaining\\\\|narrationLine\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/meditation/SessionPlayer.tsx)",
+      "Bash(/usr/bin/grep -n \"breathCycles\\\\|useBreathCycle\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/meditation/SessionPlayer.tsx)",
+      "Bash(/usr/bin/grep -n \"Sleep mode indicator\\\\|setUiHidden\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/meditation/SessionPlayer.tsx)",
+      "Bash(/usr/bin/grep -n \"onClick={\\(\\) => onSelect\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/meditation/MoodCheckIn.tsx)"
     ]
   }
 }

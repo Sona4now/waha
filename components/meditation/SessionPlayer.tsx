@@ -13,6 +13,7 @@ import { useSessionTimer } from "@/hooks/meditation/useSessionTimer";
 import { useSessionAudio } from "@/hooks/meditation/useSessionAudio";
 import { useVoiceNarrator } from "@/hooks/meditation/useVoiceNarrator";
 import BreathingOrb from "./BreathingOrb";
+import AmbientParticles from "./AmbientParticles";
 import SessionControls from "./SessionControls";
 import AmbientMixer, { type MixerState } from "./AmbientMixer";
 
@@ -136,11 +137,37 @@ export default function SessionPlayer({
     volume: mixer.voice / 100,
   });
 
+  // Milestone state — shows "🌟 X دورة" briefly when a round number is hit.
+  const [milestone, setMilestone] = useState<number | null>(null);
+  const milestoneTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    return () => {
+      if (milestoneTimerRef.current) clearTimeout(milestoneTimerRef.current);
+    };
+  }, []);
+
   // Breath cycle
   const { phase } = useBreathCycle({
     active: playing && !intro,
     timings,
-    onCycleComplete: () => setBreathCycles((c) => c + 1),
+    onCycleComplete: () => {
+      setBreathCycles((c) => {
+        const next = c + 1;
+        // Celebrate at 10, 25, 50, 100 breaths — hit enough numbers to
+        // feel rewarded but not so many it becomes noise.
+        if ([10, 25, 50, 100].includes(next)) {
+          setMilestone(next);
+          try {
+            navigator.vibrate?.([15, 40, 15]);
+          } catch {
+            /* haptic not supported */
+          }
+          if (milestoneTimerRef.current) clearTimeout(milestoneTimerRef.current);
+          milestoneTimerRef.current = setTimeout(() => setMilestone(null), 3500);
+        }
+        return next;
+      });
+    },
   });
 
   // Session timer
@@ -252,15 +279,12 @@ export default function SessionPlayer({
         ))}
       </div>
 
-      {/* ── Subtle wave particle ── */}
-      {!reduceMotion && (
-        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-          <div
-            className="absolute left-0 right-0 h-1/3 bottom-0 rounded-[50%] opacity-20"
-            style={{ background: env.waveColor, transform: "scale(1.5)" }}
-          />
-        </div>
-      )}
+      {/* ── Ambient particles (canvas, env-specific motion) ── */}
+      <AmbientParticles
+        env={session.env}
+        reduceMotion={reduceMotion}
+        paused={!playing || intro}
+      />
 
       {/* ── Top bar (auto-hides) ── */}
       <motion.div
@@ -321,6 +345,8 @@ export default function SessionPlayer({
               progress={progress}
               reduceMotion={reduceMotion}
               narrationLine={currentCaption}
+              env={session.env}
+              remainingSec={Math.max(0, session.duration - elapsed)}
             />
           </div>
 
@@ -355,6 +381,25 @@ export default function SessionPlayer({
               </span>
             </motion.div>
           )}
+
+          {/* ── Breath milestone celebration — fades in briefly at 10/25/50/100 ── */}
+          <AnimatePresence>
+            {milestone !== null && (
+              <motion.div
+                key={milestone}
+                initial={{ opacity: 0, y: -8, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 240, damping: 22 }}
+                className="absolute top-[20%] left-1/2 -translate-x-1/2 z-30 pointer-events-none"
+                aria-live="polite"
+              >
+                <div className="px-4 py-2 rounded-full bg-[#91b149]/20 backdrop-blur-md border border-[#91b149]/40 text-[#91b149] text-xs font-bold shadow-[0_4px_16px_rgba(145,177,73,0.25)]">
+                  🌟 {milestone} دورة — أحسنت
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* ── Caption (always visible) ──
                Narration is delivered via Web Speech which varies by browser;
