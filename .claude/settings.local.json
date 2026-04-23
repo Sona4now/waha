@@ -219,7 +219,10 @@
       "Bash(/usr/bin/grep -n \"سفاجا\\\\|سيوة\\\\|سيناء\\\\|الفيوم\\\\|الواحات\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/api/chat/route.ts)",
       "Bash(/usr/bin/grep -c \"content: \\\\[\\\\|content: \\\\[$\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)",
       "Bash(/usr/bin/grep -n \"id:.*\\\\\"\\\\\\(therapeutic-tourism-egypt\\\\|black-sand-safaga\\\\|siwa-sulfur-springs\\\\|mountain-therapy-sinai\\\\|best-time-visit\\\\|stress-relief-nature\\\\\\)\\\\\"\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)",
-      "Bash(/usr/bin/grep -n \"export interface BlogPost\\\\|export type BlogPost\\\\|content?:\\\\|BlogSection\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)"
+      "Bash(/usr/bin/grep -n \"export interface BlogPost\\\\|export type BlogPost\\\\|content?:\\\\|BlogSection\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)",
+      "Bash(/usr/bin/grep -n \"CompareButton\\\\|DestinationCard\\\\|FavoriteButton\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/site/DestinationCard.tsx /Users/youseffouad1icloud.com/Desktop/mahaaa/app/destinations/page.tsx)",
+      "Bash(/usr/bin/grep -n \"href=.*blog/\\\\|BLOG_POSTS\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/blog/page.tsx)",
+      "Bash(/usr/bin/grep -n \"bestMonths\\\\|okMonths\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)"
     ]
   }
 }

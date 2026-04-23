@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { CompareButton } from "./ComparisonTray";
+import FavoriteButton from "./FavoriteButton";
 import { envBadgeClasses } from "@/lib/envColors";
 import type { DestinationFull } from "@/data/siteData";
 
@@ -36,6 +37,10 @@ export default function DestinationCard({ dest, isRecommended }: Props) {
   return (
     <div className="relative group h-full">
       <CompareButton id={dest.id} />
+      {/* Favorite button — top-left on both desktop & mobile, small and quiet. */}
+      <div className="absolute top-2 left-2 z-20">
+        <FavoriteButton type="dest" id={dest.id} />
+      </div>
 
       {/* Hover glow ring — desktop only (mobile tap would trigger it briefly) */}
       <div

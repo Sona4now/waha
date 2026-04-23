@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
+import { useFavorites } from "@/hooks/useFavorites";
 
 const links = [
   { href: "/home", label: "الرئيسية" },
@@ -14,6 +15,8 @@ const links = [
   { href: "/therapy-room", label: "غرفة العلاج" },
   { href: "/symptoms", label: "فاحص الأعراض" },
   { href: "/compare", label: "المقارنة" },
+  { href: "/calendar", label: "التقويم" },
+  { href: "/favorites", label: "المفضلة" },
   { href: "/achievements", label: "إنجازاتي" },
   { href: "/about", label: "من نحن" },
   { href: "/team", label: "الفريق" },
@@ -24,6 +27,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [platformKey, setPlatformKey] = useState("Ctrl");
   const pathname = usePathname();
+  const { count: favCount } = useFavorites();
+  const favTotal = favCount();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -128,6 +133,33 @@ export default function Navbar() {
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
           </button>
+
+          {/* Favorites — heart icon with count badge */}
+          <Link
+            href="/favorites"
+            aria-label={`المفضلة${favTotal > 0 ? ` (${favTotal})` : ""}`}
+            title="المفضلة"
+            className="relative w-9 h-9 rounded-full flex items-center justify-center text-[#12394d] dark:text-white hover:bg-[#e4edf2] dark:hover:bg-[#162033] transition-colors no-underline"
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill={favTotal > 0 ? "#e11d48" : "none"}
+              stroke={favTotal > 0 ? "#e11d48" : "currentColor"}
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+            {favTotal > 0 && (
+              <span className="absolute top-0 left-0 min-w-[16px] h-4 px-1 rounded-full bg-[#91b149] text-[#0a0f14] text-[9px] font-bold flex items-center justify-center border-[1.5px] border-white dark:border-[#0d1b2a]">
+                {favTotal > 99 ? "99+" : favTotal}
+              </span>
+            )}
+          </Link>
 
           {/* Theme toggle */}
           <ThemeToggle />
