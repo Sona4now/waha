@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
 import SiteLayout from "@/components/site/SiteLayout";
+import BlogShareButton from "@/components/site/BlogShareButton";
 import { BLOG_POSTS, getBlogPost, type BlogPost } from "@/data/siteData";
 import { SITE_NAME, SITE_URL } from "@/lib/siteMeta";
 
@@ -136,8 +137,8 @@ export default async function BlogPostPage({
             </p>
           )}
 
-          {/* ── Back link ── */}
-          <div className="pt-8 border-t border-gray-200 dark:border-[#1e3a5f]">
+          {/* ── Footer: share + back ── */}
+          <div className="pt-8 border-t border-gray-200 dark:border-[#1e3a5f] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <Link
               href="/blog"
               className="inline-flex items-center gap-2 text-[#1d5770] dark:text-[#91b149] font-display font-bold text-sm no-underline hover:gap-3 transition-all"
@@ -145,6 +146,7 @@ export default async function BlogPostPage({
               <span>←</span>
               <span>العودة لكل المقالات</span>
             </Link>
+            <BlogShareButton title={post.title} />
           </div>
         </div>
       </article>
