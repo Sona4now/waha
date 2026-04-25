@@ -57,6 +57,11 @@ export default function ChatWidget() {
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  // Track whether the user is "near the bottom" of the messages list. We only
+  // auto-scroll when this is true — otherwise streaming chunks would yank the
+  // user back down whenever they scrolled up to re-read something.
+  const isUserNearBottomRef = useRef(true);
   const abortRef = useRef<AbortController | null>(null);
 
   // Show "new" badge on first visit
@@ -93,12 +98,37 @@ export default function ChatWidget() {
     }
   }, [messages]);
 
-  // Scroll to bottom on new messages
+  // Auto-scroll the messages list to the bottom on new content — but only if
+  // the user was already near the bottom. We scroll the container directly
+  // (no scrollIntoView) so the page outside the chat never moves. Instant
+  // scroll instead of smooth: smooth animations stack across streaming chunks
+  // and make the chat feel like it's "constantly going down".
   useEffect(() => {
-    if (isOpen) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (!isOpen) return;
+    const el = messagesContainerRef.current;
+    if (!el) return;
+    if (isUserNearBottomRef.current) {
+      el.scrollTop = el.scrollHeight;
     }
   }, [messages, isOpen]);
+
+  // Detect user-initiated scrolls only (wheel / touch / keyboard). We can't
+  // rely on the scroll event alone because it fires for our own programmatic
+  // scrollTop writes too — that race condition would re-arm "near bottom"
+  // immediately after the user scrolled up, and the next chunk would yank
+  // them back down.
+  function handleUserScrollIntent() {
+    // requestAnimationFrame so we read scrollTop *after* the gesture applied.
+    requestAnimationFrame(() => {
+      const el = messagesContainerRef.current;
+      if (!el) return;
+      const distanceFromBottom =
+        el.scrollHeight - el.scrollTop - el.clientHeight;
+      // 80px threshold — if user is more than 80px above the bottom, stop
+      // auto-following until they scroll back down themselves.
+      isUserNearBottomRef.current = distanceFromBottom < 80;
+    });
+  }
 
   const handleOpen = useCallback(() => {
     setIsOpen(true);
@@ -148,6 +178,9 @@ export default function ChatWidget() {
     setMessages([...newMessages, placeholderAssistant]);
     setInput("");
     setIsStreaming(true);
+    // User just submitted — they want to see the response, so re-enable
+    // auto-follow even if they had scrolled up earlier.
+    isUserNearBottomRef.current = true;
 
     const controller = new AbortController();
     abortRef.current = controller;
@@ -488,6 +521,10 @@ export default function ChatWidget() {
 
               {/* Messages */}
               <div
+                ref={messagesContainerRef}
+                onWheel={handleUserScrollIntent}
+                onTouchMove={handleUserScrollIntent}
+                onKeyDown={handleUserScrollIntent}
                 className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-4 bg-gradient-to-b from-[#f5f8fa] to-white"
                 style={{
                   // iOS momentum scrolling. Without this the messages list
