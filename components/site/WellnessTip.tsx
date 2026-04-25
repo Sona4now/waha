@@ -125,13 +125,25 @@ export default function WellnessTip() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ type: "spring", stiffness: 320, damping: 28 }}
-          className="fixed top-28 left-1/2 -translate-x-1/2 z-[128] no-print"
+          className="fixed left-3 right-3 md:left-1/2 md:right-auto md:-translate-x-1/2 z-[128] no-print"
+          // top-28 was a fixed value that drifted under the navbar on iOS Safari
+          // because of the dynamic-viewport quirk. Use a safe-area-aware offset
+          // so the tip always sits cleanly below the navbar (72px).
+          style={{ top: "calc(env(safe-area-inset-top, 0px) + 88px)" }}
           role="status"
           aria-live="polite"
           dir="rtl"
         >
-          <div className="relative flex items-center gap-2.5 pr-4 pl-2 py-2 bg-[#1d5770]/95 backdrop-blur-md text-white rounded-full shadow-[0_8px_30px_-8px_rgba(29,87,112,0.55)] border border-white/10 max-w-[92vw]">
-            {/* Progress bar — thin ring under the pill */}
+          {/*
+            Card layout (NOT a pill): the previous design tried to cram the
+            whole tip into a single line with text-ellipsis, which on mobile
+            cut tips like "15 دقيقة مشي في الطبيعة بتخفض هرمون الكورتيزول
+            بنسبة 20%" down to "15 دقيقة مشي في..." — making the feature
+            useless. Now the icon + text get a 2-row layout on mobile and the
+            text breathes naturally.
+          */}
+          <div className="relative flex items-start gap-3 px-4 py-3 bg-[#1d5770]/95 backdrop-blur-md text-white rounded-2xl shadow-[0_8px_30px_-8px_rgba(29,87,112,0.55)] border border-white/10 max-w-md md:max-w-lg mx-auto">
+            {/* Progress bar — thin line under the card */}
             <div className="absolute bottom-0 left-4 right-4 h-[2px] overflow-hidden rounded-full">
               <motion.div
                 initial={{ scaleX: 1 }}
@@ -141,27 +153,36 @@ export default function WellnessTip() {
               />
             </div>
 
-            <span className="text-base leading-none flex-shrink-0" aria-hidden>
+            <span
+              className="text-2xl leading-none flex-shrink-0 mt-0.5"
+              aria-hidden
+            >
               {tip.icon}
             </span>
 
-            <p className="text-xs font-medium leading-none flex-1 line-clamp-1 whitespace-nowrap overflow-hidden text-ellipsis max-w-[55vw] md:max-w-sm">
-              {tip.text}
-            </p>
-
-            {tip.destId && (
-              <Link
-                href={`/destination/${tip.destId}`}
-                onClick={handleDismiss}
-                className="flex-shrink-0 text-[10px] font-bold text-[#91b149] hover:text-white hover:bg-[#91b149]/20 rounded-full px-2.5 py-1 transition-colors no-underline leading-none"
-              >
-                اكتشف ←
-              </Link>
-            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-medium leading-relaxed text-white">
+                {tip.text}
+              </p>
+              <div className="flex items-center gap-3 mt-2">
+                {tip.destId && (
+                  <Link
+                    href={`/destination/${tip.destId}`}
+                    onClick={handleDismiss}
+                    className="text-[11px] font-bold text-[#91b149] hover:text-white hover:bg-[#91b149]/15 rounded-full px-2.5 py-1 transition-colors no-underline"
+                  >
+                    اكتشف ←
+                  </Link>
+                )}
+                <span className="text-[10px] text-white/45 truncate">
+                  {tip.source}
+                </span>
+              </div>
+            </div>
 
             <button
               onClick={handleDismiss}
-              className="flex-shrink-0 w-6 h-6 rounded-full hover:bg-white/15 text-white/60 hover:text-white flex items-center justify-center transition-colors text-xs leading-none"
+              className="flex-shrink-0 w-7 h-7 rounded-full hover:bg-white/15 text-white/60 hover:text-white flex items-center justify-center transition-colors text-sm leading-none -mt-0.5"
               aria-label="إغلاق"
             >
               ✕

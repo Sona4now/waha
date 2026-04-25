@@ -406,13 +406,24 @@ export default function ChatWidget() {
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               dir="rtl"
+              // Mobile: full-screen using h-dvh (Tailwind v4) so iOS Safari's
+              // address-bar shrinking doesn't push the input off-screen.
+              // Desktop: fixed 600px panel anchored bottom-left.
               className="fixed z-[100] bg-white shadow-2xl border border-[#d0dde4] overflow-hidden flex flex-col
-                         inset-x-0 bottom-0 top-0 rounded-none
-                         md:inset-auto md:bottom-8 md:left-8 md:top-auto md:right-auto
-                         md:w-[400px] md:h-[600px] md:rounded-3xl md:max-h-[85vh]"
+                         inset-x-0 bottom-0 h-dvh max-h-dvh rounded-none
+                         md:inset-auto md:bottom-8 md:left-8 md:right-auto
+                         md:w-[400px] md:h-[600px] md:max-h-[85vh] md:rounded-3xl"
             >
               {/* Header */}
-              <div className="bg-gradient-to-l from-[#0d2a39] to-[#1d5770] px-5 py-4 flex items-center justify-between flex-shrink-0">
+              <div
+                className="bg-gradient-to-l from-[#0d2a39] to-[#1d5770] px-5 py-4 flex items-center justify-between flex-shrink-0"
+                // Pad the top of the header so the title isn't tucked under
+                // the iPhone notch / Dynamic Island when the modal is full-screen.
+                style={{
+                  paddingTop:
+                    "calc(env(safe-area-inset-top, 0px) + 1rem)",
+                }}
+              >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="relative flex-shrink-0">
                     <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
@@ -435,7 +446,7 @@ export default function ChatWidget() {
                     <button
                       onClick={handleReset}
                       title="محادثة جديدة"
-                      className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                      className="w-9 h-9 rounded-full hover:bg-white/10 active:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors"
                     >
                       <svg
                         width="14"
@@ -454,8 +465,9 @@ export default function ChatWidget() {
                   )}
                   <button
                     onClick={handleClose}
+                    aria-label="إغلاق"
                     title="إغلاق"
-                    className="w-8 h-8 rounded-full hover:bg-white/10 flex items-center justify-center text-white/60 hover:text-white transition-colors"
+                    className="w-9 h-9 rounded-full hover:bg-white/10 active:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors"
                   >
                     <svg
                       width="16"
@@ -475,7 +487,14 @@ export default function ChatWidget() {
               </div>
 
               {/* Messages */}
-              <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 bg-gradient-to-b from-[#f5f8fa] to-white">
+              <div
+                className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4 py-4 space-y-4 bg-gradient-to-b from-[#f5f8fa] to-white"
+                style={{
+                  // iOS momentum scrolling. Without this the messages list
+                  // feels stiff compared to native apps.
+                  WebkitOverflowScrolling: "touch",
+                }}
+              >
                 {messages.map((msg) => (
                   <motion.div
                     key={msg.id}
@@ -634,6 +653,12 @@ export default function ChatWidget() {
               <form
                 onSubmit={handleSubmit}
                 className="border-t border-[#d0dde4] p-3 bg-white flex-shrink-0"
+                // Pad the bottom for iPhone home-indicator safe area so the
+                // send button isn't sitting on the bottom edge of the screen.
+                style={{
+                  paddingBottom:
+                    "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)",
+                }}
               >
                 <div className="flex gap-2 items-center">
                   <input
@@ -644,17 +669,24 @@ export default function ChatWidget() {
                       isStreaming ? "جاري التفكير..." : "اكتب سؤالك..."
                     }
                     disabled={isStreaming}
-                    className="flex-1 px-4 py-2.5 bg-[#f5f8fa] border border-[#d0dde4] rounded-full text-[13px] text-[#12394d] placeholder:text-[#7b7c7d] focus:outline-none focus:border-[#1d5770] focus:bg-white transition-all disabled:opacity-60"
+                    // text-base (16px) is required to prevent iOS from
+                    // auto-zooming when the input gains focus. Anything
+                    // smaller and the page jumps. enterKeyHint shows a
+                    // "Send" key on the soft keyboard.
+                    enterKeyHint="send"
+                    autoCapitalize="off"
+                    autoCorrect="off"
+                    className="flex-1 px-4 py-2.5 bg-[#f5f8fa] border border-[#d0dde4] rounded-full text-base text-[#12394d] placeholder:text-[#7b7c7d] focus:outline-none focus:border-[#1d5770] focus:bg-white transition-all disabled:opacity-60"
                   />
                   <button
                     type="submit"
                     disabled={!input.trim() || isStreaming}
-                    className="flex-shrink-0 w-10 h-10 rounded-full bg-[#1d5770] hover:bg-[#174860] disabled:bg-[#d0dde4] disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
-                    title="إرسال"
+                    aria-label="إرسال"
+                    className="flex-shrink-0 w-11 h-11 rounded-full bg-[#1d5770] hover:bg-[#174860] disabled:bg-[#d0dde4] disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
                   >
                     <svg
-                      width="14"
-                      height="14"
+                      width="16"
+                      height="16"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -668,7 +700,7 @@ export default function ChatWidget() {
                     </svg>
                   </button>
                 </div>
-                <p className="text-[9px] text-[#7b7c7d] text-center mt-1.5">
+                <p className="text-[10px] text-[#7b7c7d] text-center mt-1.5">
                   استشر طبيبك قبل أي علاج طبيعي
                 </p>
               </form>

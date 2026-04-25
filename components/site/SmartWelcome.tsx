@@ -93,6 +93,12 @@ export default function SmartWelcome() {
           exit={{ opacity: 0, y: 20 }}
           transition={{ type: "spring", stiffness: 300, damping: 28 }}
           className="fixed bottom-16 md:bottom-0 left-0 right-0 z-[75] no-print"
+          // The bottom-16 keeps it above the BottomNav on mobile. On iOS, also
+          // respect the home-indicator safe area so the close button isn't
+          // jammed against the device edge.
+          style={{
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          }}
           role="status"
           aria-live="polite"
         >
@@ -106,7 +112,9 @@ export default function SmartWelcome() {
               />
             </div>
 
-            <div className="max-w-3xl mx-auto flex items-center gap-3 px-4 py-2.5">
+            {/* Mobile: stacked rows so neither the visit label nor the
+                destination name gets truncated. Desktop: original inline layout. */}
+            <div className="max-w-3xl mx-auto flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 px-4 py-3 sm:py-2.5">
               <span className="text-[11px] font-bold text-[#91b149] flex-shrink-0">
                 {visitLabel}
               </span>
@@ -116,14 +124,14 @@ export default function SmartWelcome() {
               <Link
                 href={`/destination/${dest.id}`}
                 onClick={handleDismiss}
-                className="flex-1 text-sm font-bold text-white hover:text-[#91b149] transition-colors no-underline truncate"
+                className="flex-1 text-sm font-bold text-white hover:text-[#91b149] transition-colors no-underline pr-8 sm:pr-0"
               >
                 وجهتك المقترحة: {dest.name} ←
               </Link>
 
               <button
                 onClick={handleDismiss}
-                className="flex-shrink-0 w-7 h-7 rounded-full hover:bg-white/10 text-white/50 hover:text-white flex items-center justify-center transition-colors"
+                className="absolute top-2 left-2 sm:static flex-shrink-0 w-7 h-7 rounded-full hover:bg-white/10 text-white/50 hover:text-white flex items-center justify-center transition-colors"
                 aria-label="إغلاق"
               >
                 ✕
