@@ -11,7 +11,7 @@ interface Tour {
   id: string;
   name: string;
   subtitle: string;
-  destination: "bahariya" | "siwa";
+  destination: "bahariya" | "siwa" | "shagie-farms";
   destinationName: string;
   icon: string;
   color: string;
@@ -125,19 +125,57 @@ const TOURS: Tour[] = [
       "https://images.unsplash.com/photo-1539037116277-4db20889f2d4?w=800&q=80",
     description: "استكشف قلعة شالي المبنية من الكرشيف — شاهد على التراث الأمازيغي العريق في سيوة.",
   },
+  {
+    id: "shagie-farms-1",
+    name: "مزرعة شجيع — الجزء الأول",
+    subtitle: "البساتين والمزروعات",
+    destination: "shagie-farms",
+    destinationName: "مزارع شجيع",
+    icon: "🥭",
+    color: "#ca8a04",
+    kuulaId: "7M8QX",
+    thumbnail:
+      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80",
+    description: "تجوّل بين بساتين المانجو والأشجار المثمرة — تجربة زراعية عضوية في قلب الإسماعيلية.",
+  },
+  {
+    id: "shagie-farms-2",
+    name: "مزرعة شجيع — الجزء الثاني",
+    subtitle: "القرية الزراعية والأنشطة التراثية",
+    destination: "shagie-farms",
+    destinationName: "مزارع شجيع",
+    icon: "🏡",
+    color: "#92400e",
+    kuulaId: "7M8Sh",
+    thumbnail:
+      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80",
+    description: "استكشف القرية الزراعية والأنشطة التفاعلية — حلب الأبقار، ركوب الخيل، والطهي التراثي.",
+  },
 ];
 
-function buildKuulaUrl(id: string, withThumbs: boolean) {
-  const params = withThumbs
-    ? "logo=1&card=1&info=1&logosize=92&fs=1&vr=1&initload=0&thumbs=-1&margin=28"
-    : "logo=0&info=1&fs=1&vr=1&sd=1&thumbs=1";
+/**
+ * Build a Kuula embed URL. Params chosen to match the official "Embed HTML"
+ * snippet from Kuula's share dialog with logo hidden:
+ *   logo=-1   → no Kuula logo
+ *   card=1    → show info card
+ *   info=1    → show info button
+ *   fs=1      → enable fullscreen
+ *   vr=1      → enable VR mode
+ *   zoom=1    → allow scroll-wheel zoom
+ *   initload=0 → don't autoload (waits for user interaction)
+ *   thumbs=-1 → thumbnails repositioned
+ *   margin=30 → 30px breathing room
+ */
+function buildKuulaUrl(id: string) {
+  const params =
+    "logo=-1&card=1&info=1&fs=1&vr=1&zoom=1&initload=0&thumbs=-1&margin=30";
   return `https://kuula.co/share/collection/${id}?${params}`;
 }
 
 export default function ToursPage() {
-  const [activeFilter, setActiveFilter] = useState<"all" | "bahariya" | "siwa">(
-    "all"
-  );
+  const [activeFilter, setActiveFilter] = useState<
+    "all" | "bahariya" | "siwa" | "shagie-farms"
+  >("all");
   const [activeTour, setActiveTour] = useState<Tour | null>(null);
 
   const filteredTours =
@@ -156,6 +194,11 @@ export default function ToursPage() {
       id: "siwa" as const,
       label: "سيوة",
       count: TOURS.filter((t) => t.destination === "siwa").length,
+    },
+    {
+      id: "shagie-farms" as const,
+      label: "مزارع شجيع",
+      count: TOURS.filter((t) => t.destination === "shagie-farms").length,
     },
   ];
 
@@ -278,17 +321,17 @@ export default function ToursPage() {
                   </button>
                 </div>
 
-                {/* Kuula iframe */}
-                <div className="relative w-full" style={{ height: "640px" }}>
+                {/* Kuula iframe — responsive height. Fixed 640px broke mobile
+                    (covered the full screen on iPhone SE). h-[60vh] keeps it
+                    proportional to the device, capped at 640px on desktop. */}
+                <div className="relative w-full h-[60vh] min-h-[400px] max-h-[640px] md:h-[640px]">
                   <iframe
-                    src={buildKuulaUrl(
-                      activeTour.kuulaId,
-                      activeTour.destination === "bahariya"
-                    )}
+                    src={buildKuulaUrl(activeTour.kuulaId)}
                     className="absolute inset-0 w-full h-full border-0"
                     allowFullScreen
                     allow="xr-spatial-tracking; gyroscope; accelerometer; fullscreen"
                     loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
                     title={activeTour.name}
                   />
                 </div>
