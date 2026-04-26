@@ -7,11 +7,22 @@
 //   - API routes (/api/*) and auth-related URLs: never cache (avoids
 //     stale auth state and accidentally caching personal data)
 
-const CACHE_VERSION = "waaha-v2";
-const RUNTIME_CACHE = "waaha-runtime";
+// Bumped to v3 — added top-destination precache so the most-visited
+// pages open instantly and work offline.
+const CACHE_VERSION = "waaha-v3";
+const RUNTIME_CACHE = "waaha-runtime-v3";
 
 const PRECACHE_URLS = [
   "/",
+  "/home",
+  "/destinations",
+  "/blog",
+  "/tours",
+  // Top-traffic destinations — pre-cache so they open instantly
+  // and work offline after first visit.
+  "/destination/safaga",
+  "/destination/siwa",
+  "/destination/sinai",
   "/manifest.json",
   "/logo.png",
   "/icon.png",

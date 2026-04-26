@@ -136,7 +136,7 @@ export default async function BlogPostPage({
       <header className="relative w-full h-[46vh] min-h-[340px] overflow-hidden">
         <Image
           src={post.image}
-          alt={post.title}
+          alt={`${post.title} — مدونة السياحة الاستشفائية في مصر`}
           fill
           priority
           sizes="100vw"
@@ -272,7 +272,7 @@ export default async function BlogPostPage({
                   <div className="relative h-44 overflow-hidden">
                     <Image
                       src={r.image}
-                      alt={r.title}
+                      alt={`${r.title} — السياحة الاستشفائية في مصر`}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"

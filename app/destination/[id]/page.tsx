@@ -947,8 +947,9 @@ export default function DestinationDetailPage() {
         <section className="relative w-full h-[55vh] min-h-[380px] overflow-hidden">
           <Image
             src={dest.image}
-            alt={dest.name}
+            alt={`${dest.name} — السياحة الاستشفائية في مصر — ${dest.description}`}
             fill
+            sizes="100vw"
             className="object-cover scale-105 animate-[kenBurns_16s_ease-out_forwards]"
             priority
           />

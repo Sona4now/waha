@@ -344,7 +344,7 @@ export default function BlogPage() {
                     <div className="relative h-48 md:h-52 overflow-hidden flex-shrink-0">
                       <Image
                         src={post.image}
-                        alt={post.title}
+                        alt={`${post.title} — مقال في السياحة الاستشفائية في مصر`}
                         fill
                         sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
                         className="object-cover transition-transform duration-500 group-hover:scale-110"

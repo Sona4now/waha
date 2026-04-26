@@ -29,6 +29,56 @@ function parseSuggestions(content: string): [string, string[]] {
   return [cleanContent, suggestions];
 }
 
+/**
+ * Parse the optional BOOK directive — the model emits "BOOK: id|tier"
+ * when it has confidently recommended a specific destination, so the
+ * UI can render an inline "احجز X" CTA below the bubble.
+ *
+ * Validates the destination ID and tier against known values; rejects
+ * anything else to avoid letting the model render arbitrary URLs.
+ */
+const KNOWN_DESTINATIONS: Record<string, string> = {
+  safaga: "سفاجا",
+  siwa: "سيوة",
+  sinai: "سيناء",
+  fayoum: "الفيوم",
+  bahariya: "الواحات البحرية",
+  "wadi-degla": "وادي دجلة",
+  "shagie-farms": "مزارع شجيع",
+};
+const KNOWN_TIERS = new Set(["basic", "standard", "premium"]);
+
+interface BookCta {
+  destinationId: string;
+  destinationName: string;
+  tier: "basic" | "standard" | "premium";
+}
+
+function parseBook(content: string): [string, BookCta | null] {
+  const match = content.match(/BOOK:\s*([\w-]+)\s*\|\s*(\w+)/);
+  if (!match) return [content, null];
+  const destinationId = match[1].trim();
+  const tier = match[2].trim() as "basic" | "standard" | "premium";
+  const cleanContent = content.replace(/BOOK:.+?(?:\n|$)/, "").trim();
+  if (!KNOWN_DESTINATIONS[destinationId] || !KNOWN_TIERS.has(tier)) {
+    return [cleanContent, null];
+  }
+  return [
+    cleanContent,
+    {
+      destinationId,
+      destinationName: KNOWN_DESTINATIONS[destinationId],
+      tier,
+    },
+  ];
+}
+
+const TIER_LABEL: Record<BookCta["tier"], string> = {
+  basic: "الأساسية",
+  standard: "الموصى بها ⭐",
+  premium: "المتكاملة",
+};
+
 const GREETING: Message = {
   id: "greeting",
   role: "assistant",
@@ -570,10 +620,17 @@ export default function ChatWidget() {
                     {/* Bubble */}
                     <div className="max-w-[82%] flex flex-col gap-2">
                       {(() => {
-                        const [cleanContent, suggestions] =
+                        // Parse SUGGESTIONS first, then BOOK from the
+                        // already-cleaned content. Order matters because
+                        // the model can emit both.
+                        const [afterSuggestions, suggestions] =
                           msg.role === "assistant"
                             ? parseSuggestions(msg.content)
-                            : [msg.content, []];
+                            : [msg.content, [] as string[]];
+                        const [cleanContent, book] =
+                          msg.role === "assistant"
+                            ? parseBook(afterSuggestions)
+                            : [afterSuggestions, null];
                         const isLast =
                           msg.id === messages[messages.length - 1]?.id;
                         const showSuggestions =
@@ -581,6 +638,10 @@ export default function ChatWidget() {
                           !isStreaming &&
                           msg.role === "assistant" &&
                           isLast;
+                        const showBookCta =
+                          book !== null &&
+                          !isStreaming &&
+                          msg.role === "assistant";
 
                         return (
                           <>
@@ -616,6 +677,41 @@ export default function ChatWidget() {
                                 </div>
                               )}
                             </div>
+
+                            {/* Inline booking CTA — when the model
+                                confidently recommended a destination + tier,
+                                we surface a one-click route to the
+                                destination page (which scrolls to the
+                                pricing card and pre-selects the tier via
+                                sessionStorage for the lead form). */}
+                            {showBookCta && book && (
+                              <motion.a
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.15 }}
+                                href={`/destination/${book.destinationId}#lead-capture`}
+                                onClick={() => {
+                                  try {
+                                    sessionStorage.setItem(
+                                      "waaha_chosen_tier",
+                                      book.tier,
+                                    );
+                                  } catch {}
+                                }}
+                                className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-l from-[#91b149] to-[#6a8435] hover:from-[#a3c45a] hover:to-[#7a9442] text-[#0a0f14] no-underline px-3.5 py-2.5 shadow-[0_4px_14px_-4px_rgba(145,177,73,0.5)] hover:shadow-[0_6px_20px_-4px_rgba(145,177,73,0.7)] transition-all"
+                              >
+                                <span className="text-base">✦</span>
+                                <div className="text-right flex-1">
+                                  <div className="text-[10px] font-bold opacity-80">
+                                    احجز الباقة {TIER_LABEL[book.tier]}
+                                  </div>
+                                  <div className="text-xs font-bold">
+                                    {book.destinationName}
+                                  </div>
+                                </div>
+                                <span className="text-base">←</span>
+                              </motion.a>
+                            )}
 
                             {/* Quick reply suggestions */}
                             {showSuggestions && (
