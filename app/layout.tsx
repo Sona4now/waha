@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/lib/siteMeta";
+import { organizationSchema } from "@/lib/structuredData";
 
 /**
  * Self-hosted Arabic fonts via next/font.
@@ -105,7 +106,10 @@ export default function RootLayout({
     >
       <head>
         <link rel="apple-touch-icon" href="/apple-icon.png" />
-        {/* JSON-LD structured data */}
+        {/* JSON-LD: WebSite + Organization (root-level schemas).
+            Page-specific schemas (TouristAttraction, Article, FAQPage,
+            BreadcrumbList) are added in their respective pages via the
+            JsonLd component.  */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -128,6 +132,12 @@ export default function RootLayout({
                 "query-input": "required name=search_term_string",
               },
             }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema()),
           }}
         />
       </head>

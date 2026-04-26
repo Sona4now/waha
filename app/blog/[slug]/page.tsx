@@ -4,8 +4,10 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import SiteLayout from "@/components/site/SiteLayout";
 import BlogShareButton from "@/components/site/BlogShareButton";
+import JsonLd from "@/components/site/JsonLd";
 import { BLOG_POSTS, getBlogPost, type BlogPost } from "@/data/siteData";
 import { SITE_NAME, SITE_URL } from "@/lib/siteMeta";
+import { articleSchema, breadcrumbSchema } from "@/lib/structuredData";
 
 export async function generateStaticParams() {
   return BLOG_POSTS.map((p) => ({ slug: p.id }));
@@ -64,6 +66,25 @@ export default async function BlogPostPage({
 
   return (
     <SiteLayout>
+      {/* SEO: structured data — Article + Breadcrumb. Goes in the SSR HTML
+          since this is a server component. */}
+      <JsonLd
+        data={[
+          articleSchema({
+            title: post.title,
+            description: post.excerpt,
+            image: post.image,
+            datePublished: post.date,
+            url: `${SITE_URL}/blog/${post.id}`,
+          }),
+          breadcrumbSchema([
+            { name: "الرئيسية", url: `${SITE_URL}/home` },
+            { name: "المدونة", url: `${SITE_URL}/blog` },
+            { name: post.title, url: `${SITE_URL}/blog/${post.id}` },
+          ]),
+        ]}
+      />
+
       {/* ── Hero ── */}
       <header className="relative w-full h-[46vh] min-h-[340px] overflow-hidden">
         <Image

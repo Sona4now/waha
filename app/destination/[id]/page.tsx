@@ -21,7 +21,14 @@ import Testimonials from "@/components/destination/Testimonials";
 import SmartRelated from "@/components/destination/SmartRelated";
 import PricingPackages from "@/components/destination/PricingPackages";
 import LeadCaptureForm from "@/components/destination/LeadCaptureForm";
+import JsonLd from "@/components/site/JsonLd";
 import { getDestById } from "@/data/siteData";
+import { SITE_URL } from "@/lib/siteMeta";
+import {
+  destinationSchema,
+  breadcrumbSchema,
+  faqSchema,
+} from "@/lib/structuredData";
 
 const BASE_TABS = [
   { key: "overview", label: "نبذة" },
@@ -893,6 +900,23 @@ export default function DestinationDetailPage() {
 
   return (
     <SiteLayout>
+      {/* SEO: TouristAttraction + Breadcrumb + FAQ schemas. Even though this
+          is a client component, modern Google crawlers run JS and pick up
+          JSON-LD rendered after hydration. (For perfect crawler coverage we
+          could split data fetching into a server component, but the page is
+          1700 lines — diminishing returns vs current setup.) */}
+      <JsonLd
+        data={[
+          destinationSchema(dest),
+          breadcrumbSchema([
+            { name: "الرئيسية", url: `${SITE_URL}/home` },
+            { name: "الوجهات", url: `${SITE_URL}/destinations` },
+            { name: dest.name, url: `${SITE_URL}/destination/${dest.id}` },
+          ]),
+          faqSchema(getFAQForDestination(dest.id)),
+        ]}
+      />
+
       {/* Sticky section navigation — appears on scroll */}
       <SectionNav />
       {/* Floating bottom action bar */}
