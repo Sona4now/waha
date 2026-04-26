@@ -7,8 +7,10 @@ import PageHero from "@/components/site/PageHero";
 import Reveal from "@/components/site/Reveal";
 import EmptyState from "@/components/site/EmptyState";
 import DestinationCard from "@/components/site/DestinationCard";
+import EnvironmentChapter from "@/components/destination/EnvironmentChapter";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
 import { TESTIMONIALS_BY_DEST } from "@/data/testimonials";
+import { ENVIRONMENT_CHAPTERS } from "@/data/environmentChapters";
 import { isInSeasonNow } from "@/lib/season";
 import {
   useRecommendation,
@@ -670,49 +672,82 @@ export default function DestinationsPage() {
             </div>
           </Reveal>
 
-          {/* ── Destinations grid / list ── */}
-          {filtered.length > 0 ? (
-            <div
-              className={
-                density === "grid"
-                  ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
-                  : "flex flex-col gap-3"
-              }
-            >
-              {filtered.map((dest, i) => (
-                <Reveal key={dest.id} delay={Math.min(i * 0.06, 0.5)}>
-                  <DestinationCard
-                    dest={dest}
-                    compact={density === "list"}
-                    isRecommended={
-                      !!recommendation &&
-                      (dest.id === recommendation.destinationId ||
-                        relevanceScore(dest, recommendation) >= 3)
-                    }
-                  />
-                </Reveal>
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              icon="🏜️"
-              title="ما لقيناش وجهات بالمواصفات دي"
-              description="جرّب تعديل الفلاتر أو شيلها كلها عشان تشوف كل الوجهات المتاحة"
-              action={
-                <button
-                  onClick={resetAll}
-                  className="px-6 py-3 rounded-full bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white font-bold text-sm hover:shadow-lg transition-all hover:scale-[1.03]"
-                >
-                  امسح الفلاتر
-                </button>
-              }
-            />
-          )}
+        </div>
+      </section>
 
-          {/* ── Helper for the indecisive ── */}
-          {filtered.length > 0 && (
+      {/* ── BODY ──────────────────────────────────────────────────────
+          Two render paths:
+            · No filters active → full-bleed narrative chapters (default).
+              The page reads like a journey: sea → mountain → oasis → desert.
+            · Any filter active → flat grid/list of just the matches. We
+              switch out of narrative because chapters with mixed/empty
+              destinations break the storytelling. */}
+      {activeFilterCount === 0 ? (
+        <div className="bg-white dark:bg-[#0d1b2a]">
+          {ENVIRONMENT_CHAPTERS.map((chapter, idx) => {
+            const destsForChapter = filtered.filter((d) =>
+              chapter.matchesEnvironment.includes(d.environment),
+            );
+            return (
+              <EnvironmentChapter
+                key={chapter.key}
+                chapter={chapter}
+                destinations={destsForChapter}
+                index={idx}
+              />
+            );
+          })}
+        </div>
+      ) : (
+        <section className="py-10 md:py-16 px-4 bg-[#f5f8fa] dark:bg-[#0a151f]">
+          <div className="max-w-6xl mx-auto" dir="rtl">
+            {filtered.length > 0 ? (
+              <div
+                className={
+                  density === "grid"
+                    ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8"
+                    : "flex flex-col gap-3"
+                }
+              >
+                {filtered.map((dest, i) => (
+                  <Reveal key={dest.id} delay={Math.min(i * 0.06, 0.5)}>
+                    <DestinationCard
+                      dest={dest}
+                      compact={density === "list"}
+                      isRecommended={
+                        !!recommendation &&
+                        (dest.id === recommendation.destinationId ||
+                          relevanceScore(dest, recommendation) >= 3)
+                      }
+                    />
+                  </Reveal>
+                ))}
+              </div>
+            ) : (
+              <EmptyState
+                icon="🏜️"
+                title="ما لقيناش وجهات بالمواصفات دي"
+                description="جرّب تعديل الفلاتر أو شيلها كلها عشان تشوف كل الوجهات المتاحة"
+                action={
+                  <button
+                    onClick={resetAll}
+                    className="px-6 py-3 rounded-full bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white font-bold text-sm hover:shadow-lg transition-all hover:scale-[1.03]"
+                  >
+                    امسح الفلاتر
+                  </button>
+                }
+              />
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* ── Helper for the indecisive — bottom of page in either mode. */}
+      {filtered.length > 0 && (
+        <section className="bg-[#f5f8fa] dark:bg-[#0a151f] pb-16">
+          <div className="max-w-6xl mx-auto px-4" dir="rtl">
             <Reveal delay={0.4}>
-              <div className="mt-12 text-center">
+              <div className="text-center">
                 <div className="inline-flex flex-col sm:flex-row items-center gap-3 px-5 py-4 rounded-2xl bg-white dark:bg-[#162033] border border-[#d0dde4] dark:border-[#1e3a5f]">
                   <span className="text-2xl">🤔</span>
                   <p className="text-sm text-[#12394d] dark:text-white">
@@ -728,9 +763,9 @@ export default function DestinationsPage() {
                 </div>
               </div>
             </Reveal>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
     </SiteLayout>
   );
 }
