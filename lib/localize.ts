@@ -16,8 +16,10 @@
 import type { Locale } from "./i18n";
 import type { DestinationFull } from "@/data/siteData";
 import type { EnvironmentChapter } from "@/data/environmentChapters";
+import type { DestinationPricing, Package } from "@/data/pricingPackages";
 import { DESTINATIONS_EN } from "@/data/translations/destinations.en";
 import { CHAPTERS_EN } from "@/data/translations/chapters.en";
+import { PRICING_EN } from "@/data/translations/packages.en";
 
 export function localizeDestination(
   dest: DestinationFull,
@@ -58,5 +60,35 @@ export function localizeChapter(
     name: en.name ?? chapter.name,
     tagline: en.tagline ?? chapter.tagline,
     intro: en.intro ?? chapter.intro,
+  };
+}
+
+/**
+ * Pricing-package localizer. Looks up the destination → tier overlay
+ * and merges. Returns the original Arabic record when locale is "ar"
+ * or the overlay is missing.
+ */
+export function localizePricing(
+  pricing: DestinationPricing,
+  locale: Locale,
+): DestinationPricing {
+  if (locale !== "en") return pricing;
+  const en = PRICING_EN[pricing.destinationId];
+  if (!en) return pricing;
+  return {
+    ...pricing,
+    note: en.note ?? pricing.note,
+    packages: pricing.packages.map((pkg): Package => {
+      const tierOverlay = en.packages[pkg.tier];
+      if (!tierOverlay) return pkg;
+      return {
+        ...pkg,
+        name: tierOverlay.name ?? pkg.name,
+        duration: tierOverlay.duration ?? pkg.duration,
+        highlight: tierOverlay.highlight ?? pkg.highlight,
+        includes: tierOverlay.includes ?? pkg.includes,
+        notIncluded: tierOverlay.notIncluded ?? pkg.notIncluded,
+      };
+    }),
   };
 }

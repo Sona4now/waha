@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "./LocaleProvider";
+import { COMMON_EN, BY_DEST_EN } from "@/data/translations/faq.en";
 
 const VOTES_KEY = "waaha_faq_votes";
 
@@ -13,6 +15,9 @@ export interface FAQItem {
 interface Props {
   items: FAQItem[];
   title?: string;
+  /** Optional destination ID — when set + locale is EN, we substitute
+   *  the English FAQ entries from `data/translations/faq.en.ts`.  */
+  destId?: string;
 }
 
 type Vote = "up" | "down" | undefined;
@@ -28,9 +33,23 @@ function buildVoteKey(question: string) {
 }
 
 export default function FAQ({
-  items,
-  title = "أسئلة شائعة",
+  items: rawItems,
+  title,
+  destId,
 }: Props) {
+  const { locale, t } = useTranslations();
+  const resolvedTitle =
+    title ?? (locale === "en" ? "Frequently Asked Questions" : "أسئلة شائعة");
+
+  // When the user is browsing in English and we have a destination ID,
+  // substitute the EN FAQ list (per-dest + common). Otherwise show the
+  // Arabic items the page already passed in.
+  const items: FAQItem[] = (() => {
+    if (locale !== "en") return rawItems;
+    const specific = destId ? BY_DEST_EN[destId] ?? [] : [];
+    return [...specific, ...COMMON_EN];
+  })();
+
   const [openIdx, setOpenIdx] = useState<number | null>(0);
   const [votes, setVotes] = useState<Record<string, Vote>>({});
 
@@ -74,10 +93,12 @@ export default function FAQ({
         </div>
         <div>
           <h3 className="text-xl font-bold font-display text-[#12394d] dark:text-white">
-            {title}
+            {resolvedTitle}
           </h3>
           <p className="text-xs text-[#7b7c7d]">
-            إجابات على أكثر الأسئلة تكراراً
+            {locale === "en"
+              ? "Answers to the most common questions"
+              : "إجابات على أكثر الأسئلة تكراراً"}
           </p>
         </div>
       </div>
@@ -144,7 +165,9 @@ export default function FAQ({
                             Helps the team see which answers need rewriting. */}
                         <div className="flex items-center gap-3 text-xs">
                           <span className="text-[#7b7c7d] dark:text-white/50">
-                            هل ساعدتك الإجابة؟
+                            {locale === "en"
+                              ? "Was this answer helpful?"
+                              : "هل ساعدتك الإجابة؟"}
                           </span>
                           {(() => {
                             const key = buildVoteKey(item.question);
@@ -161,7 +184,7 @@ export default function FAQ({
                                   aria-pressed={v === "up"}
                                   aria-label="مفيد"
                                 >
-                                  👍 مفيد
+                                  👍 {locale === "en" ? "Helpful" : "مفيد"}
                                 </button>
                                 <button
                                   onClick={() => castVote(item.question, "down")}
@@ -173,16 +196,18 @@ export default function FAQ({
                                   aria-pressed={v === "down"}
                                   aria-label="مش مفيد"
                                 >
-                                  👎 مش كفاية
+                                  👎 {locale === "en" ? "Not enough" : "مش كفاية"}
                                 </button>
                                 {v === "up" && (
                                   <span className="text-[10px] text-[#91b149]">
-                                    ✓ شكراً!
+                                    ✓ {locale === "en" ? "Thanks!" : "شكراً!"}
                                   </span>
                                 )}
                                 {v === "down" && (
                                   <span className="text-[10px] text-red-500">
-                                    لاحظنا — هنحسّنها
+                                    {locale === "en"
+                                      ? "Noted — we'll improve it"
+                                      : "لاحظنا — هنحسّنها"}
                                   </span>
                                 )}
                               </>

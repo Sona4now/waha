@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getPricing, type Tier, type Package } from "@/data/pricingPackages";
+import { useTranslations } from "@/components/site/LocaleProvider";
+import { localizePricing } from "@/lib/localize";
 
 interface Props {
   destinationId: string;
@@ -12,21 +14,20 @@ interface Props {
   bookCtaTarget?: string;
 }
 
-const TIER_META: Record<Tier, { label: string; color: string; bg: string; ring: string }> = {
+// Tier visuals only — the human-facing label resolves through t() at
+// render time so it switches AR ↔ EN.
+const TIER_META: Record<Tier, { color: string; bg: string; ring: string }> = {
   basic: {
-    label: "أساسي",
     color: "text-[#1d5770]",
     bg: "bg-[#f5f8fa] dark:bg-[#162033]",
     ring: "ring-gray-200 dark:ring-[#1e3a5f]",
   },
   standard: {
-    label: "موصى به ⭐",
     color: "text-white",
     bg: "bg-gradient-to-br from-[#1d5770] to-[#12394d]",
     ring: "ring-[#91b149] ring-2",
   },
   premium: {
-    label: "متكامل",
     color: "text-[#92400e] dark:text-[#fcd34d]",
     bg: "bg-[#FEF9EB] dark:bg-[#92400e]/20",
     ring: "ring-[#d97706]/40",
@@ -74,29 +75,43 @@ function extractNights(duration: string): number | null {
  *
  * The numbers shift slightly per tier (premium has more treatment %).
  */
-function breakdownFor(tier: "basic" | "standard" | "premium"): {
-  label: string;
-  percent: number;
-  color: string;
-}[] {
+function breakdownFor(
+  tier: "basic" | "standard" | "premium",
+  locale: "ar" | "en",
+): { label: string; percent: number; color: string }[] {
+  const labels =
+    locale === "en"
+      ? {
+          accommodation: "Accommodation",
+          treatmentLong: "Therapy & medical supervision",
+          treatment: "Therapy",
+          food: "Food & transport",
+        }
+      : {
+          accommodation: "الإقامة",
+          treatmentLong: "العلاج والإشراف الطبي",
+          treatment: "العلاج",
+          food: "الأكل والمواصلات",
+        };
+
   if (tier === "premium") {
     return [
-      { label: "الإقامة", percent: 50, color: "#1d5770" },
-      { label: "العلاج والإشراف الطبي", percent: 30, color: "#91b149" },
-      { label: "الأكل والمواصلات", percent: 20, color: "#d97706" },
+      { label: labels.accommodation, percent: 50, color: "#1d5770" },
+      { label: labels.treatmentLong, percent: 30, color: "#91b149" },
+      { label: labels.food, percent: 20, color: "#d97706" },
     ];
   }
   if (tier === "standard") {
     return [
-      { label: "الإقامة", percent: 55, color: "#1d5770" },
-      { label: "العلاج", percent: 25, color: "#91b149" },
-      { label: "الأكل والمواصلات", percent: 20, color: "#d97706" },
+      { label: labels.accommodation, percent: 55, color: "#1d5770" },
+      { label: labels.treatment, percent: 25, color: "#91b149" },
+      { label: labels.food, percent: 20, color: "#d97706" },
     ];
   }
   return [
-    { label: "الإقامة", percent: 60, color: "#1d5770" },
-    { label: "العلاج", percent: 20, color: "#91b149" },
-    { label: "الأكل والمواصلات", percent: 20, color: "#d97706" },
+    { label: labels.accommodation, percent: 60, color: "#1d5770" },
+    { label: labels.treatment, percent: 20, color: "#91b149" },
+    { label: labels.food, percent: 20, color: "#d97706" },
   ];
 }
 
@@ -105,7 +120,9 @@ export default function PricingPackages({
   destinationName,
   bookCtaTarget = "#lead-capture",
 }: Props) {
-  const pricing = getPricing(destinationId);
+  const { t, locale } = useTranslations();
+  const rawPricing = getPricing(destinationId);
+  const pricing = rawPricing ? localizePricing(rawPricing, locale) : null;
   const [openTier, setOpenTier] = useState<Tier | null>(null);
 
   if (!pricing || pricing.packages.length === 0) return null;
@@ -123,18 +140,20 @@ export default function PricingPackages({
   }
 
   return (
-    <section className="py-12 md:py-16 bg-white dark:bg-[#0a151f]" dir="rtl">
+    <section
+      className="py-12 md:py-16 bg-white dark:bg-[#0a151f]"
+      dir={locale === "ar" ? "rtl" : "ltr"}
+    >
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-10">
           <span className="inline-block text-xs font-bold text-[#91b149] uppercase tracking-wider mb-3">
-            الأسعار والباقات
+            {locale === "en" ? "Pricing & Packages" : "الأسعار والباقات"}
           </span>
           <h2 className="font-display text-3xl md:text-4xl font-black text-[#12394d] dark:text-white mb-3">
-            اختر اللي يناسبك في {destinationName}
+            {t("packages.sectionTitle").replace("{name}", destinationName)}
           </h2>
           <p className="text-[#7b7c7d] dark:text-white/60 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-            ٣ باقات مختلفة — من تجربة قصيرة لبرنامج علاجي كامل. كل الأسعار شاملة
-            الإقامة والوجبات والعلاج. مفيش مفاجآت في الفاتورة.
+            {t("packages.sectionSubtitle")}
           </p>
         </div>
 
@@ -143,6 +162,8 @@ export default function PricingPackages({
             <PackageCard
               key={pkg.tier}
               pkg={pkg}
+              locale={locale}
+              t={t}
               isOpen={openTier === pkg.tier}
               onToggleDetails={() =>
                 setOpenTier(openTier === pkg.tier ? null : pkg.tier)
@@ -164,11 +185,15 @@ export default function PricingPackages({
 
 function PackageCard({
   pkg,
+  locale,
+  t,
   isOpen,
   onToggleDetails,
   onBook,
 }: {
   pkg: Package;
+  locale: "ar" | "en";
+  t: (key: string) => string;
   isOpen: boolean;
   onToggleDetails: () => void;
   onBook: () => void;
@@ -187,7 +212,7 @@ function PackageCard({
         <span
           className={`inline-block text-[11px] font-bold ${meta.color} uppercase tracking-wider mb-1`}
         >
-          {meta.label}
+          {t(`packages.tier.${pkg.tier}`)}
         </span>
         <h3
           className={`font-display text-2xl font-black ${
@@ -220,7 +245,7 @@ function PackageCard({
               isFeatured ? "text-white/70" : "text-[#7b7c7d] dark:text-white/60"
             }`}
           >
-            ج / للشخص
+            {t("packages.perPerson")}
           </span>
         </div>
         {/* Per-night reframing — total prices feel large, per-night
@@ -237,7 +262,10 @@ function PackageCard({
                     : "text-[#1d5770] dark:text-[#91b149]"
                 }`}
               >
-                ≈ {formatEGP(perNight)} ج / ليلة
+                {t("packages.perNight").replace(
+                  "{value}",
+                  formatEGP(perNight),
+                )}
               </div>
             );
           }
@@ -256,7 +284,7 @@ function PackageCard({
             does my money go" without reading bullet points. */}
         <div className="mt-3">
           <div className="flex h-2 rounded-full overflow-hidden bg-white/10">
-            {breakdownFor(pkg.tier).map((b) => (
+            {breakdownFor(pkg.tier, locale).map((b) => (
               <div
                 key={b.label}
                 className="h-full"
@@ -269,7 +297,7 @@ function PackageCard({
             ))}
           </div>
           <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
-            {breakdownFor(pkg.tier).map((b) => (
+            {breakdownFor(pkg.tier, locale).map((b) => (
               <span
                 key={b.label}
                 className={`text-[10px] inline-flex items-center gap-1 ${
@@ -295,7 +323,7 @@ function PackageCard({
             isFeatured ? "text-[#91b149]" : "text-[#1d5770] dark:text-[#91b149]"
           }`}
         >
-          يشمل
+          {t("packages.includes")}
         </p>
         <ul className="space-y-2">
           {pkg.includes.slice(0, 4).map((item, i) => (
@@ -346,7 +374,7 @@ function PackageCard({
                       isFeatured ? "text-white/50" : "text-[#7b7c7d]"
                     }`}
                   >
-                    غير شامل
+                    {t("packages.notIncluded")}
                   </p>
                   <ul className="space-y-1.5">
                     {pkg.notIncluded.map((item, i) => (
@@ -376,7 +404,7 @@ function PackageCard({
                 : "text-[#1d5770] dark:text-[#91b149] hover:underline"
             }`}
           >
-            {isOpen ? "إخفاء التفاصيل" : "عرض كل التفاصيل ←"}
+            {isOpen ? t("packages.hideDetails") : t("packages.viewDetails")}
           </button>
         )}
       </div>
@@ -391,7 +419,7 @@ function PackageCard({
               : "bg-[#1d5770] hover:bg-[#174860] text-white dark:bg-[#91b149] dark:text-[#12394d] dark:hover:bg-[#a3c45a]"
           }`}
         >
-          احجز الآن ←
+          {t("packages.bookNow")}
         </button>
       </div>
     </div>

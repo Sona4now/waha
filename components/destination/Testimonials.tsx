@@ -6,6 +6,8 @@ import {
   TESTIMONIALS_BY_DEST,
   type Testimonial,
 } from "@/data/testimonials";
+import { TESTIMONIALS_EN } from "@/data/translations/testimonials.en";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   destId: string;
@@ -29,7 +31,25 @@ interface Props {
  *    individual quotes.
  */
 export default function Testimonials({ destId, destName }: Props) {
-  const all = TESTIMONIALS_BY_DEST[destId] || [];
+  const { locale } = useTranslations();
+  const rawList = TESTIMONIALS_BY_DEST[destId] || [];
+  // Overlay English translations on top of the Arabic source so quote/role/
+  // condition/duration switch with the locale. Names stay as-is.
+  const all = useMemo(() => {
+    if (locale !== "en") return rawList;
+    const enMap = TESTIMONIALS_EN[destId] ?? {};
+    return rawList.map((t) => {
+      const en = enMap[t.name];
+      if (!en) return t;
+      return {
+        ...t,
+        quote: en.quote ?? t.quote,
+        role: en.role ?? t.role,
+        condition: en.condition ?? t.condition,
+        duration: en.duration ?? t.duration,
+      };
+    });
+  }, [rawList, locale, destId]);
 
   // Read the user's condition from /symptoms output if present.
   // No useEffect — read at first render via lazy initialiser to avoid
@@ -89,13 +109,15 @@ export default function Testimonials({ destId, destName }: Props) {
         {/* Header + aggregate */}
         <div className="text-center mb-8">
           <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-            تجارب حقيقية
+            {locale === "en" ? "Real experiences" : "تجارب حقيقية"}
           </div>
           <h2
             className="text-2xl md:text-3xl font-bold text-[#12394d] dark:text-white mb-3"
             style={{ fontFamily: "var(--font-display)" }}
           >
-            ناس زارت {destName} قبلك
+            {locale === "en"
+              ? `Visitors who came to ${destName} before you`
+              : `ناس زارت ${destName} قبلك`}
           </h2>
           <div className="inline-flex items-center gap-3 bg-[#f5f8fa] dark:bg-[#162033] rounded-full px-4 py-2 text-sm">
             <span className="text-[#91b149] font-bold">
@@ -105,10 +127,15 @@ export default function Testimonials({ destId, destName }: Props) {
               </span>
             </span>
             <span className="text-[#12394d] dark:text-white font-bold">
-              {avgRating.toFixed(1)} من 5
+              {avgRating.toFixed(1)} {locale === "en" ? "of 5" : "من 5"}
             </span>
             <span className="text-[#7b7c7d] dark:text-white/50 text-xs">
-              · {all.length} تقييم
+              · {all.length}{" "}
+              {locale === "en"
+                ? all.length === 1
+                  ? "review"
+                  : "reviews"
+                : "تقييم"}
             </span>
           </div>
         </div>
@@ -124,7 +151,7 @@ export default function Testimonials({ destId, destName }: Props) {
                   : "bg-[#f5f8fa] dark:bg-[#162033] text-[#7b7c7d] dark:text-white/60 hover:bg-[#1d5770]/10"
               }`}
             >
-              كل التجارب
+              {locale === "en" ? "All experiences" : "كل التجارب"}
             </button>
             {conditions.map((c) => (
               <button
@@ -146,19 +173,30 @@ export default function Testimonials({ destId, destName }: Props) {
         {matchedCount !== null && matchedCount > 0 && (
           <div className="mb-6 text-center">
             <div className="inline-flex items-center gap-2 bg-[#91b149]/10 text-[#91b149] text-xs font-bold rounded-full px-4 py-2">
-              ✨ <span>{matchedCount}</span> شخص بحالة شبه حالتك تعالجوا هنا
+              ✨{" "}
+              {locale === "en" ? (
+                <>
+                  <span>{matchedCount}</span> {matchedCount === 1 ? "person" : "people"} with a similar condition healed here
+                </>
+              ) : (
+                <>
+                  <span>{matchedCount}</span> شخص بحالة شبه حالتك تعالجوا هنا
+                </>
+              )}
             </div>
           </div>
         )}
 
         {filtered.length === 0 ? (
           <div className="text-center py-10 text-[#7b7c7d] dark:text-white/50 text-sm">
-            مفيش تجارب لهذه الحالة في {destName} حالياً.{" "}
+            {locale === "en"
+              ? `No experiences yet for this condition in ${destName}. `
+              : `مفيش تجارب لهذه الحالة في ${destName} حالياً. `}
             <button
               onClick={() => setActiveCondition("all")}
               className="text-[#1d5770] dark:text-[#91b149] font-bold hover:underline"
             >
-              اعرض الكل
+              {locale === "en" ? "Show all" : "اعرض الكل"}
             </button>
           </div>
         ) : (

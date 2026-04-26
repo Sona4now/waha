@@ -1808,6 +1808,7 @@ export default function DestinationDetailPage() {
         <section id="faq" className="py-16 bg-white dark:bg-[#0d1b2a]">
           <div className="max-w-4xl mx-auto px-4">
             <FAQ
+              destId={dest.id}
               items={getFAQForDestination(dest.id)}
               title={`أسئلة شائعة عن ${dest.name}`}
             />
