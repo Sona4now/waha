@@ -4,6 +4,7 @@ import Link from "next/link";
 // hydrate just that subtree on the client. (We can't use dynamic with
 // ssr:false here — that pattern is only valid inside client components.)
 import NewsletterForm from "./NewsletterForm";
+import SocialBar from "./SocialBar";
 
 export default function Footer() {
   return (
@@ -16,10 +17,11 @@ export default function Footer() {
               <span className="text-white">وا</span>
               <span className="text-[#1d5770]">حة</span>
             </div>
-            <p className="text-[0.88rem] text-white/60 leading-relaxed max-w-[290px]">
+            <p className="text-[0.88rem] text-white/60 leading-relaxed max-w-[290px] mb-5">
               منصة متخصصة في السياحة الاستشفائية في مصر. نساعدك على اكتشاف
               الوجهة الطبيعية المثالية لصحتك وراحتك.
             </p>
+            <SocialBar size="md" variant="muted" />
           </div>
 
           {/* Pages */}

@@ -440,7 +440,7 @@ export default function AboutPage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-xl mx-auto mb-8">
               <a
-                href="mailto:wahhaa.2026@gmail.com"
+                href="mailto:info@wahaeg.com"
                 className="group bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-xl px-5 py-4 hover:bg-white/[0.12] transition-all flex items-center gap-3 no-underline"
               >
                 <div className="w-10 h-10 rounded-full bg-[#91b149]/20 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
@@ -463,7 +463,7 @@ export default function AboutPage() {
                     البريد الإلكتروني
                   </div>
                   <div className="text-sm font-semibold truncate">
-                    wahhaa.2026@gmail.com
+                    info@wahaeg.com
                   </div>
                 </div>
               </a>

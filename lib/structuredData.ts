@@ -17,7 +17,13 @@
  */
 
 import type { DestinationFull } from "@/data/siteData";
-import { SITE_NAME, SITE_URL, CONTACT_PHONE_DISPLAY, CONTACT_EMAIL } from "./siteMeta";
+import {
+  SITE_NAME,
+  SITE_URL,
+  CONTACT_PHONE_DISPLAY,
+  CONTACT_EMAIL,
+  SOCIAL_LINKS,
+} from "./siteMeta";
 
 /**
  * Matches the FAQ component's shape (`question` / `answer`) so callers can
@@ -28,7 +34,16 @@ interface FAQItem {
   answer: string;
 }
 
-/** Organization — embed once, in the root layout. */
+/**
+ * Organization — embed once, in the root layout.
+ *
+ * The `sameAs` array is the single most important field here for brand
+ * SERP: it tells Google that wahaeg.com, instagram.com/waha.eg,
+ * tiktok.com/@waha.eg etc are all the same entity. Once Google merges
+ * these signals it (a) starts showing the social icons in the brand
+ * panel of search results, and (b) is more likely to surface the site
+ * for the brand name "واحة" in the Knowledge Graph.
+ */
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",
@@ -50,6 +65,7 @@ export function organizationSchema() {
       contactType: "customer service",
       availableLanguage: ["Arabic", "English"],
     },
+    sameAs: SOCIAL_LINKS.map((s) => s.url),
   };
 }
 

@@ -98,10 +98,10 @@ export default function PrivacyPage() {
               تقدر تمسح بياناتك المحلية في أي وقت من إعدادات المتصفح
               (مسح الـ localStorage). لأي استفسار تقدر تتواصل معانا على{" "}
               <a
-                href="mailto:wahhaa.2026@gmail.com"
+                href="mailto:info@wahaeg.com"
                 className="text-[#1d5770] dark:text-[#91b149] underline"
               >
-                wahhaa.2026@gmail.com
+                info@wahaeg.com
               </a>
               .
             </p>

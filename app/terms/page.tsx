@@ -90,10 +90,10 @@ export default function TermsPage() {
             <p className="leading-relaxed">
               لأي استفسار:{" "}
               <a
-                href="mailto:wahhaa.2026@gmail.com"
+                href="mailto:info@wahaeg.com"
                 className="text-[#1d5770] dark:text-[#91b149] underline"
               >
-                wahhaa.2026@gmail.com
+                info@wahaeg.com
               </a>
             </p>
           </section>

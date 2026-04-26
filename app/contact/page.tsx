@@ -4,8 +4,10 @@ import { useState } from "react";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import Reveal from "@/components/site/Reveal";
+import SocialBar from "@/components/site/SocialBar";
 import { showToast } from "@/components/site/Toast";
 import { TEAM } from "@/data/siteData";
+import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY } from "@/lib/siteMeta";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -48,7 +50,10 @@ export default function ContactPage() {
     const body = encodeURIComponent(
       `الاسم: ${formData.name}\nالإيميل: ${formData.email}\n\n${formData.message}`,
     );
-    window.open(`mailto:waha.team.contact@gmail.com?subject=${subject}&body=${body}`, "_self");
+    window.open(
+      `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`,
+      "_self",
+    );
 
     // Save to localStorage for admin dashboard
     try {
@@ -221,8 +226,14 @@ export default function ContactPage() {
                   {
                     icon: "📧",
                     title: "البريد الإلكتروني",
-                    info: "waha.team.contact@gmail.com",
+                    info: CONTACT_EMAIL,
                     bg: "bg-[#1d5770]",
+                  },
+                  {
+                    icon: "📱",
+                    title: "واتساب / تليفون",
+                    info: CONTACT_PHONE_DISPLAY,
+                    bg: "bg-[#25D366]",
                   },
                   {
                     icon: "💬",
@@ -256,6 +267,17 @@ export default function ContactPage() {
                     </p>
                   </div>
                 ))}
+
+                {/* Social media — site-wide unified bar */}
+                <div className="rounded-2xl p-6 bg-[#f5f8fa] dark:bg-[#162033] border border-transparent dark:border-[#1e3a5f]">
+                  <h4 className="font-bold text-[#12394d] dark:text-white mb-1">
+                    تابعنا على السوشيال
+                  </h4>
+                  <p className="text-xs text-[#7b7c7d] dark:text-white/50 mb-4">
+                    آخر الفيديوهات والصور من الوجهات
+                  </p>
+                  <SocialBar size="md" variant="muted" />
+                </div>
               </div>
             </Reveal>
           </div>
