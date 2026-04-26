@@ -3,9 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { CompareButton } from "./ComparisonTray";
+import { useTranslations } from "./LocaleProvider";
 import { envBadgeClasses } from "@/lib/envColors";
 import { getDestinationRating } from "@/data/testimonials";
 import { getSeasonLabel } from "@/lib/season";
+import { localizeDestination } from "@/lib/localize";
 import type { DestinationFull } from "@/data/siteData";
 
 interface Props {
@@ -37,10 +39,14 @@ const MAX_MOBILE_CHIPS = 2;
  * color-coded per `envClass`; treatments are truncated to 2 + "+N" on mobile.
  */
 export default function DestinationCard({
-  dest,
+  dest: rawDest,
   isRecommended,
   compact,
 }: Props) {
+  const { locale } = useTranslations();
+  // Merge in English overlays at render time. The rest of the component
+  // keeps using `dest.field` as before — locale-aware values just appear.
+  const dest = localizeDestination(rawDest, locale);
   const treatments = dest.treatments ?? [];
   const visibleMobile = treatments.slice(0, MAX_MOBILE_CHIPS);
   const extraMobile = Math.max(0, treatments.length - MAX_MOBILE_CHIPS);

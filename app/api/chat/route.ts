@@ -255,6 +255,8 @@ export async function POST(req: NextRequest) {
     }
 
     const messagesRaw = (payload as { messages?: unknown })?.messages;
+    const localeRaw = (payload as { locale?: unknown })?.locale;
+    const locale: "ar" | "en" = localeRaw === "en" ? "en" : "ar";
 
     if (!messagesRaw || !Array.isArray(messagesRaw) || messagesRaw.length === 0) {
       return new Response(
@@ -304,6 +306,15 @@ export async function POST(req: NextRequest) {
       messages.push({ role: role as Message["role"], content });
     }
 
+    // Locale-aware system prompt: append a small directive that overrides
+    // the default Egyptian-Arabic instruction when the user is browsing in
+    // English. Cache the base prompt; the locale instruction is short
+    // enough that it doesn't matter for caching.
+    const localeInstruction =
+      locale === "en"
+        ? `\n\n## CRITICAL OVERRIDE — RESPOND IN ENGLISH\nThe user is browsing in English. Override every instruction above that says to use Egyptian Arabic. Respond in clear, friendly English. Keep all other guidance — pricing data, the destination knowledge, the SUGGESTIONS line, and the optional BOOK directive — exactly the same. Suggestions should be in English (5-7 words each).`
+        : "";
+
     const stream = await client.messages.stream({
       model: "claude-haiku-4-5",
       max_tokens: 1024,
@@ -313,6 +324,9 @@ export async function POST(req: NextRequest) {
           text: SYSTEM_PROMPT,
           cache_control: { type: "ephemeral" },
         },
+        ...(localeInstruction
+          ? [{ type: "text" as const, text: localeInstruction }]
+          : []),
       ],
       messages: messages.map((m) => ({
         role: m.role,

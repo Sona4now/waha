@@ -9,6 +9,7 @@ import {
 } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "./LocaleProvider";
 
 type Message = {
   id: string;
@@ -79,18 +80,32 @@ const TIER_LABEL: Record<BookCta["tier"], string> = {
   premium: "المتكاملة",
 };
 
-const GREETING: Message = {
+const GREETING_AR: Message = {
   id: "greeting",
   role: "assistant",
   content:
     "أهلاً بك في واحة 🌿\n\nأنا مساعدك الذكي للسياحة الاستشفائية في مصر. احكيلي عن حالتك الصحية وأنا هساعدك تكتشف وجهتك المثالية.",
 };
 
-const SUGGESTED_PROMPTS = [
+const GREETING_EN: Message = {
+  id: "greeting",
+  role: "assistant",
+  content:
+    "Welcome to Waha 🌿\n\nI'm your AI guide for wellness tourism in Egypt. Tell me what you're looking to heal — body, mind, or both — and I'll help you find the right destination.",
+};
+
+const SUGGESTED_PROMPTS_AR = [
   "عندي آلام مفاصل",
   "علاج للصدفية",
   "مكان للاسترخاء",
   "أفضل وقت لسفاجا",
+];
+
+const SUGGESTED_PROMPTS_EN = [
+  "I have joint pain",
+  "Psoriasis treatment",
+  "Somewhere to relax",
+  "Best time to visit Safaga",
 ];
 
 // Don't show the widget on these paths
@@ -100,6 +115,10 @@ const STORAGE_KEY = "waaha_chat_messages";
 
 export default function ChatWidget() {
   const pathname = usePathname();
+  const { locale, t } = useTranslations();
+  const GREETING = locale === "en" ? GREETING_EN : GREETING_AR;
+  const SUGGESTED_PROMPTS =
+    locale === "en" ? SUGGESTED_PROMPTS_EN : SUGGESTED_PROMPTS_AR;
   const [isOpen, setIsOpen] = useState(false);
   const [hasNewBadge, setHasNewBadge] = useState(false);
   const [messages, setMessages] = useState<Message[]>([GREETING]);
@@ -244,6 +263,9 @@ export default function ChatWidget() {
           messages: newMessages
             .filter((m) => m.id !== "greeting")
             .map((m) => ({ role: m.role, content: m.content })),
+          // Tells the API which language the assistant should respond in.
+          // The system prompt picks up this value and adapts.
+          locale,
         }),
       });
 
@@ -390,7 +412,7 @@ export default function ChatWidget() {
             {/* The actual button */}
             <motion.button
               onClick={handleOpen}
-              aria-label="فتح المساعد الذكي"
+              aria-label={t("chat.openLabel")}
               className="relative block"
               whileHover={{ scale: 1.12 }}
               whileTap={{ scale: 0.92 }}
@@ -516,10 +538,12 @@ export default function ChatWidget() {
                   </div>
                   <div className="min-w-0">
                     <h3 className="text-white font-bold font-display text-base truncate">
-                      مساعد واحة
+                      {locale === "en" ? "Waha Assistant" : "مساعد واحة"}
                     </h3>
                     <p className="text-white/50 text-[10px] truncate">
-                      متاح الآن · مدعوم بـ Claude
+                      {locale === "en"
+                        ? "Available now · Powered by Claude"
+                        : "متاح الآن · مدعوم بـ Claude"}
                     </p>
                   </div>
                 </div>
@@ -528,7 +552,7 @@ export default function ChatWidget() {
                   {messages.length > 1 && (
                     <button
                       onClick={handleReset}
-                      title="محادثة جديدة"
+                      title={t("chat.newConversation")}
                       className="w-9 h-9 rounded-full hover:bg-white/10 active:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors"
                     >
                       <svg
@@ -548,8 +572,8 @@ export default function ChatWidget() {
                   )}
                   <button
                     onClick={handleClose}
-                    aria-label="إغلاق"
-                    title="إغلاق"
+                    aria-label={t("chat.closeLabel")}
+                    title={t("chat.closeLabel")}
                     className="w-9 h-9 rounded-full hover:bg-white/10 active:bg-white/20 flex items-center justify-center text-white/70 hover:text-white transition-colors"
                   >
                     <svg
@@ -749,7 +773,7 @@ export default function ChatWidget() {
                     className="pt-2"
                   >
                     <p className="text-[10px] text-[#7b7c7d] mb-2 text-center">
-                      جرّب:
+                      {t("chat.tryThese")}
                     </p>
                     <div className="flex flex-wrap gap-1.5 justify-center">
                       {SUGGESTED_PROMPTS.map((text) => (
@@ -799,7 +823,9 @@ export default function ChatWidget() {
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder={
-                      isStreaming ? "جاري التفكير..." : "اكتب سؤالك..."
+                      isStreaming
+                        ? t("chat.thinking")
+                        : t("chat.inputPlaceholder")
                     }
                     disabled={isStreaming}
                     // text-base (16px) is required to prevent iOS from
@@ -814,7 +840,7 @@ export default function ChatWidget() {
                   <button
                     type="submit"
                     disabled={!input.trim() || isStreaming}
-                    aria-label="إرسال"
+                    aria-label={t("chat.send")}
                     className="flex-shrink-0 w-11 h-11 rounded-full bg-[#1d5770] hover:bg-[#174860] disabled:bg-[#d0dde4] disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
                   >
                     <svg
@@ -834,7 +860,7 @@ export default function ChatWidget() {
                   </button>
                 </div>
                 <p className="text-[10px] text-[#7b7c7d] text-center mt-1.5">
-                  استشر طبيبك قبل أي علاج طبيعي
+                  {t("chat.disclaimer")}
                 </p>
               </form>
             </motion.div>

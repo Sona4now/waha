@@ -4,10 +4,12 @@ import { useMemo, useRef } from "react";
 import Image from "next/image";
 import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import DestinationCard from "@/components/site/DestinationCard";
+import { useTranslations } from "@/components/site/LocaleProvider";
 import type { EnvironmentChapter as ChapterType } from "@/data/environmentChapters";
 import type { DestinationFull } from "@/data/siteData";
 import { TESTIMONIALS_BY_DEST } from "@/data/testimonials";
 import { isInSeasonNow } from "@/lib/season";
+import { localizeChapter, localizeDestination } from "@/lib/localize";
 
 const MONTH_NAMES = [
   "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
@@ -35,10 +37,15 @@ interface Props {
  * renders nothing — the parent decides what to show in that case.
  */
 export default function EnvironmentChapter({
-  chapter,
-  destinations,
+  chapter: rawChapter,
+  destinations: rawDestinations,
   index,
 }: Props) {
+  const { locale } = useTranslations();
+  const chapter = localizeChapter(rawChapter, locale);
+  const destinations = rawDestinations.map((d) =>
+    localizeDestination(d, locale),
+  );
   const heroRef = useRef<HTMLDivElement>(null);
   const reduceMotion = useReducedMotion();
 

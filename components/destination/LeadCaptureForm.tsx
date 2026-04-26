@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CONTACT_PHONE_INTL, CONTACT_PHONE_DISPLAY } from "@/lib/siteMeta";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const PROFILE_KEY = "waaha_lead_profile";
 const TIER_KEY = "waaha_chosen_tier";
@@ -36,6 +37,7 @@ export default function LeadCaptureForm({
   destinationId,
   destinationName,
 }: Props) {
+  const { t, locale } = useTranslations();
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [dates, setDates] = useState("");
@@ -87,17 +89,31 @@ export default function LeadCaptureForm({
     e.preventDefault();
     if (!name.trim() || !phone.trim()) return;
 
-    const body = [
-      `طلب عرض سعر — ${destinationName}`,
-      "",
-      `الاسم: ${name.trim()}`,
-      `الموبايل: ${phone.trim()}`,
-      `الموعد المفضّل: ${dates.trim() || "مرن"}`,
-      `عدد الأشخاص: ${people}`,
-      notes.trim() ? `ملاحظات: ${notes.trim()}` : "",
-      "",
-      `(تم إرسال هذا الطلب من /destination/${destinationId})`,
-    ]
+    const body = (
+      locale === "en"
+        ? [
+            `Quote request — ${destinationName}`,
+            "",
+            `Name: ${name.trim()}`,
+            `Phone: ${phone.trim()}`,
+            `Preferred dates: ${dates.trim() || "Flexible"}`,
+            `Group size: ${people}`,
+            notes.trim() ? `Notes: ${notes.trim()}` : "",
+            "",
+            `(Sent from /destination/${destinationId})`,
+          ]
+        : [
+            `طلب عرض سعر — ${destinationName}`,
+            "",
+            `الاسم: ${name.trim()}`,
+            `الموبايل: ${phone.trim()}`,
+            `الموعد المفضّل: ${dates.trim() || "مرن"}`,
+            `عدد الأشخاص: ${people}`,
+            notes.trim() ? `ملاحظات: ${notes.trim()}` : "",
+            "",
+            `(تم إرسال هذا الطلب من /destination/${destinationId})`,
+          ]
+    )
       .filter(Boolean)
       .join("\n");
 
@@ -142,11 +158,10 @@ export default function LeadCaptureForm({
               ✓
             </div>
             <h3 className="font-display text-xl font-bold mb-2">
-              تم إرسال طلبك ✨
+              {t("lead.successTitle")}
             </h3>
             <p className="text-sm text-white/75 leading-relaxed mb-5 max-w-sm mx-auto">
-              فريقنا هيتواصل معاك على الواتساب خلال ساعتين. لو محتاج تواصل
-              مباشر، اتصل بـ{" "}
+              {t("lead.successBody")} {t("lead.directLine")}{" "}
               <a
                 href={`tel:+${CONTACT_PHONE_INTL}`}
                 className="text-[#91b149] font-bold hover:underline"
@@ -158,7 +173,7 @@ export default function LeadCaptureForm({
               onClick={() => setSent(false)}
               className="text-xs text-white/60 hover:text-white underline"
             >
-              إرسال طلب آخر
+              {t("lead.anotherRequest")}
             </button>
           </motion.div>
         ) : (
@@ -172,69 +187,68 @@ export default function LeadCaptureForm({
             <div className="flex items-center gap-2 mb-2">
               <span className="inline-block w-1 h-5 bg-[#91b149] rounded-full" />
               <h3 className="text-xs font-bold text-[#91b149] uppercase tracking-wider">
-                احجز رحلتك
+                {locale === "en" ? "Book your trip" : "احجز رحلتك"}
               </h3>
             </div>
             <h2 className="font-display text-2xl md:text-3xl font-black mb-2 leading-tight">
-              اطلب عرض سعر — {destinationName}
+              {t("lead.title")} — {destinationName}
             </h2>
             <p className="text-sm text-white/70 mb-4 leading-relaxed">
-              املأ البيانات وفريقنا هيتواصل معاك على واتساب خلال ساعتين بعرض
-              سعر مفصّل وبرنامج مقترح حسب احتياجك.
+              {t("lead.subtitle")}
             </p>
             {returning && (
               <div className="mb-5 inline-flex items-center gap-2 bg-[#91b149]/15 text-[#91b149] text-xs font-bold rounded-full px-3 py-1.5">
                 <span>✨</span>
                 <span>
-                  أهلاً {name} — بياناتك جاهزة، اضغط إرسال على طول
+                  {t("lead.returningHi").replace("{name}", name)}
                 </span>
               </div>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
               <FormField
-                label="الاسم"
+                label={t("lead.name")}
                 value={name}
                 onChange={setName}
-                placeholder="مثال: أحمد محمد"
+                placeholder={t("lead.namePlaceholder")}
                 required
                 autoComplete="name"
               />
               <FormField
-                label="الموبايل"
+                label={t("lead.phone")}
                 value={phone}
                 onChange={setPhone}
-                placeholder="01012345678"
+                placeholder={t("lead.phonePlaceholder")}
                 type="tel"
                 required
                 inputMode="tel"
                 autoComplete="tel"
               />
               <FormField
-                label="الموعد المفضّل (اختياري)"
+                label={t("lead.dates")}
                 value={dates}
                 onChange={setDates}
-                placeholder="مثال: نوفمبر 2026"
+                placeholder={t("lead.datesPlaceholder")}
               />
               <SelectField
-                label="عدد الأشخاص"
+                label={t("lead.people")}
                 value={people}
                 onChange={setPeople}
                 options={[
-                  { v: "1", l: "شخص واحد" },
-                  { v: "2", l: "شخصين" },
-                  { v: "3", l: "3 أشخاص" },
-                  { v: "4", l: "4 أشخاص" },
-                  { v: "5+", l: "5 أو أكتر" },
+                  { v: "1", l: t("lead.groupOne") },
+                  { v: "2", l: t("lead.groupTwo") },
+                  { v: "3", l: t("lead.groupThree") },
+                  { v: "4", l: t("lead.groupFour") },
+                  { v: "5+", l: t("lead.groupFivePlus") },
                 ]}
               />
             </div>
 
             <FormField
-              label="ملاحظات إضافية (اختياري)"
+              label={t("lead.notes")}
               value={notes}
               onChange={setNotes}
-              placeholder="أي طلبات خاصة أو حالة صحية محددة"
+              placeholder={t("lead.notesPlaceholder")}
               multiline
             />
 
@@ -246,11 +260,11 @@ export default function LeadCaptureForm({
               <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.693.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
               </svg>
-              <span>أرسل عبر واتساب</span>
+              <span>{t("lead.send")}</span>
             </button>
 
             <p className="mt-3 text-[11px] text-white/50 text-center leading-relaxed">
-              مفيش رسوم على الطلب · البيانات بتُرسل لواتسابك مباشرة
+              {t("lead.noFee")}
             </p>
           </motion.form>
         )}

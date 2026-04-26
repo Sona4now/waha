@@ -65,6 +65,16 @@
     "hintTitle": "Got a question?",
     "hintBody": "Ask us on WhatsApp"
   },
+  "chat": {
+    "newConversation": "New conversation",
+    "inputPlaceholder": "Type your question...",
+    "thinking": "Thinking...",
+    "send": "Send",
+    "tryThese": "Try:",
+    "disclaimer": "Consult your doctor before any natural treatment",
+    "openLabel": "Open AI assistant",
+    "closeLabel": "Close"
+  },
   "lead": {
     "title": "Request a quote",
     "subtitle": "Fill in your details and our team will contact you on WhatsApp within two hours with a detailed quote and a suggested programme.",
@@ -76,6 +86,150 @@
     "send": "Send via WhatsApp",
     "sending": "Sending...",
     "successTitle": "Request sent ✨",
-    "successBody": "Our team will reach out on WhatsApp within two hours."
+    "successBody": "Our team will reach out on WhatsApp within two hours.",
+    "directLine": "Need an immediate answer? Call",
+    "noFee": "No booking fee · Sent directly to your WhatsApp",
+    "namePlaceholder": "e.g. Ahmed Mohamed",
+    "phonePlaceholder": "01012345678",
+    "datesPlaceholder": "e.g. November 2026",
+    "notesPlaceholder": "Any specific requests or medical conditions",
+    "groupOne": "1 person",
+    "groupTwo": "2 people",
+    "groupThree": "3 people",
+    "groupFour": "4 people",
+    "groupFivePlus": "5 or more",
+    "returningHi": "Welcome back, {name} — your details are pre-filled. Just hit send.",
+    "anotherRequest": "Send another request"
+  },
+  "destinationsPage": {
+    "title": "Wellness Tourism in Egypt",
+    "subtitle": "7 natural healing destinations — from the Red Sea to the deserts of Siwa and the mountains of Sinai",
+    "stats": {
+      "destinations": "Destinations",
+      "environments": "Natural environments",
+      "reviews": "Documented experiences"
+    },
+    "recentlyViewed": "Recently viewed",
+    "clearHistory": "Clear history",
+    "intentTitle": "Pick by intent",
+    "intent": {
+      "calm": "Looking for calm",
+      "treatment": "Natural therapy",
+      "adventure": "Adventure & energy",
+      "weekend": "Quick close-by trip"
+    },
+    "treatmentTitle": "What are you treating?",
+    "treatments": {
+      "all": "All",
+      "joints": "Joints",
+      "skin": "Skin",
+      "respiratory": "Respiratory",
+      "stress": "Stress",
+      "relaxation": "Relaxation"
+    },
+    "filterCount": "{count} destinations available",
+    "inSeasonNow": "{count} in season right now ✨",
+    "clearFilters": "Clear filters",
+    "advancedFilters": "Advanced filters",
+    "sortBy": "Sort by",
+    "sort": {
+      "relevance": "Best for you",
+      "inSeason": "In season first",
+      "distance": "Nearest first",
+      "cost": "Cheapest first",
+      "rating": "Highest rated",
+      "duration": "Shortest first",
+      "name": "Alphabetical"
+    },
+    "distance": {
+      "label": "Distance",
+      "all": "Any distance",
+      "near": "Near (under 200 km)",
+      "mid": "Medium (200–500 km)",
+      "far": "Far (500 km+)"
+    },
+    "budget": {
+      "label": "Budget",
+      "all": "Any budget",
+      "low": "Economy (under 5,000 EGP)",
+      "mid": "Mid (5,000–10,000 EGP)",
+      "high": "Premium (10,000 EGP+)"
+    },
+    "duration": {
+      "label": "Duration",
+      "all": "Any length",
+      "day": "1 day",
+      "week": "Up to a week",
+      "long": "More than a week"
+    },
+    "noResultsTitle": "No destinations match those filters",
+    "noResultsBody": "Try adjusting or clearing the filters to see all destinations",
+    "indecisive": "Still not sure?",
+    "trySymptomChecker": "Try the symptom checker",
+    "viewGrid": "Grid view",
+    "viewList": "List view",
+    "appliedRecommendation": "✦ We pre-filtered for {treatment} based on your trip",
+    "change": "Change",
+    "fittingForYou": "Fits you"
+  },
+  "destinationPage": {
+    "bestMonths": "Best months to visit",
+    "duration": "Duration",
+    "distance": "Distance from Cairo",
+    "difficulty": "Difficulty",
+    "audience": "For",
+    "treatments": "Treats",
+    "benefits": "Healing benefits",
+    "whyHere": "Why come here",
+    "features": "Highlights",
+    "gallery": "Gallery",
+    "weather": "Weather & seasons",
+    "faq": "Frequently asked",
+    "testimonials": "What previous visitors said",
+    "relatedArticles": "Articles about Wellness Tourism in {name}",
+    "relatedDestinations": "Other healing destinations",
+    "stickyBookNow": "Book now",
+    "stickyExplore": "Explore"
+  },
+  "packages": {
+    "sectionTitle": "Pick what fits you in {name}",
+    "sectionSubtitle": "Three packages — from a short taster to a complete treatment programme. All prices include accommodation, meals, and therapy. No hidden surprises.",
+    "tier": {
+      "basic": "Basic",
+      "standard": "Recommended ⭐",
+      "premium": "Complete"
+    },
+    "perPerson": "EGP / per person",
+    "perNight": "≈ {value} EGP / night",
+    "includes": "Includes",
+    "notIncluded": "Not included",
+    "viewDetails": "View full details ←",
+    "hideDetails": "Hide details",
+    "bookNow": "Book now ←"
+  },
+  "chapterNav": {
+    "ariaLabel": "Journey chapters",
+    "jumpTo": "Jump to chapter {number}: {name}"
+  },
+  "chapter": {
+    "destinationsLabel": {
+      "one": "Single destination",
+      "many": "Number of destinations"
+    },
+    "avgDistance": "Average distance from Cairo",
+    "peakMonths": "Best months to visit",
+    "yearRound": "Year-round",
+    "now": "Now ✨"
+  },
+  "share": {
+    "shareArticle": "Share article",
+    "linkCopied": "✓ Link copied"
+  },
+  "search": {
+    "placeholder": "Search articles...",
+    "clearSearch": "Clear search",
+    "showingAll": "Showing all {count} articles",
+    "showingFiltered": "{shown} of {total} articles",
+    "noResults": "No matches"
   }
 }

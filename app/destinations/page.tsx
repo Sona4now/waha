@@ -9,6 +9,7 @@ import EmptyState from "@/components/site/EmptyState";
 import DestinationCard from "@/components/site/DestinationCard";
 import EnvironmentChapter from "@/components/destination/EnvironmentChapter";
 import ChapterNav from "@/components/destination/ChapterNav";
+import { useTranslations } from "@/components/site/LocaleProvider";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
 import { TESTIMONIALS_BY_DEST } from "@/data/testimonials";
 import { ENVIRONMENT_CHAPTERS } from "@/data/environmentChapters";
@@ -29,35 +30,37 @@ const TREATMENT_FILTERS = [
   { key: "استرخاء", label: "استرخاء", icon: "🧘" },
 ];
 
+// Filter / sort metadata. Labels are translation keys looked up at render
+// time so the chips relocalise when the user toggles the language switch.
 const DISTANCE_FILTERS = [
-  { key: "all", label: "كل المسافات" },
-  { key: "near", label: "قريب (أقل من 200 كم)" },
-  { key: "mid", label: "متوسط (200-500 كم)" },
-  { key: "far", label: "بعيد (أكتر من 500 كم)" },
+  { key: "all", labelKey: "destinationsPage.distance.all" },
+  { key: "near", labelKey: "destinationsPage.distance.near" },
+  { key: "mid", labelKey: "destinationsPage.distance.mid" },
+  { key: "far", labelKey: "destinationsPage.distance.far" },
 ];
 
 const BUDGET_FILTERS = [
-  { key: "all", label: "كل الميزانيات" },
-  { key: "low", label: "اقتصادي (أقل من 5,000 ج)" },
-  { key: "mid", label: "متوسط (5,000-10,000 ج)" },
-  { key: "high", label: "فاخر (أكتر من 10,000 ج)" },
+  { key: "all", labelKey: "destinationsPage.budget.all" },
+  { key: "low", labelKey: "destinationsPage.budget.low" },
+  { key: "mid", labelKey: "destinationsPage.budget.mid" },
+  { key: "high", labelKey: "destinationsPage.budget.high" },
 ];
 
 const DURATION_FILTERS = [
-  { key: "all", label: "أي مدة" },
-  { key: "day", label: "يوم واحد" },
-  { key: "week", label: "أسبوع أو أقل" },
-  { key: "long", label: "أكتر من أسبوع" },
+  { key: "all", labelKey: "destinationsPage.duration.all" },
+  { key: "day", labelKey: "destinationsPage.duration.day" },
+  { key: "week", labelKey: "destinationsPage.duration.week" },
+  { key: "long", labelKey: "destinationsPage.duration.long" },
 ];
 
 const SORT_OPTIONS = [
-  { key: "relevance", label: "الأنسب لحالتك" },
-  { key: "in-season", label: "اللي في موسمها" },
-  { key: "distance", label: "الأقرب أولاً" },
-  { key: "cost", label: "الأرخص أولاً" },
-  { key: "rating", label: "الأعلى تقييماً" },
-  { key: "duration", label: "الأقصر أولاً" },
-  { key: "name", label: "الترتيب الأبجدي" },
+  { key: "relevance", labelKey: "destinationsPage.sort.relevance" },
+  { key: "in-season", labelKey: "destinationsPage.sort.inSeason" },
+  { key: "distance", labelKey: "destinationsPage.sort.distance" },
+  { key: "cost", labelKey: "destinationsPage.sort.cost" },
+  { key: "rating", labelKey: "destinationsPage.sort.rating" },
+  { key: "duration", labelKey: "destinationsPage.sort.duration" },
+  { key: "name", labelKey: "destinationsPage.sort.name" },
 ];
 
 /**
@@ -145,7 +148,20 @@ const RECENT_VIEWED_KEY = "waaha_recent_destinations";
 const VIEW_DENSITY_KEY = "waaha_destinations_density";
 
 /* ── Component ──────────────────────────────────────────── */
+// Treatment filter keys → translation keys for the chip labels.
+// The data values stay Arabic because that's what the destination
+// `treatments` arrays match against; only the visible label is localised.
+const TREATMENT_LABEL_KEYS: Record<string, string> = {
+  all: "destinationsPage.treatments.all",
+  مفاصل: "destinationsPage.treatments.joints",
+  جلد: "destinationsPage.treatments.skin",
+  تنفس: "destinationsPage.treatments.respiratory",
+  توتر: "destinationsPage.treatments.stress",
+  استرخاء: "destinationsPage.treatments.relaxation",
+};
+
 export default function DestinationsPage() {
+  const { t } = useTranslations();
   const [treatment, setTreatment] = useState("all");
   const [distance, setDistance] = useState("all");
   const [budget, setBudget] = useState("all");
@@ -331,8 +347,8 @@ export default function DestinationsPage() {
   return (
     <SiteLayout>
       <PageHero
-        title="السياحة الاستشفائية في مصر"
-        subtitle="7 وجهات علاجية طبيعية — من البحر الأحمر لصحاري سيوة وجبال سيناء"
+        title={t("destinationsPage.title")}
+        subtitle={t("destinationsPage.subtitle")}
       />
 
       <section className="py-10 md:py-16 px-4 bg-[#f5f8fa] dark:bg-[#0a151f]">
@@ -340,11 +356,17 @@ export default function DestinationsPage() {
           {/* ── Stats banner ── */}
           <Reveal>
             <div className="mb-6 grid grid-cols-3 gap-3 md:gap-6 text-center">
-              <StatTile value={DESTINATIONS.length} label="وجهة استشفائية" />
-              <StatTile value={environments} label="بيئة طبيعية" />
+              <StatTile
+                value={DESTINATIONS.length}
+                label={t("destinationsPage.stats.destinations")}
+              />
+              <StatTile
+                value={environments}
+                label={t("destinationsPage.stats.environments")}
+              />
               <StatTile
                 value={totalReviews}
-                label="تجربة موثقة"
+                label={t("destinationsPage.stats.reviews")}
                 accent
               />
             </div>
@@ -357,7 +379,7 @@ export default function DestinationsPage() {
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-sm font-bold text-[#12394d] dark:text-white flex items-center gap-2">
                     <span>👀</span>
-                    <span>شفت مؤخراً</span>
+                    <span>{t("destinationsPage.recentlyViewed")}</span>
                   </h3>
                   <button
                     onClick={() => {
@@ -368,7 +390,7 @@ export default function DestinationsPage() {
                     }}
                     className="text-[11px] text-[#7b7c7d] hover:text-[#1d5770] dark:hover:text-[#91b149] hover:underline"
                   >
-                    امسح السجل
+                    {t("destinationsPage.clearHistory")}
                   </button>
                 </div>
                 <div className="flex gap-3 overflow-x-auto no-scrollbar pb-2">
@@ -394,7 +416,7 @@ export default function DestinationsPage() {
           <Reveal delay={0.08}>
             <div className="mb-6">
               <h3 className="text-sm font-bold text-[#7b7c7d] dark:text-white/60 mb-3 uppercase tracking-wider">
-                اختار حسب احتياجك
+                {t("destinationsPage.intentTitle")}
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-3">
                 {INTENT_PRESETS.map((p) => {
@@ -431,7 +453,7 @@ export default function DestinationsPage() {
                           isActive ? "text-white" : "text-[#12394d]"
                         }`}
                       >
-                        {p.label}
+                        {t(`destinationsPage.intent.${p.key}`)}
                       </span>
                     </button>
                   );
@@ -445,7 +467,7 @@ export default function DestinationsPage() {
             <div className="mb-5">
               <h3 className="text-base font-bold mb-3 text-[#12394d] dark:text-white flex items-center gap-2">
                 <span>🩺</span>
-                <span>أنت بتعاني من إيه؟</span>
+                <span>{t("destinationsPage.treatmentTitle")}</span>
               </h3>
               <div className="flex flex-wrap gap-2">
                 {TREATMENT_FILTERS.map((f) => (
@@ -459,7 +481,7 @@ export default function DestinationsPage() {
                     }`}
                   >
                     <span>{f.icon}</span>
-                    <span>{f.label}</span>
+                    <span>{t(TREATMENT_LABEL_KEYS[f.key] ?? "common.error")}</span>
                   </button>
                 ))}
               </div>
@@ -474,12 +496,20 @@ export default function DestinationsPage() {
               <Reveal delay={0.15}>
                 <div className="mb-5 flex items-center justify-between gap-3 px-4 py-3 rounded-2xl bg-[#f0f7ed] dark:bg-[#91b149]/10 border border-[#91b149]/30">
                   <p className="text-xs md:text-sm text-[#12394d] dark:text-white">
-                    <span aria-hidden="true">✦ </span>
-                    فلترنا لك على{" "}
-                    <strong className="text-[#91b149]">
-                      {NEED_TO_TREATMENTS[recommendation.need]?.[0]}
-                    </strong>{" "}
-                    بناء على رحلتك
+                    {(() => {
+                      const treatmentValue =
+                        NEED_TO_TREATMENTS[recommendation.need]?.[0] ?? "";
+                      // Localise the treatment label too — the data
+                      // value is Arabic, the rendered label may be EN.
+                      const labelKey = TREATMENT_LABEL_KEYS[treatmentValue];
+                      const labelText = labelKey
+                        ? t(labelKey)
+                        : treatmentValue;
+                      return t("destinationsPage.appliedRecommendation").replace(
+                        "{treatment}",
+                        labelText,
+                      );
+                    })()}
                   </p>
                   <button
                     onClick={() => {
@@ -488,7 +518,7 @@ export default function DestinationsPage() {
                     }}
                     className="text-xs font-bold text-[#1d5770] dark:text-[#91b149] hover:underline whitespace-nowrap"
                   >
-                    غيّر
+                    {t("destinationsPage.change")}
                   </button>
                 </div>
               </Reveal>
@@ -514,7 +544,7 @@ export default function DestinationsPage() {
                   >
                     <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
                   </svg>
-                  <span>فلاتر متقدمة</span>
+                  <span>{t("destinationsPage.advancedFilters")}</span>
                   {activeFilterCount > 0 && (
                     <span className="flex items-center justify-center w-5 h-5 bg-[#91b149] text-white text-[10px] font-bold rounded-full">
                       {activeFilterCount}
@@ -531,8 +561,8 @@ export default function DestinationsPage() {
                         ? "bg-[#1d5770] text-white"
                         : "text-[#7b7c7d] hover:text-[#1d5770]"
                     }`}
-                    aria-label="عرض شبكي"
-                    title="عرض شبكي"
+                    aria-label={t("destinationsPage.viewGrid")}
+                    title={t("destinationsPage.viewGrid")}
                   >
                     <svg
                       width="14"
@@ -555,8 +585,8 @@ export default function DestinationsPage() {
                         ? "bg-[#1d5770] text-white"
                         : "text-[#7b7c7d] hover:text-[#1d5770]"
                     }`}
-                    aria-label="عرض قائمة"
-                    title="عرض قائمة"
+                    aria-label={t("destinationsPage.viewList")}
+                    title={t("destinationsPage.viewList")}
                   >
                     <svg
                       width="14"
@@ -581,7 +611,7 @@ export default function DestinationsPage() {
               >
                 {SORT_OPTIONS.map((s) => (
                   <option key={s.key} value={s.key}>
-                    {s.label}
+                    {t(s.labelKey)}
                   </option>
                 ))}
               </select>
@@ -594,7 +624,7 @@ export default function DestinationsPage() {
               <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <label className="text-xs font-bold text-[#7b7c7d] mb-2 block">
-                    المسافة
+                    {t("destinationsPage.distance.label")}
                   </label>
                   <select
                     value={distance}
@@ -603,14 +633,14 @@ export default function DestinationsPage() {
                   >
                     {DISTANCE_FILTERS.map((f) => (
                       <option key={f.key} value={f.key}>
-                        {f.label}
+                        {t(f.labelKey)}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-[#7b7c7d] mb-2 block">
-                    الميزانية
+                    {t("destinationsPage.budget.label")}
                   </label>
                   <select
                     value={budget}
@@ -619,14 +649,14 @@ export default function DestinationsPage() {
                   >
                     {BUDGET_FILTERS.map((f) => (
                       <option key={f.key} value={f.key}>
-                        {f.label}
+                        {t(f.labelKey)}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-[#7b7c7d] mb-2 block">
-                    المدة
+                    {t("destinationsPage.duration.label")}
                   </label>
                   <select
                     value={duration}
@@ -635,7 +665,7 @@ export default function DestinationsPage() {
                   >
                     {DURATION_FILTERS.map((f) => (
                       <option key={f.key} value={f.key}>
-                        {f.label}
+                        {t(f.labelKey)}
                       </option>
                     ))}
                   </select>
@@ -651,14 +681,18 @@ export default function DestinationsPage() {
                 <span className="font-bold text-[#12394d] dark:text-white">
                   {filtered.length}
                 </span>{" "}
-                وجهة متاحة
+                {t("destinationsPage.filterCount")
+                  .replace("{count}", "")
+                  .trim()}
                 {inSeasonCount > 0 && filtered.length > 0 && (
                   <>
                     {" "}·{" "}
                     <span className="text-[#91b149] font-bold">
                       {inSeasonCount}
                     </span>{" "}
-                    في موسمها دلوقتي ✨
+                    {t("destinationsPage.inSeasonNow")
+                      .replace("{count}", "")
+                      .trim()}
                   </>
                 )}
               </p>
@@ -667,7 +701,7 @@ export default function DestinationsPage() {
                   onClick={resetAll}
                   className="text-xs text-[#91b149] hover:underline font-bold"
                 >
-                  امسح الفلاتر
+                  {t("destinationsPage.clearFilters")}
                 </button>
               )}
             </div>
@@ -729,14 +763,14 @@ export default function DestinationsPage() {
             ) : (
               <EmptyState
                 icon="🏜️"
-                title="ما لقيناش وجهات بالمواصفات دي"
-                description="جرّب تعديل الفلاتر أو شيلها كلها عشان تشوف كل الوجهات المتاحة"
+                title={t("destinationsPage.noResultsTitle")}
+                description={t("destinationsPage.noResultsBody")}
                 action={
                   <button
                     onClick={resetAll}
                     className="px-6 py-3 rounded-full bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white font-bold text-sm hover:shadow-lg transition-all hover:scale-[1.03]"
                   >
-                    امسح الفلاتر
+                    {t("destinationsPage.clearFilters")}
                   </button>
                 }
               />
@@ -754,13 +788,13 @@ export default function DestinationsPage() {
                 <div className="inline-flex flex-col sm:flex-row items-center gap-3 px-5 py-4 rounded-2xl bg-white dark:bg-[#162033] border border-[#d0dde4] dark:border-[#1e3a5f]">
                   <span className="text-2xl">🤔</span>
                   <p className="text-sm text-[#12394d] dark:text-white">
-                    لسه مش متأكد؟
+                    {t("destinationsPage.indecisive")}
                   </p>
                   <Link
                     href="/symptoms"
                     className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-xs transition-colors no-underline"
                   >
-                    جرّب فاحص الأعراض
+                    {t("destinationsPage.trySymptomChecker")}
                     <span>←</span>
                   </Link>
                 </div>

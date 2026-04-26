@@ -28,7 +28,13 @@ export interface DestinationFull {
   /** Approximate cost in EGP, e.g. "من 8,000 ج" */
   costFrom?: string;
   /** Difficulty level */
-  difficulty?: "سهل" | "متوسط" | "متقدم";
+  /**
+   * Difficulty level. Stored in Arabic as the source language. The
+   * locale layer in `lib/localize.ts` overlays translated strings at
+   * render time, so the type is intentionally `string` to accept the
+   * English variants ("Easy", "Moderate", "Challenging") too.
+   */
+  difficulty?: string;
   /** Target audience */
   audience?: string;
   /** Short pitch — one-line unique selling point */

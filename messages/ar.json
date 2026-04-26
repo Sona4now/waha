@@ -65,6 +65,16 @@
     "hintTitle": "عندك سؤال؟",
     "hintBody": "اسأل علي WhatsApp"
   },
+  "chat": {
+    "newConversation": "محادثة جديدة",
+    "inputPlaceholder": "اكتب سؤالك...",
+    "thinking": "جاري التفكير...",
+    "send": "إرسال",
+    "tryThese": "جرّب:",
+    "disclaimer": "استشر طبيبك قبل أي علاج طبيعي",
+    "openLabel": "فتح المساعد الذكي",
+    "closeLabel": "إغلاق"
+  },
   "lead": {
     "title": "اطلب عرض سعر",
     "subtitle": "املأ البيانات وفريقنا هيتواصل معاك على واتساب خلال ساعتين بعرض سعر مفصّل وبرنامج مقترح حسب احتياجك.",
@@ -76,6 +86,150 @@
     "send": "أرسل عبر واتساب",
     "sending": "جاري الإرسال...",
     "successTitle": "تم إرسال طلبك ✨",
-    "successBody": "فريقنا هيتواصل معاك على الواتساب خلال ساعتين."
+    "successBody": "فريقنا هيتواصل معاك على الواتساب خلال ساعتين.",
+    "directLine": "لو محتاج تواصل مباشر، اتصل بـ",
+    "noFee": "مفيش رسوم على الطلب · البيانات بتُرسل لواتسابك مباشرة",
+    "namePlaceholder": "مثال: أحمد محمد",
+    "phonePlaceholder": "01012345678",
+    "datesPlaceholder": "مثال: نوفمبر 2026",
+    "notesPlaceholder": "أي طلبات خاصة أو حالة صحية محددة",
+    "groupOne": "شخص واحد",
+    "groupTwo": "شخصين",
+    "groupThree": "3 أشخاص",
+    "groupFour": "4 أشخاص",
+    "groupFivePlus": "5 أو أكتر",
+    "returningHi": "أهلاً {name} — بياناتك جاهزة، اضغط إرسال على طول",
+    "anotherRequest": "إرسال طلب آخر"
+  },
+  "destinationsPage": {
+    "title": "السياحة الاستشفائية في مصر",
+    "subtitle": "7 وجهات علاجية طبيعية — من البحر الأحمر لصحاري سيوة وجبال سيناء",
+    "stats": {
+      "destinations": "وجهة استشفائية",
+      "environments": "بيئة طبيعية",
+      "reviews": "تجربة موثقة"
+    },
+    "recentlyViewed": "شفت مؤخراً",
+    "clearHistory": "امسح السجل",
+    "intentTitle": "اختار حسب احتياجك",
+    "intent": {
+      "calm": "بحث عن الهدوء",
+      "treatment": "علاج طبيعي",
+      "adventure": "مغامرة وطاقة",
+      "weekend": "إجازة قصيرة قريبة"
+    },
+    "treatmentTitle": "أنت بتعاني من إيه؟",
+    "treatments": {
+      "all": "الكل",
+      "joints": "مفاصل",
+      "skin": "جلد",
+      "respiratory": "تنفس",
+      "stress": "توتر",
+      "relaxation": "استرخاء"
+    },
+    "filterCount": "{count} وجهة متاحة",
+    "inSeasonNow": "{count} في موسمها دلوقتي ✨",
+    "clearFilters": "امسح الفلاتر",
+    "advancedFilters": "فلاتر متقدمة",
+    "sortBy": "ترتيب",
+    "sort": {
+      "relevance": "الأنسب لحالتك",
+      "inSeason": "اللي في موسمها",
+      "distance": "الأقرب أولاً",
+      "cost": "الأرخص أولاً",
+      "rating": "الأعلى تقييماً",
+      "duration": "الأقصر أولاً",
+      "name": "الترتيب الأبجدي"
+    },
+    "distance": {
+      "label": "المسافة",
+      "all": "كل المسافات",
+      "near": "قريب (أقل من 200 كم)",
+      "mid": "متوسط (200-500 كم)",
+      "far": "بعيد (أكتر من 500 كم)"
+    },
+    "budget": {
+      "label": "الميزانية",
+      "all": "كل الميزانيات",
+      "low": "اقتصادي (أقل من 5,000 ج)",
+      "mid": "متوسط (5,000-10,000 ج)",
+      "high": "فاخر (أكتر من 10,000 ج)"
+    },
+    "duration": {
+      "label": "المدة",
+      "all": "أي مدة",
+      "day": "يوم واحد",
+      "week": "أسبوع أو أقل",
+      "long": "أكتر من أسبوع"
+    },
+    "noResultsTitle": "ما لقيناش وجهات بالمواصفات دي",
+    "noResultsBody": "جرّب تعديل الفلاتر أو شيلها كلها عشان تشوف كل الوجهات المتاحة",
+    "indecisive": "لسه مش متأكد؟",
+    "trySymptomChecker": "جرّب فاحص الأعراض",
+    "viewGrid": "عرض شبكي",
+    "viewList": "عرض قائمة",
+    "appliedRecommendation": "✦ فلترنا لك على {treatment} بناء على رحلتك",
+    "change": "غيّر",
+    "fittingForYou": "مناسب لك"
+  },
+  "destinationPage": {
+    "bestMonths": "أفضل شهور للزيارة",
+    "duration": "المدة",
+    "distance": "البعد عن القاهرة",
+    "difficulty": "الصعوبة",
+    "audience": "مناسب لـ",
+    "treatments": "بيعالج",
+    "benefits": "فوائد علاجية",
+    "whyHere": "ليه تيجي هنا",
+    "features": "المميزات",
+    "gallery": "معرض الصور",
+    "weather": "الطقس والمواسم",
+    "faq": "الأسئلة الشائعة",
+    "testimonials": "ناس زاروا الوجهة قبلك",
+    "relatedArticles": "مقالات عن السياحة الاستشفائية في {name}",
+    "relatedDestinations": "وجهات استشفائية أخرى",
+    "stickyBookNow": "احجز الآن",
+    "stickyExplore": "اكتشف"
+  },
+  "packages": {
+    "sectionTitle": "اختر اللي يناسبك في {name}",
+    "sectionSubtitle": "٣ باقات مختلفة — من تجربة قصيرة لبرنامج علاجي كامل. كل الأسعار شاملة الإقامة والوجبات والعلاج. مفيش مفاجآت في الفاتورة.",
+    "tier": {
+      "basic": "أساسي",
+      "standard": "موصى به ⭐",
+      "premium": "متكامل"
+    },
+    "perPerson": "ج / للشخص",
+    "perNight": "≈ {value} ج / ليلة",
+    "includes": "يشمل",
+    "notIncluded": "غير شامل",
+    "viewDetails": "عرض كل التفاصيل ←",
+    "hideDetails": "إخفاء التفاصيل",
+    "bookNow": "احجز الآن ←"
+  },
+  "chapterNav": {
+    "ariaLabel": "فصول الرحلة",
+    "jumpTo": "اقفز للفصل {number}: {name}"
+  },
+  "chapter": {
+    "destinationsLabel": {
+      "one": "وجهة واحدة",
+      "many": "عدد الوجهات"
+    },
+    "avgDistance": "متوسط البعد عن القاهرة",
+    "peakMonths": "أفضل شهور الزيارة",
+    "yearRound": "السنة كاملة",
+    "now": "الآن ✨"
+  },
+  "share": {
+    "shareArticle": "مشاركة المقال",
+    "linkCopied": "✓ تم نسخ الرابط"
+  },
+  "search": {
+    "placeholder": "ابحث في المقالات...",
+    "clearSearch": "مسح البحث",
+    "showingAll": "عرض كل {count} مقال",
+    "showingFiltered": "{shown} من {total} مقال",
+    "noResults": "مفيش نتائج"
   }
 }
