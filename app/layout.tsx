@@ -1,11 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Cairo, Reem_Kufi } from "next/font/google";
+import { Cairo, Reem_Kufi, Inter } from "next/font/google";
+import { cookies } from "next/headers";
 import "./globals.css";
 import Script from "next/script";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { SITE_URL } from "@/lib/siteMeta";
 import { organizationSchema } from "@/lib/structuredData";
+import { LOCALE_COOKIE, normaliseLocale, localeDir } from "@/lib/i18n";
+import LocaleProvider from "@/components/site/LocaleProvider";
 
 /**
  * Self-hosted Arabic fonts via next/font.
@@ -29,6 +32,17 @@ const reemKufi = Reem_Kufi({
   display: "swap",
   preload: false, // display font — not on critical path
   variable: "--font-reem-kufi",
+});
+
+// English fallback font — Inter is the standard "neutral, readable" pick.
+// Cairo also has Latin glyphs but Inter renders English UI more cleanly
+// and the file size is small with the trimmed weight set.
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  preload: false,
+  variable: "--font-inter",
 });
 
 // SEO note: the exact phrase "السياحة الاستشفائية في مصر" appears in:
@@ -122,16 +136,23 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Read the locale once on the server. Cookie wins; otherwise default to
+  // Arabic. The same value is passed to <html lang/dir> AND to the client
+  // LocaleProvider, so SSR + hydration stay in sync.
+  const cookieStore = await cookies();
+  const locale = normaliseLocale(cookieStore.get(LOCALE_COOKIE)?.value);
+  const dir = localeDir(locale);
+
   return (
     <html
-      lang="ar"
-      dir="rtl"
-      className={`h-full ${cairo.variable} ${reemKufi.variable}`}
+      lang={locale}
+      dir={dir}
+      className={`h-full ${cairo.variable} ${reemKufi.variable} ${inter.variable}`}
     >
       <head>
         <link rel="apple-touch-icon" href="/apple-icon.png" />
@@ -171,7 +192,7 @@ export default function RootLayout({
         />
       </head>
       <body className="h-full bg-[#070d15]">
-        {children}
+        <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
         <Analytics />
         <SpeedInsights />
 

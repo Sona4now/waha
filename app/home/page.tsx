@@ -6,6 +6,7 @@ import MoodBoard from "@/components/site/MoodBoard";
 import AnimatedText from "@/components/site/AnimatedText";
 import TiltCard from "@/components/site/TiltCard";
 import MagneticButton from "@/components/site/MagneticButton";
+import { useTranslations } from "@/components/site/LocaleProvider";
 import FAQ from "@/components/site/FAQ";
 import type { FAQItem } from "@/components/site/FAQ";
 import Link from "next/link";
@@ -131,6 +132,7 @@ function CTASection() {
 }
 
 export default function HomePage() {
+  const { t, locale } = useTranslations();
   const [recommendation, setRecommendation] = useState<{
     destinationId: string;
     need: string;
@@ -146,6 +148,8 @@ export default function HomePage() {
   const recDest = recommendation
     ? DESTINATIONS.find((d) => d.id === recommendation.destinationId)
     : null;
+  const recDestName =
+    recDest && locale === "en" && recDest.nameEn ? recDest.nameEn : recDest?.name;
 
   return (
     <SiteLayout>
@@ -170,31 +174,32 @@ export default function HomePage() {
             <>
               <div className="inline-flex items-center gap-2 bg-[#91b149]/20 backdrop-blur-sm text-[#91b149] text-[0.75rem] sm:text-[0.82rem] font-bold px-3 sm:px-4 py-1.5 rounded-full border border-[#91b149]/40 mb-5">
                 <span className="w-2 h-2 rounded-full bg-[#91b149] animate-pulse" />
-                وجهتك المقترحة بناءً على إجاباتك
+                {t("home.recommendedFor")}
               </div>
               <h1 className="text-2xl sm:text-4xl md:text-6xl font-black mb-3 font-display leading-tight max-w-[680px]">
-                رحلتك تبدأ من
-                <span className="text-[#91b149] mr-3">{recDest.name}</span>
+                {locale === "en" ? "Your journey starts at" : "رحلتك تبدأ من"}
+                <span className="text-[#91b149] mr-3">{recDestName}</span>
               </h1>
               <p className="text-white/60 text-base mb-2 font-display italic max-w-[520px]">
                 &ldquo;{recDest.description}&rdquo;
               </p>
               <p className="text-white/80 text-lg mb-8 max-w-[520px] leading-relaxed">
-                اخترنا لك {recDest.name} لأنها تناسب احتياجاتك تماماً. استكشف
-                التفاصيل، الفوائد العلاجية، وأفضل الأوقات للسفر.
+                {locale === "en"
+                  ? `We picked ${recDestName} because it fits your needs. Dive into the details, healing benefits, and best times to visit.`
+                  : `اخترنا لك ${recDestName} لأنها تناسب احتياجاتك تماماً. استكشف التفاصيل، الفوائد العلاجية، وأفضل الأوقات للسفر.`}
               </p>
               <div className="flex gap-3.5 flex-wrap">
                 <Link
                   href={`/destination/${recDest.id}`}
                   className="px-8 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold rounded-full transition-all duration-300 no-underline text-sm shadow-[0_8px_24px_-8px_rgba(145,177,73,0.6)] hover:shadow-[0_12px_32px_-8px_rgba(145,177,73,0.8)] hover:scale-[1.03]"
                 >
-                  اكتشف {recDest.name}
+                  {t("home.discoverDestination")} {recDestName}
                 </Link>
                 <Link
                   href="/destinations"
                   className="px-8 py-3.5 bg-white/[0.13] hover:bg-white/[0.22] backdrop-blur-sm text-white font-bold rounded-full border border-white/[0.22] transition-all duration-300 no-underline text-sm"
                 >
-                  استكشف وجهات أخرى
+                  {locale === "en" ? "Explore more destinations" : "استكشف وجهات أخرى"}
                 </Link>
                 <Link
                   href="/"
@@ -213,7 +218,7 @@ export default function HomePage() {
                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                     <path d="M3 3v5h5" />
                   </svg>
-                  أعد التجربة
+                  {t("home.retake")}
                 </Link>
               </div>
             </>
@@ -221,13 +226,13 @@ export default function HomePage() {
             <>
               <div className="inline-flex items-center gap-2 bg-white/[0.13] backdrop-blur-sm text-white text-[0.82rem] font-bold px-4 py-1.5 rounded-full border border-white/[0.22] mb-5">
                 <span className="w-1.5 h-1.5 rounded-full bg-[#91b149] animate-pulse" />
-                السياحة البيئية الطبيعية
+                {t("home.badge")}
               </div>
               {/* SEO H1: exact target phrase. Single H1 per page is best
                   practice for crawler ranking. Sub-headline is an h2. */}
               <AnimatedText
                 as="h1"
-                text="السياحة الاستشفائية في مصر"
+                text={t("home.title")}
                 splitBy="word"
                 stagger={0.08}
                 delay={0.2}
@@ -236,7 +241,7 @@ export default function HomePage() {
               />
               <AnimatedText
                 as="h2"
-                text="استكشف رحلة شفائك في قلب الطبيعة"
+                text={t("home.subtitle")}
                 splitBy="word"
                 stagger={0.05}
                 delay={0.6}
@@ -245,7 +250,7 @@ export default function HomePage() {
               />
               <AnimatedText
                 as="p"
-                text="منصة واحة بتساعدك تختار وجهتك العلاجية في مصر — سفاجا (الصدفية والروماتيزم)، سيوة (المياه الكبريتية)، سيناء (الجبال والربو)، الفيوم، والواحات. حجز عبر واتساب وأسعار شفافة."
+                text={t("home.tagline")}
                 splitBy="word"
                 stagger={0.02}
                 delay={1}
@@ -258,7 +263,7 @@ export default function HomePage() {
                     href="/"
                     className="inline-block px-8 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold rounded-full transition-all duration-300 no-underline text-sm shadow-[0_8px_24px_-8px_rgba(145,177,73,0.6)] hover:shadow-[0_12px_32px_-8px_rgba(145,177,73,0.9)]"
                   >
-                    ابدأ رحلتك
+                    {t("home.ctaStart")}
                   </Link>
                 </MagneticButton>
                 <MagneticButton strength={14}>
@@ -266,7 +271,7 @@ export default function HomePage() {
                     href="/destinations"
                     className="inline-block px-8 py-3.5 bg-white/[0.13] hover:bg-white/[0.22] backdrop-blur-sm text-white font-bold rounded-full border border-white/[0.22] transition-all duration-300 no-underline text-sm"
                   >
-                    استكشف الأماكن
+                    {t("home.ctaExplore")}
                   </Link>
                 </MagneticButton>
               </div>

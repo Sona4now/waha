@@ -4,20 +4,24 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
+import LanguageSwitcher from "./LanguageSwitcher";
+import { useTranslations } from "./LocaleProvider";
 
-const links = [
-  { href: "/home", label: "الرئيسية" },
-  { href: "/destinations", label: "الأماكن" },
-  { href: "/tours", label: "جولات 360°" },
-  { href: "/map", label: "الخريطة" },
-  { href: "/blog", label: "المدونة" },
-  { href: "/therapy-room", label: "غرفة العلاج" },
-  { href: "/symptoms", label: "فاحص الأعراض" },
-  { href: "/compare", label: "المقارنة" },
-  { href: "/calendar", label: "التقويم" },
-  { href: "/achievements", label: "إنجازاتي" },
-  { href: "/about", label: "من نحن" },
-  { href: "/team", label: "الفريق" },
+// Each link's label is a translation key resolved at render time so the
+// nav re-localises when the user flips the language switch.
+const linkDefs: { href: string; key: string }[] = [
+  { href: "/home", key: "nav.home" },
+  { href: "/destinations", key: "nav.destinations" },
+  { href: "/tours", key: "nav.tours" },
+  { href: "/map", key: "nav.map" },
+  { href: "/blog", key: "nav.blog" },
+  { href: "/therapy-room", key: "nav.therapyRoom" },
+  { href: "/symptoms", key: "nav.symptoms" },
+  { href: "/compare", key: "nav.compare" },
+  { href: "/calendar", key: "nav.calendar" },
+  { href: "/achievements", key: "nav.achievements" },
+  { href: "/about", key: "nav.about" },
+  { href: "/team", key: "nav.team" },
 ];
 
 export default function Navbar() {
@@ -25,6 +29,8 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [platformKey, setPlatformKey] = useState("Ctrl");
   const pathname = usePathname();
+  const { t } = useTranslations();
+  const links = linkDefs.map((l) => ({ ...l, label: t(l.key) }));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -86,8 +92,8 @@ export default function Navbar() {
           {/* Search button */}
           <button
             onClick={openSearch}
-            aria-label="بحث"
-            title="بحث"
+            aria-label={t("common.search")}
+            title={t("common.search")}
             className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-xs text-[#7b7c7d] bg-[#f5f8fa] dark:bg-[#162033] hover:bg-[#e4edf2] dark:hover:bg-[#1e3a5f] rounded-full border border-[#d0dde4] dark:border-[#1e3a5f] transition-colors"
           >
             <svg
@@ -103,7 +109,7 @@ export default function Navbar() {
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <span className="hidden md:inline">بحث</span>
+            <span className="hidden md:inline">{t("common.search")}</span>
             <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 text-[9px] font-mono font-semibold bg-white dark:bg-[#0a151f] border border-[#d0dde4] dark:border-[#1e3a5f] rounded">
               {platformKey}K
             </kbd>
@@ -112,7 +118,7 @@ export default function Navbar() {
           {/* Mobile search (icon only) */}
           <button
             onClick={openSearch}
-            aria-label="بحث"
+            aria-label={t("common.search")}
             className="sm:hidden w-9 h-9 rounded-full flex items-center justify-center text-[#12394d] dark:text-white hover:bg-[#e4edf2] dark:hover:bg-[#162033] transition-colors"
           >
             <svg
@@ -133,11 +139,14 @@ export default function Navbar() {
           {/* Theme toggle */}
           <ThemeToggle />
 
+          {/* Language switcher (AR ↔ EN) */}
+          <LanguageSwitcher />
+
           {/* Hamburger */}
           <button
             className="flex md:hidden flex-col gap-[5px] p-2 cursor-pointer bg-transparent border-none ml-1"
             onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="القائمة"
+            aria-label={t("common.menu")}
           >
             <span
               className={`block w-[22px] h-[2px] bg-[#12394d] dark:bg-white rounded-sm transition-all duration-300 ${

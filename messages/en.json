@@ -1,0 +1,81 @@
+{
+  "common": {
+    "search": "Search",
+    "menu": "Menu",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "cancel": "Cancel",
+    "save": "Save",
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again.",
+    "tryAgain": "Try again",
+    "viewAll": "View all",
+    "readMore": "Read more",
+    "exploreMore": "Explore more",
+    "comingSoon": "Coming soon",
+    "language": "Language"
+  },
+  "nav": {
+    "home": "Home",
+    "destinations": "Destinations",
+    "tours": "360° Tours",
+    "map": "Map",
+    "blog": "Blog",
+    "therapyRoom": "Therapy Room",
+    "symptoms": "Symptom Checker",
+    "compare": "Compare",
+    "calendar": "Calendar",
+    "achievements": "Achievements",
+    "about": "About",
+    "team": "Team",
+    "contact": "Contact",
+    "darkMode": "Switch to dark mode",
+    "lightMode": "Switch to light mode"
+  },
+  "home": {
+    "badge": "Natural Eco-tourism",
+    "title": "Wellness Tourism in Egypt",
+    "subtitle": "Discover your healing journey in the heart of nature",
+    "tagline": "Waha helps you find your natural healing destination in Egypt — Safaga (psoriasis & rheumatism), Siwa (sulfuric springs), Sinai (mountains & asthma), Fayoum, and the Western Oases. Transparent pricing, easy WhatsApp booking.",
+    "ctaStart": "Start Your Journey",
+    "ctaExplore": "Explore Destinations",
+    "ctaAskAI": "Ask the AI Assistant",
+    "ctaTryExperience": "Begin Experience",
+    "recommendedFor": "Your recommended destination based on your answers",
+    "discoverDestination": "Discover",
+    "retake": "Retake the quiz",
+    "infoCardsTitle": "Why Wellness Tourism?",
+    "infoCardsSubtitle": "Egypt holds rare natural resources that make it one of the world's best wellness destinations"
+  },
+  "footer": {
+    "tagline": "Egypt's specialised wellness-tourism platform. We help you find the natural destination that fits your health and wellbeing.",
+    "followUs": "Follow us",
+    "pages": "Pages",
+    "info": "Info",
+    "destinations": "Destinations",
+    "privacy": "Privacy Policy",
+    "terms": "Terms",
+    "rights": "© 2026 Waha · Eco-tourism & Natural Healing in Egypt",
+    "tagShort": "Healing from nature 🌿"
+  },
+  "whatsapp": {
+    "label": "Chat on WhatsApp",
+    "hintTitle": "Got a question?",
+    "hintBody": "Ask us on WhatsApp"
+  },
+  "lead": {
+    "title": "Request a quote",
+    "subtitle": "Fill in your details and our team will contact you on WhatsApp within two hours with a detailed quote and a suggested programme.",
+    "name": "Name",
+    "phone": "Phone",
+    "dates": "Preferred dates (optional)",
+    "people": "Group size",
+    "notes": "Notes (optional)",
+    "send": "Send via WhatsApp",
+    "sending": "Sending...",
+    "successTitle": "Request sent ✨",
+    "successBody": "Our team will reach out on WhatsApp within two hours."
+  }
+}

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { CONTACT_PHONE_INTL } from "@/lib/siteMeta";
+import { useTranslations } from "./LocaleProvider";
 
 const HIDDEN_PATHS = ["/", "/gate", "/therapy-room", "/map"];
 const STORAGE_KEY = "waaha_wa_hint_dismissed";
@@ -67,6 +68,7 @@ function buildContextualMessage(path: string): string {
  */
 export default function WhatsAppButton() {
   const pathname = usePathname();
+  const { t, locale } = useTranslations();
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
@@ -102,8 +104,15 @@ export default function WhatsAppButton() {
    */
   function buildHref() {
     const path = pathname || "/";
-    const text = encodeURIComponent(buildContextualMessage(path));
-    return `https://wa.me/${CONTACT_PHONE_INTL}?text=${text}`;
+    // English users get a one-line English opener so the operator on the
+    // other end knows which language to start in.
+    const message =
+      locale === "en"
+        ? `Hi, I'm browsing ${path} and would like to learn more about wellness tourism in Egypt.`
+        : buildContextualMessage(path);
+    return `https://wa.me/${CONTACT_PHONE_INTL}?text=${encodeURIComponent(
+      message,
+    )}`;
   }
 
   if (HIDDEN_PATHS.includes(pathname)) return null;
@@ -125,11 +134,11 @@ export default function WhatsAppButton() {
             transition={{ type: "spring", stiffness: 320, damping: 26 }}
             onClick={dismissHint}
             className="absolute bottom-full mb-3 right-0 whitespace-nowrap bg-white dark:bg-[#162033] rounded-2xl shadow-[0_10px_30px_-8px_rgba(0,0,0,0.25)] border border-gray-100 dark:border-[#1e3a5f] px-4 py-2.5 text-sm text-[#12394d] dark:text-white"
-            aria-label="إخفاء التلميح"
+            aria-label={t("common.close")}
           >
-            <span className="font-bold">عندك سؤال؟</span>{" "}
+            <span className="font-bold">{t("whatsapp.hintTitle")}</span>{" "}
             <span className="text-[#7b7c7d] dark:text-white/60">
-              اسأل علي WhatsApp
+              {t("whatsapp.hintBody")}
             </span>
             {/* Triangle pointing down to the FAB */}
             <span className="absolute -bottom-1.5 right-6 w-3 h-3 rotate-45 bg-white dark:bg-[#162033] border-r border-b border-gray-100 dark:border-[#1e3a5f]" />
@@ -145,7 +154,7 @@ export default function WhatsAppButton() {
         whileHover={{ scale: 1.06 }}
         whileTap={{ scale: 0.94 }}
         className="relative flex items-center justify-center w-14 h-14 rounded-full bg-[#25D366] hover:bg-[#1da851] shadow-[0_8px_24px_-6px_rgba(37,211,102,0.55)] transition-colors no-underline"
-        aria-label="تواصل عبر واتساب"
+        aria-label={t("whatsapp.label")}
       >
         {/* Pulse ring */}
         <span
