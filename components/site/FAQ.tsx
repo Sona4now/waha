@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+
+const VOTES_KEY = "waaha_faq_votes";
 
 export interface FAQItem {
   question: string;
@@ -13,11 +15,43 @@ interface Props {
   title?: string;
 }
 
+type Vote = "up" | "down" | undefined;
+
+/**
+ * Per-question vote state, keyed by `${pageId}::${question.slice(0,40)}`.
+ * Stored locally — there's no analytics backend yet, but the data builds
+ * up under a known key so the admin page can later read it and decide
+ * which questions need rewriting.
+ */
+function buildVoteKey(question: string) {
+  return `q::${question.slice(0, 80)}`;
+}
+
 export default function FAQ({
   items,
   title = "أسئلة شائعة",
 }: Props) {
   const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const [votes, setVotes] = useState<Record<string, Vote>>({});
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem(VOTES_KEY);
+      if (raw) setVotes(JSON.parse(raw));
+    } catch {}
+  }, []);
+
+  function castVote(question: string, vote: Vote) {
+    const key = buildVoteKey(question);
+    setVotes((prev) => {
+      const next = { ...prev, [key]: prev[key] === vote ? undefined : vote };
+      try {
+        localStorage.setItem(VOTES_KEY, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
+  }
 
   return (
     <div className="bg-white dark:bg-[#162033] rounded-2xl border border-[#d0dde4] dark:border-[#1e3a5f] p-6 md:p-8">
@@ -103,9 +137,58 @@ export default function FAQ({
                   >
                     <div className="px-4 pb-4">
                       <div className="border-t border-[#d0dde4] dark:border-[#1e3a5f] pt-3">
-                        <p className="text-sm text-[#12394d]/80 dark:text-white/70 leading-relaxed">
+                        <p className="text-sm text-[#12394d]/80 dark:text-white/70 leading-relaxed mb-3">
                           {item.answer}
                         </p>
+                        {/* Was this answer helpful? Per-question vote.
+                            Helps the team see which answers need rewriting. */}
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="text-[#7b7c7d] dark:text-white/50">
+                            هل ساعدتك الإجابة؟
+                          </span>
+                          {(() => {
+                            const key = buildVoteKey(item.question);
+                            const v = votes[key];
+                            return (
+                              <>
+                                <button
+                                  onClick={() => castVote(item.question, "up")}
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all ${
+                                    v === "up"
+                                      ? "bg-[#91b149]/20 text-[#91b149]"
+                                      : "text-[#7b7c7d] hover:bg-[#91b149]/10 hover:text-[#91b149]"
+                                  }`}
+                                  aria-pressed={v === "up"}
+                                  aria-label="مفيد"
+                                >
+                                  👍 مفيد
+                                </button>
+                                <button
+                                  onClick={() => castVote(item.question, "down")}
+                                  className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold transition-all ${
+                                    v === "down"
+                                      ? "bg-red-500/15 text-red-500"
+                                      : "text-[#7b7c7d] hover:bg-red-500/10 hover:text-red-500"
+                                  }`}
+                                  aria-pressed={v === "down"}
+                                  aria-label="مش مفيد"
+                                >
+                                  👎 مش كفاية
+                                </button>
+                                {v === "up" && (
+                                  <span className="text-[10px] text-[#91b149]">
+                                    ✓ شكراً!
+                                  </span>
+                                )}
+                                {v === "down" && (
+                                  <span className="text-[10px] text-red-500">
+                                    لاحظنا — هنحسّنها
+                                  </span>
+                                )}
+                              </>
+                            );
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </motion.div>

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
+import { getBlogProgress } from "@/components/site/BlogReadingTracker";
 import { BLOG_POSTS, type BlogPost } from "@/data/siteData";
 
 /** Category filter — values match `post.category` in data/siteData.ts. */
@@ -49,6 +50,19 @@ export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState("all");
   const [sort, setSort] = useState("newest");
   const [search, setSearch] = useState("");
+
+  // Read per-post reading progress from localStorage. Updated on mount only;
+  // we don't watch storage events because it changes only when the user
+  // navigates to a post and back, at which point this page is remounted.
+  const [progress, setProgress] = useState<Record<string, number>>({});
+  useEffect(() => {
+    const map: Record<string, number> = {};
+    for (const p of BLOG_POSTS) {
+      const v = getBlogProgress(p.id);
+      if (typeof v === "number" && v > 5) map[p.id] = v;
+    }
+    setProgress(map);
+  }, []);
 
   const filteredPosts = useMemo(() => {
     let list =
@@ -366,13 +380,43 @@ export default function BlogPage() {
                         {post.excerpt}
                       </p>
 
+                      {/* Reading progress bar — shown if user has scrolled
+                          ≥5% on this post in a previous visit. Tiny but
+                          measurable retention nudge. */}
+                      {progress[post.id] !== undefined && (
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between text-[10px] mb-1">
+                            <span className="text-[#91b149] font-bold">
+                              {progress[post.id] >= 90
+                                ? "✓ قُرئ"
+                                : `${progress[post.id]}% قُرئ`}
+                            </span>
+                            {progress[post.id] < 90 && (
+                              <span className="text-[#7b7c7d] dark:text-white/40">
+                                كمل من حيث وقفت
+                              </span>
+                            )}
+                          </div>
+                          <div className="h-1 bg-gray-100 dark:bg-[#1e3a5f] rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-[#91b149]"
+                              style={{ width: `${progress[post.id]}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
                       {/* Meta */}
                       <div className="flex items-center justify-between border-t border-gray-100 dark:border-[#1e3a5f] pt-4 mt-auto">
                         <span className="text-xs text-[#7b7c7d] dark:text-white/50">
                           {fmtDate(post.date)}
                         </span>
                         <span className="text-xs font-display font-bold text-[#1d5770] dark:text-[#91b149] group-hover:gap-2 inline-flex items-center gap-1 transition-all">
-                          اقرأ <span>←</span>
+                          {progress[post.id] !== undefined &&
+                          progress[post.id] < 90
+                            ? "كمّل"
+                            : "اقرأ"}{" "}
+                          <span>←</span>
                         </span>
                       </div>
                     </div>

@@ -4,8 +4,17 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 
-const STORAGE_KEY = "waaha_pwa_dismissed";
+const STORAGE_KEY = "waaha_pwa_dismissed_until";
 const HIDDEN_PATHS = ["/", "/gate", "/therapy-room"];
+
+/**
+ * How long to suppress the prompt after the user closes it.
+ *
+ * 30 days is a sweet spot for "don't pester them" without forgetting them
+ * forever — most users who said no once will say no again the same week,
+ * but might warm up to the idea after a month of repeat visits.
+ */
+const DISMISS_MS = 30 * 24 * 60 * 60 * 1000;
 
 /**
  * Type for the `beforeinstallprompt` event Chrome/Edge fire when the PWA is
@@ -35,9 +44,10 @@ export default function PWAInstallPrompt() {
     if (typeof window === "undefined") return;
     if (HIDDEN_PATHS.includes(pathname)) return;
 
-    // Already dismissed this session
+    // Already dismissed within the last DISMISS_MS — skip.
     try {
-      if (sessionStorage.getItem(STORAGE_KEY)) return;
+      const until = parseInt(localStorage.getItem(STORAGE_KEY) || "0", 10);
+      if (!Number.isNaN(until) && until > Date.now()) return;
     } catch {}
 
     // Already installed (running as PWA)
@@ -63,7 +73,7 @@ export default function PWAInstallPrompt() {
   function handleDismiss() {
     setVisible(false);
     try {
-      sessionStorage.setItem(STORAGE_KEY, "1");
+      localStorage.setItem(STORAGE_KEY, String(Date.now() + DISMISS_MS));
     } catch {}
   }
 

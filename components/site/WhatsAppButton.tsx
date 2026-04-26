@@ -9,6 +9,55 @@ const HIDDEN_PATHS = ["/", "/gate", "/therapy-room", "/map"];
 const STORAGE_KEY = "waaha_wa_hint_dismissed";
 
 /**
+ * Pretty Arabic name for each destination ID — kept inline (small list,
+ * doesn't justify a data-file import for the hot path of a footer FAB).
+ */
+const DESTINATION_NAMES: Record<string, string> = {
+  safaga: "سفاجا",
+  siwa: "سيوة",
+  sinai: "سيناء",
+  fayoum: "الفيوم",
+  bahariya: "الواحات البحرية",
+  "wadi-degla": "وادي دجلة",
+  "shagie-farms": "مزارع شجيع",
+};
+
+function buildContextualMessage(path: string): string {
+  // /destination/safaga → "صفحة سفاجا"
+  const destMatch = path.match(/^\/destination\/([\w-]+)/);
+  if (destMatch) {
+    const name = DESTINATION_NAMES[destMatch[1]] || destMatch[1];
+    return `أهلاً، أنا على صفحة ${name} وعايز أعرف الباقات وأحجز رحلتي.`;
+  }
+  // /blog/some-slug → "قريت مقالكم"
+  if (path.startsWith("/blog/")) {
+    return "أهلاً، قريت مقالكم في المدونة وعايز أستفسر عن السياحة الاستشفائية في مصر.";
+  }
+  // /tours → ".. شفت جولات الـ 360"
+  if (path.startsWith("/tours")) {
+    return "أهلاً، شفت جولات 360° على موقعكم وعايز أحجز زيارة فعلية.";
+  }
+  // /destinations
+  if (path.startsWith("/destinations")) {
+    return "أهلاً، بتفرج في الوجهات وعايز نصيحة لاختيار الأنسب لحالتي.";
+  }
+  // /symptoms → quiz user
+  if (path.startsWith("/symptoms")) {
+    return "أهلاً، عملت فاحص الأعراض وعايز نتكلم عن التوصية.";
+  }
+  // /compare
+  if (path.startsWith("/compare")) {
+    return "أهلاً، بقارن بين وجهات على الموقع وعايز رأيكم.";
+  }
+  // /calendar
+  if (path.startsWith("/calendar")) {
+    return "أهلاً، بشوف التقويم وعايز أحجز رحلة في الموسم القادم.";
+  }
+  // Generic
+  return "أهلاً، عايز أعرف أكتر عن السياحة الاستشفائية في مصر.";
+}
+
+/**
  * Floating WhatsApp CTA — the single most effective conversion tool for
  * Egyptian users. Shows a small contextual hint bubble on first visit
  * ("سؤال؟ اسأل واتساب") that fades on click or after 8s.
@@ -44,11 +93,16 @@ export default function WhatsAppButton() {
     } catch {}
   }
 
+  /**
+   * Build a context-aware opening message.
+   *
+   * The operator on the other end sees a meaningful first message instead
+   * of a generic greeting — they know which destination/article/action
+   * the user is asking about and can skip the discovery phase.
+   */
   function buildHref() {
     const path = pathname || "/";
-    const text = encodeURIComponent(
-      `أهلاً، أنا على صفحة ${path} وعايز أعرف أكتر عن السياحة الاستشفائية.`,
-    );
+    const text = encodeURIComponent(buildContextualMessage(path));
     return `https://wa.me/${CONTACT_PHONE_INTL}?text=${text}`;
   }
 

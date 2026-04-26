@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import SiteLayout from "@/components/site/SiteLayout";
 import BlogShareButton from "@/components/site/BlogShareButton";
+import BlogReadingTracker from "@/components/site/BlogReadingTracker";
 import JsonLd from "@/components/site/JsonLd";
 import {
   BLOG_POSTS,
@@ -108,6 +109,10 @@ export default async function BlogPostPage({
 
   return (
     <SiteLayout>
+      {/* Track scroll progress per-post so the blog list can show
+          "كمل من حيث وقفت" on cards the user has partially read. */}
+      <BlogReadingTracker postId={post.id} />
+
       {/* SEO: structured data — Article + Breadcrumb. Goes in the SSR HTML
           since this is a server component. */}
       <JsonLd

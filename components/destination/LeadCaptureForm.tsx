@@ -1,12 +1,23 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CONTACT_PHONE_INTL, CONTACT_PHONE_DISPLAY } from "@/lib/siteMeta";
+
+const PROFILE_KEY = "waaha_lead_profile";
+const TIER_KEY = "waaha_chosen_tier";
+const COOLDOWN_KEY = "waaha_lead_cooldown";
+const COOLDOWN_HOURS = 4;
 
 interface Props {
   destinationId: string;
   destinationName: string;
+}
+
+interface SavedProfile {
+  name: string;
+  phone: string;
+  people: string;
 }
 
 /**
@@ -31,6 +42,46 @@ export default function LeadCaptureForm({
   const [people, setPeople] = useState("2");
   const [notes, setNotes] = useState("");
   const [sent, setSent] = useState(false);
+  const [returning, setReturning] = useState(false);
+
+  // Pre-fill from a previous successful lead — same user shouldn't have to
+  // re-type their name/phone for every destination.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem(PROFILE_KEY);
+      if (raw) {
+        const saved: SavedProfile = JSON.parse(raw);
+        if (saved.name) setName(saved.name);
+        if (saved.phone) setPhone(saved.phone);
+        if (saved.people) setPeople(saved.people);
+        if (saved.name) setReturning(true);
+      }
+      // Pre-fill notes with chosen tier from PricingPackages "احجز" CTA.
+      const tier = sessionStorage.getItem(TIER_KEY);
+      if (tier) {
+        const labelByTier: Record<string, string> = {
+          basic: "مهتم بالباقة الأساسية",
+          standard: "مهتم بالباقة الموصى بها",
+          premium: "مهتم بالباقة المتكاملة",
+        };
+        if (labelByTier[tier]) setNotes(labelByTier[tier]);
+        sessionStorage.removeItem(TIER_KEY);
+      }
+      // If they submitted within the last few hours, mark "sent" so we
+      // don't double-spam the operator.
+      const cd = localStorage.getItem(COOLDOWN_KEY);
+      if (cd) {
+        const last = parseInt(cd, 10);
+        if (
+          !Number.isNaN(last) &&
+          Date.now() - last < COOLDOWN_HOURS * 60 * 60 * 1000
+        ) {
+          setSent(true);
+        }
+      }
+    } catch {}
+  }, []);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -54,7 +105,18 @@ export default function LeadCaptureForm({
     window.open(url, "_blank");
     setSent(true);
 
-    // Track for the analytics dashboard / admin (best-effort, no PII).
+    // Persist profile for next time so they don't re-type.
+    try {
+      const profile: SavedProfile = {
+        name: name.trim(),
+        phone: phone.trim(),
+        people,
+      };
+      localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+      localStorage.setItem(COOLDOWN_KEY, String(Date.now()));
+    } catch {}
+
+    // Lead count for the future analytics dashboard.
     try {
       const key = "waaha_lead_count";
       const cur = parseInt(localStorage.getItem(key) || "0", 10);
@@ -116,10 +178,18 @@ export default function LeadCaptureForm({
             <h2 className="font-display text-2xl md:text-3xl font-black mb-2 leading-tight">
               اطلب عرض سعر — {destinationName}
             </h2>
-            <p className="text-sm text-white/70 mb-6 leading-relaxed">
+            <p className="text-sm text-white/70 mb-4 leading-relaxed">
               املأ البيانات وفريقنا هيتواصل معاك على واتساب خلال ساعتين بعرض
               سعر مفصّل وبرنامج مقترح حسب احتياجك.
             </p>
+            {returning && (
+              <div className="mb-5 inline-flex items-center gap-2 bg-[#91b149]/15 text-[#91b149] text-xs font-bold rounded-full px-3 py-1.5">
+                <span>✨</span>
+                <span>
+                  أهلاً {name} — بياناتك جاهزة، اضغط إرسال على طول
+                </span>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
               <FormField

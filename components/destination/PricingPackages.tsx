@@ -38,6 +38,68 @@ function formatEGP(amount: number): string {
   return amount.toLocaleString("en-US");
 }
 
+/**
+ * Pull a numeric night-count out of a free-form duration string. We use
+ * this to compute a per-night price for the "psychological framing"
+ * trick — 8,500 ج total feels expensive; 1,700 ج/ليلة feels reasonable.
+ *
+ * Examples handled:
+ *   "5 أيام / 4 ليالي" → 4
+ *   "10 أيام / 9 ليالي" → 9
+ *   "يومين / ليلة"     → 1
+ *   "يوم واحد"         → 0 (return null, no per-night meaningful)
+ *   "نصف يوم"          → null
+ */
+function extractNights(duration: string): number | null {
+  // Arabic-Indic digits → ASCII so the regex catches them.
+  const ascii = duration.replace(/[٠-٩]/g, (d) =>
+    String("٠١٢٣٤٥٦٧٨٩".indexOf(d)),
+  );
+  // Match "X ليلة" or "X ليالي".
+  const m = ascii.match(/(\d+)\s*ليال?ي?ة?/);
+  if (m) {
+    const n = parseInt(m[1], 10);
+    return n > 0 ? n : null;
+  }
+  // "ليلة" with no number = 1
+  if (/ليلة/.test(duration)) return 1;
+  return null;
+}
+
+/**
+ * Rough breakdown of where the price goes — calibrated against typical
+ * package compositions for healing tourism in Egypt. Used purely for
+ * visualisation: bars that show ~60% accommodation, ~25% treatment,
+ * ~15% transport+meals.
+ *
+ * The numbers shift slightly per tier (premium has more treatment %).
+ */
+function breakdownFor(tier: "basic" | "standard" | "premium"): {
+  label: string;
+  percent: number;
+  color: string;
+}[] {
+  if (tier === "premium") {
+    return [
+      { label: "الإقامة", percent: 50, color: "#1d5770" },
+      { label: "العلاج والإشراف الطبي", percent: 30, color: "#91b149" },
+      { label: "الأكل والمواصلات", percent: 20, color: "#d97706" },
+    ];
+  }
+  if (tier === "standard") {
+    return [
+      { label: "الإقامة", percent: 55, color: "#1d5770" },
+      { label: "العلاج", percent: 25, color: "#91b149" },
+      { label: "الأكل والمواصلات", percent: 20, color: "#d97706" },
+    ];
+  }
+  return [
+    { label: "الإقامة", percent: 60, color: "#1d5770" },
+    { label: "العلاج", percent: 20, color: "#91b149" },
+    { label: "الأكل والمواصلات", percent: 20, color: "#d97706" },
+  ];
+}
+
 export default function PricingPackages({
   destinationId,
   destinationName,
@@ -161,6 +223,26 @@ function PackageCard({
             ج / للشخص
           </span>
         </div>
+        {/* Per-night reframing — total prices feel large, per-night
+            prices feel like everyday lifestyle decisions. */}
+        {(() => {
+          const nights = extractNights(pkg.duration);
+          if (nights && nights > 0) {
+            const perNight = Math.round(pkg.pricePerPerson / nights);
+            return (
+              <div
+                className={`mt-1 text-xs ${
+                  isFeatured
+                    ? "text-[#91b149]"
+                    : "text-[#1d5770] dark:text-[#91b149]"
+                }`}
+              >
+                ≈ {formatEGP(perNight)} ج / ليلة
+              </div>
+            );
+          }
+          return null;
+        })()}
         <p
           className={`text-xs mt-2 leading-relaxed ${
             isFeatured ? "text-white/80" : "text-[#7b7c7d] dark:text-white/60"
@@ -168,6 +250,42 @@ function PackageCard({
         >
           {pkg.highlight}
         </p>
+
+        {/* Cost breakdown bar — shows accommodation/treatment/meals
+            split as a stacked bar. Helps the user understand "where
+            does my money go" without reading bullet points. */}
+        <div className="mt-3">
+          <div className="flex h-2 rounded-full overflow-hidden bg-white/10">
+            {breakdownFor(pkg.tier).map((b) => (
+              <div
+                key={b.label}
+                className="h-full"
+                style={{
+                  width: `${b.percent}%`,
+                  backgroundColor: b.color,
+                }}
+                title={`${b.label} — ${b.percent}%`}
+              />
+            ))}
+          </div>
+          <div className="flex flex-wrap gap-x-3 gap-y-1 mt-2">
+            {breakdownFor(pkg.tier).map((b) => (
+              <span
+                key={b.label}
+                className={`text-[10px] inline-flex items-center gap-1 ${
+                  isFeatured ? "text-white/70" : "text-[#7b7c7d] dark:text-white/60"
+                }`}
+              >
+                <span
+                  className="w-1.5 h-1.5 rounded-full"
+                  style={{ backgroundColor: b.color }}
+                  aria-hidden
+                />
+                {b.label} {b.percent}%
+              </span>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Includes */}

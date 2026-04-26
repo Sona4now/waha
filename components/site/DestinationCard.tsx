@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { CompareButton } from "./ComparisonTray";
 import { envBadgeClasses } from "@/lib/envColors";
+import { getDestinationRating } from "@/data/testimonials";
 import type { DestinationFull } from "@/data/siteData";
 
 interface Props {
@@ -32,6 +33,7 @@ export default function DestinationCard({ dest, isRecommended }: Props) {
   const treatments = dest.treatments ?? [];
   const visibleMobile = treatments.slice(0, MAX_MOBILE_CHIPS);
   const extraMobile = Math.max(0, treatments.length - MAX_MOBILE_CHIPS);
+  const rating = getDestinationRating(dest.id);
 
   return (
     <div className="relative group h-full">
@@ -81,6 +83,13 @@ export default function DestinationCard({ dest, isRecommended }: Props) {
             </span>
           )}
 
+          {/* Trust signal: rating chip — only when we actually have reviews. */}
+          {rating.reviewCount > 0 && (
+            <span className="hidden md:inline-flex absolute top-3 right-3 items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full text-white bg-[#91b149]/85 backdrop-blur-sm z-[1]">
+              ★ {rating.ratingValue.toFixed(1)} ({rating.reviewCount})
+            </span>
+          )}
+
           {/* Desktop: name overlayed on image */}
           <div className="hidden md:block absolute bottom-3 right-4 left-4 z-[1]">
             <h3 className="text-2xl font-bold text-white font-display drop-shadow-md">
@@ -98,6 +107,13 @@ export default function DestinationCard({ dest, isRecommended }: Props) {
             >
               {dest.envIcon} {dest.environment}
             </span>
+            {/* Mobile rating: same trust signal as the desktop chip on the
+                image, just sized to fit the dense mobile layout. */}
+            {rating.reviewCount > 0 && (
+              <span className="md:hidden inline-flex items-center gap-0.5 text-[10px] font-bold text-[#91b149]">
+                ★ {rating.ratingValue.toFixed(1)} ({rating.reviewCount})
+              </span>
+            )}
             {isRecommended && (
               <span className="text-[10px] font-bold text-[#91b149] md:hidden">
                 ✦ مناسب لك

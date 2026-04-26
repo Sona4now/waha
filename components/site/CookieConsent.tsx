@@ -9,12 +9,60 @@ const STORAGE_KEY = "waaha_cookie_consent";
 const HIDDEN_PATHS = ["/", "/gate", "/therapy-room", "/map"];
 
 /**
- * Minimal cookie / data-use consent banner.
- * Shows once per device. Persists acceptance in localStorage.
+ * Cookie / data-use consent banner with granular categories.
+ *
+ * Three categories the user can opt in/out of:
+ *   - essential: required for the site to work (auth, comparison tray,
+ *     theme). Always on, can't be toggled.
+ *   - analytics: Vercel Analytics + Speed Insights. Aggregate-only, no
+ *     personal data, but the user should still be able to refuse.
+ *   - features: localStorage-based UX features (saved profile in the
+ *     lead form, blog reading progress, recommendation memory). Refusing
+ *     this disables the personalised features but the site still works.
+ *
+ * The choice is persisted as JSON so we (and the rest of the codebase)
+ * can read what was accepted later — see `getConsent()` below.
  */
+
+export interface ConsentChoice {
+  essential: true;
+  analytics: boolean;
+  features: boolean;
+  acceptedAt: number;
+}
+
+const DEFAULT_CHOICE: ConsentChoice = {
+  essential: true,
+  analytics: true,
+  features: true,
+  acceptedAt: 0,
+};
+
+/** Read consent state from localStorage. SSR-safe. */
+export function getConsent(): ConsentChoice {
+  if (typeof window === "undefined") return DEFAULT_CHOICE;
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return DEFAULT_CHOICE;
+    const parsed = JSON.parse(raw);
+    if (typeof parsed === "object" && parsed !== null) {
+      return {
+        essential: true,
+        analytics: parsed.analytics !== false,
+        features: parsed.features !== false,
+        acceptedAt: parsed.acceptedAt || parsed.at || 0,
+      };
+    }
+  } catch {}
+  return DEFAULT_CHOICE;
+}
+
 export default function CookieConsent() {
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
+  const [showCustomize, setShowCustomize] = useState(false);
+  const [analytics, setAnalytics] = useState(true);
+  const [features, setFeatures] = useState(true);
 
   useEffect(() => {
     if (HIDDEN_PATHS.includes(pathname)) return;
@@ -26,15 +74,18 @@ export default function CookieConsent() {
     }
   }, [pathname]);
 
-  const accept = () => {
+  function persist(choice: { analytics: boolean; features: boolean }) {
+    const payload: ConsentChoice = {
+      essential: true,
+      analytics: choice.analytics,
+      features: choice.features,
+      acceptedAt: Date.now(),
+    };
     try {
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({ accepted: true, at: Date.now() }),
-      );
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
     } catch {}
     setVisible(false);
-  };
+  }
 
   if (HIDDEN_PATHS.includes(pathname)) return null;
 
@@ -61,8 +112,8 @@ export default function CookieConsent() {
                   نستخدم بيانات بسيطة
                 </h3>
                 <p className="text-xs text-white/70 leading-relaxed">
-                  موقعنا بيستخدم تحليلات Vercel وتخزين محلي (localStorage)
-                  لتحسين تجربتك. مفيش trackers إعلانية.{" "}
+                  موقعنا بيستخدم تحليلات Vercel و localStorage لتحسين تجربتك.
+                  مفيش trackers إعلانية.{" "}
                   <Link
                     href="/privacy"
                     className="text-[#91b149] underline hover:text-[#a3c45a]"
@@ -72,15 +123,123 @@ export default function CookieConsent() {
                 </p>
               </div>
             </div>
-            <button
-              onClick={accept}
-              className="w-full py-2.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-sm rounded-full transition-colors"
-            >
-              تمام، استمرّ
-            </button>
+
+            <AnimatePresence initial={false}>
+              {showCustomize && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="space-y-3 mb-4 pt-3 border-t border-white/10">
+                    <ConsentRow
+                      label="ضرورية"
+                      hint="تسجيل الدخول، المقارنة، الـ theme — مش ممكن تتعطل"
+                      checked
+                      disabled
+                      onChange={() => {}}
+                    />
+                    <ConsentRow
+                      label="تحليلات"
+                      hint="Vercel Analytics — أعداد فقط، بدون بيانات شخصية"
+                      checked={analytics}
+                      onChange={(v) => setAnalytics(v)}
+                    />
+                    <ConsentRow
+                      label="مميزات شخصية"
+                      hint="حفظ تفضيلاتك، تقدم القراءة، فورم الحجز"
+                      checked={features}
+                      onChange={(v) => setFeatures(v)}
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() =>
+                  persist({
+                    analytics: showCustomize ? analytics : true,
+                    features: showCustomize ? features : true,
+                  })
+                }
+                className="w-full py-2.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-sm rounded-full transition-colors"
+              >
+                {showCustomize ? "احفظ تفضيلاتي" : "تمام، استمرّ"}
+              </button>
+              {!showCustomize ? (
+                <button
+                  onClick={() => setShowCustomize(true)}
+                  className="text-[11px] text-white/60 hover:text-white underline-offset-2 hover:underline"
+                >
+                  اضبط التفضيلات
+                </button>
+              ) : (
+                <button
+                  onClick={() =>
+                    persist({ analytics: false, features: false })
+                  }
+                  className="text-[11px] text-white/60 hover:text-white underline-offset-2 hover:underline"
+                >
+                  ارفض كل ما هو غير ضروري
+                </button>
+              )}
+            </div>
           </div>
         </motion.div>
       )}
     </AnimatePresence>
+  );
+}
+
+function ConsentRow({
+  label,
+  hint,
+  checked,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <label className="flex items-start gap-3 cursor-pointer">
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        disabled={disabled}
+        onClick={() => !disabled && onChange(!checked)}
+        className={`flex-shrink-0 w-9 h-5 rounded-full transition-colors relative ${
+          checked
+            ? disabled
+              ? "bg-white/20"
+              : "bg-[#91b149]"
+            : "bg-white/15"
+        } ${disabled ? "cursor-not-allowed" : ""}`}
+      >
+        <span
+          className={`absolute top-0.5 w-4 h-4 rounded-full bg-white transition-all ${
+            checked ? "right-0.5" : "right-[18px]"
+          }`}
+        />
+      </button>
+      <div className="flex-1 min-w-0">
+        <div className="text-xs font-bold text-white">
+          {label}
+          {disabled && (
+            <span className="ml-1 text-[10px] text-white/40">(دائماً)</span>
+          )}
+        </div>
+        <div className="text-[10px] text-white/50 leading-relaxed">
+          {hint}
+        </div>
+      </div>
+    </label>
   );
 }
