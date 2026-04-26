@@ -1,20 +1,23 @@
+"use client";
+
 import Link from "next/link";
-// NewsletterForm has its own `"use client"` directive — importing it
-// directly from this server component is fine; the React runtime knows to
-// hydrate just that subtree on the client. (We can't use dynamic with
-// ssr:false here — that pattern is only valid inside client components.)
 import NewsletterForm from "./NewsletterForm";
 import SocialBar from "./SocialBar";
-import { getServerTranslations } from "@/lib/i18n.server";
+import { useTranslations } from "./LocaleProvider";
 import { DESTINATIONS } from "@/data/siteData";
 
-export default async function Footer() {
-  const { t, locale } = await getServerTranslations();
+/**
+ * Site footer. Client component because SiteLayout (its parent) is also
+ * client (most pages that mount SiteLayout are client components, and
+ * Next.js bundles imported children into the same boundary). Locale +
+ * t() come from the LocaleProvider context that the server-side root
+ * layout populated from the cookie.
+ */
+export default function Footer() {
+  const { t, locale } = useTranslations();
 
-  // Destination link labels: prefer the English short name when available
-  // (already curated in data/siteData.ts as `nameEn`) so the EN footer
-  // doesn't show Arabic-only names. Falls back to the Arabic name if no
-  // English exists.
+  // Destination link labels: prefer the curated English short name when
+  // available so the EN footer shows English place names.
   const destLinks = DESTINATIONS.map((d) => ({
     id: d.id,
     label: locale === "en" && d.nameEn ? d.nameEn : d.name,

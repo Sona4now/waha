@@ -1,28 +1,34 @@
+"use client";
+
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import BottomNav from "./BottomNav";
 import ReadingProgress from "./ReadingProgress";
 import ClientWidgets from "./ClientWidgets";
-import { getServerTranslations } from "@/lib/i18n.server";
+import { useTranslations } from "./LocaleProvider";
 
 /**
- * Server component shell. Navbar/Footer/BottomNav stream from the
- * server immediately; all the optional floating widgets (chat, search,
- * toasts, cursor, etc.) are lazy-loaded on the client via
- * <ClientWidgets /> after the critical path renders.
+ * Page shell. Mounts Navbar, Footer, BottomNav, ReadingProgress, and the
+ * lazy ClientWidgets island.
  *
- * Bilingual: reads the locale on the server and toggles `dir` so the
- * shell flips RTL ↔ LTR with the navigation. Inner content sections
- * still own their own `dir` (Arabic content blocks keep `dir="rtl"`
- * regardless of UI locale — browsers handle mixed-direction content
- * correctly inside an LTR shell).
+ * Why client: most pages that wrap their content in SiteLayout are client
+ * components ("use client" + useState/useEffect for filters/quizzes/etc).
+ * Next.js requires that any component imported by a client component must
+ * also live in the client bundle, which means SiteLayout can't use
+ * next/headers directly. Locale + direction come through the LocaleProvider
+ * context (set up at the root layout from the cookie value).
+ *
+ * The outer div repeats `dir` for two reasons:
+ *   1) html `dir` is set on the server, so the first paint is correct;
+ *   2) this outer div tracks locale changes after the user toggles
+ *      languages, before the cookie-driven full-reload finishes.
  */
-export default async function SiteLayout({
+export default function SiteLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { locale } = await getServerTranslations();
+  const { locale } = useTranslations();
   const dir = locale === "ar" ? "rtl" : "ltr";
 
   return (
