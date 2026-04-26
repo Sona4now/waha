@@ -224,7 +224,27 @@
       "Bash(/usr/bin/grep -n \"href=.*blog/\\\\|BLOG_POSTS\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/blog/page.tsx)",
       "Bash(/usr/bin/grep -n \"bestMonths\\\\|okMonths\" /Users/youseffouad1icloud.com/Desktop/mahaaa/data/siteData.ts)",
       "Bash(/usr/bin/curl -sL -o /dev/null -w \"home: %{http_code}\\\\nfavorites: %{http_code}\\\\ncalendar: %{http_code}\\\\nblog-article: %{http_code}\\\\nblog-article2: %{http_code}\\\\n\" https://wahaeg.com/home https://wahaeg.com/favorites https://wahaeg.com/calendar https://wahaeg.com/blog/therapeutic-tourism-egypt https://wahaeg.com/blog/black-sand-safaga)",
-      "Bash(/usr/bin/grep -rln \"useFavorites\\\\|FavoriteButton\\\\|/favorites\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app /Users/youseffouad1icloud.com/Desktop/mahaaa/components /Users/youseffouad1icloud.com/Desktop/mahaaa/hooks)"
+      "Bash(/usr/bin/grep -rln \"useFavorites\\\\|FavoriteButton\\\\|/favorites\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app /Users/youseffouad1icloud.com/Desktop/mahaaa/components /Users/youseffouad1icloud.com/Desktop/mahaaa/hooks)",
+      "Bash(/usr/bin/curl -sL -o /dev/null -w \"home: %{http_code}\\\\nfavorites: %{http_code}\\\\ncalendar: %{http_code}\\\\n\" https://wahaeg.com/home https://wahaeg.com/favorites https://wahaeg.com/calendar)",
+      "Bash(/usr/bin/curl -sL -H \"Cookie: waaha_auth=authenticated\" -o /dev/null -w \"favorites \\(auth\\): %{http_code}\\\\n\" https://wahaeg.com/favorites)",
+      "Bash(/usr/bin/curl -sL -H \"Cookie: waaha_auth=authenticated\" \"https://wahaeg.com/favorites\")",
+      "Bash(/usr/bin/grep -oE \"<title>[^<]+\")",
+      "Bash(/usr/bin/curl -sL -H \"Cookie: waaha_auth=authenticated\" -o /dev/null -w \"home: %{http_code}\\\\ndestinations: %{http_code}\\\\ncalendar: %{http_code}\\\\ntherapy: %{http_code}\\\\n\" https://wahaeg.com/home https://wahaeg.com/destinations https://wahaeg.com/calendar https://wahaeg.com/therapy-room)",
+      "Bash(/usr/bin/curl -sL -H \"Cookie: waaha_auth=authenticated\" -o /dev/null -w \"therapy-room: %{http_code}\\\\nhistory: %{http_code}\\\\n\" https://wahaeg.com/therapy-room https://wahaeg.com/therapy-room/history)",
+      "Bash(/usr/bin/grep -n \"useMemo\\\\|if \\(!loaded\\\\|return <div\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/therapy-room/page.tsx)",
+      "Bash(/usr/bin/grep -n \"use\\\\\\(Memo\\\\|Callback\\\\|Effect\\\\|State\\\\|Ref\\\\\\)\\\\|if \\(!loaded\\\\|return <\\\\|return \\(\" /Users/youseffouad1icloud.com/Desktop/mahaaa/app/therapy-room/page.tsx)",
+      "Bash(/usr/bin/head -60)",
+      "Bash(/usr/bin/curl -sL -H \"Cookie: waaha_auth=authenticated\" -o /dev/null -w \"therapy-room: %{http_code}\\\\n\" https://wahaeg.com/therapy-room)",
+      "Bash(/usr/bin/wc -l /Users/youseffouad1icloud.com/Desktop/mahaaa/components/site/ChatWidget.tsx)",
+      "Bash(/usr/bin/grep -n \"fixed\\\\|max-w\\\\|h-\\\\[\\\\|w-\\\\[\\\\|md:\\\\|sm:\\\\|safe-area\\\\|bottom-\\\\|right-\\\\|left-\\\\|md\\\\|p-\\\\|inset-\\\\|z-\\\\[\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/site/ChatWidget.tsx)",
+      "Bash(/usr/bin/grep -n \"md:h-\\\\[\\\\|md:max-h-\\\\[\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/site/ChatWidget.tsx)",
+      "Bash(/usr/bin/grep -n \"messagesEndRef\\\\|overflow-y\\\\|overscroll\\\\|messages\\\\.map\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/site/ChatWidget.tsx)",
+      "Bash(/usr/bin/grep -n \"handleClose\\\\|w-8 h-8\\\\|aria-label=\\\\\"إغلاق\" /Users/youseffouad1icloud.com/Desktop/mahaaa/components/site/ChatWidget.tsx)",
+      "Bash(node -e ' *)",
+      "Bash(node /tmp/check_blog.mjs)",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth -H \"Content-Type: application/json\" -d '{\"password\":\"test\"}' --cookie-jar /tmp/cookies.txt)",
+      "Bash(curl -s -X POST http://localhost:3000/api/auth -H \"Content-Type: application/json\" -d '{\"password\":\"Pola@0100450\"}' -i)",
+      "Bash(curl -s -X POST https://wahaeg.com/api/admin-auth -H \"Content-Type: application/json\" -d '{\"password\":\"admin2026\"}')"
     ]
   }
 }

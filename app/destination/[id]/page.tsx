@@ -19,6 +19,8 @@ import StickyBottomBar from "@/components/destination/StickyBottomBar";
 import SectionNav from "@/components/destination/SectionNav";
 import Testimonials from "@/components/destination/Testimonials";
 import SmartRelated from "@/components/destination/SmartRelated";
+import PricingPackages from "@/components/destination/PricingPackages";
+import LeadCaptureForm from "@/components/destination/LeadCaptureForm";
 import { getDestById } from "@/data/siteData";
 
 const BASE_TABS = [
@@ -1724,6 +1726,26 @@ export default function DestinationDetailPage() {
 
         {/* Testimonials — social proof */}
         <Testimonials destId={dest.id} destName={dest.name} />
+
+        {/* Pricing packages — tied into the lead form via #lead-capture */}
+        <PricingPackages
+          destinationId={dest.id}
+          destinationName={dest.name}
+          bookCtaTarget="#lead-capture"
+        />
+
+        {/* Lead capture — conversion CTA. WhatsApp deep-link, no backend. */}
+        <section
+          id="lead-capture"
+          className="py-12 md:py-16 bg-[#f5f8fa] dark:bg-[#0a151f]"
+        >
+          <div className="max-w-3xl mx-auto px-4">
+            <LeadCaptureForm
+              destinationId={dest.id}
+              destinationName={dest.name}
+            />
+          </div>
+        </section>
 
         {/* FAQ Section */}
         <section id="faq" className="py-16 bg-white dark:bg-[#0d1b2a]">

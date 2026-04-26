@@ -26,6 +26,10 @@ const DesktopOnlyCursor = dynamic(
   () => import("./DesktopOnlyCursor"),
   { ssr: false },
 );
+const WhatsAppButton = dynamic(() => import("./WhatsAppButton"), {
+  ssr: false,
+});
+const CookieConsent = dynamic(() => import("./CookieConsent"), { ssr: false });
 
 export default function ClientWidgets() {
   return (
@@ -39,6 +43,8 @@ export default function ClientWidgets() {
       <AchievementListener />
       <VisitTracker />
       <DesktopOnlyCursor />
+      <WhatsAppButton />
+      <CookieConsent />
     </>
   );
 }
