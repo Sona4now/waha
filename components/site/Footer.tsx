@@ -21,7 +21,15 @@ export default function Footer() {
               منصة متخصصة في السياحة الاستشفائية في مصر. نساعدك على اكتشاف
               الوجهة الطبيعية المثالية لصحتك وراحتك.
             </p>
-            <SocialBar size="md" variant="muted" />
+            {/* Social — labelled and high-contrast so users actually
+                notice them. variant="white" gives 10% white bg vs 4%, and
+                the "تابعنا" label removes the "what are these?" friction. */}
+            <div className="flex items-center gap-3">
+              <span className="text-[0.7rem] uppercase tracking-widest text-white/50 font-bold">
+                تابعنا
+              </span>
+              <SocialBar size="md" variant="white" />
+            </div>
           </div>
 
           {/* Pages */}
