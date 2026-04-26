@@ -8,6 +8,7 @@ import Reveal from "@/components/site/Reveal";
 import EmptyState from "@/components/site/EmptyState";
 import DestinationCard from "@/components/site/DestinationCard";
 import EnvironmentChapter from "@/components/destination/EnvironmentChapter";
+import ChapterNav from "@/components/destination/ChapterNav";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
 import { TESTIMONIALS_BY_DEST } from "@/data/testimonials";
 import { ENVIRONMENT_CHAPTERS } from "@/data/environmentChapters";
@@ -684,6 +685,8 @@ export default function DestinationsPage() {
               destinations break the storytelling. */}
       {activeFilterCount === 0 ? (
         <div className="bg-white dark:bg-[#0d1b2a]">
+          {/* Sticky dot navigation — desktop only, jumps between chapters. */}
+          <ChapterNav />
           {ENVIRONMENT_CHAPTERS.map((chapter, idx) => {
             const destsForChapter = filtered.filter((d) =>
               chapter.matchesEnvironment.includes(d.environment),
