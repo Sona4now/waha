@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 /**
  * Seasonal calendar — 12-month view of which destinations are best to visit
@@ -60,6 +61,7 @@ function labelFor(i: Intensity): string {
 }
 
 export default function CalendarPage() {
+  const { t } = useTranslations();
   const now = new Date();
   const [selectedMonth, setSelectedMonth] = useState<number>(now.getMonth());
 
@@ -75,8 +77,8 @@ export default function CalendarPage() {
   return (
     <SiteLayout>
       <PageHero
-        title="تقويم الزيارات"
-        subtitle="إمتى تزور كل وجهة — حسب أفضل المواسم للاستشفاء"
+        title={t("calendarPage.title")}
+        subtitle={t("calendarPage.subtitle")}
         breadcrumb={[
           { label: "الرئيسية", href: "/home" },
           { label: "التقويم" },

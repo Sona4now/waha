@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Tour {
   id: string;
@@ -199,6 +200,7 @@ function buildKuulaUrl(id: string) {
 }
 
 export default function ToursPage() {
+  const { t } = useTranslations();
   const [activeFilter, setActiveFilter] = useState<
     "all" | "bahariya" | "siwa" | "shagie-farms"
   >("all");
@@ -231,11 +233,11 @@ export default function ToursPage() {
   return (
     <SiteLayout>
       <PageHero
-        title="جولات 360° الافتراضية"
-        subtitle="استكشف وجهات السياحة الاستشفائية في مصر بتجربة غامرة كأنك هناك"
+        title={t("toursPage.title")}
+        subtitle={t("toursPage.subtitle")}
         breadcrumb={[
-          { label: "الرئيسية", href: "/home" },
-          { label: "جولات 360°" },
+          { label: t("nav.home"), href: "/home" },
+          { label: t("nav.tours") },
         ]}
       />
 

@@ -6,6 +6,8 @@ import Image from "next/image";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
+import { useTranslations } from "@/components/site/LocaleProvider";
+import { localizeDestination } from "@/lib/localize";
 
 const COMPARISON_ROWS = [
   { key: "environment", label: "البيئة" },
@@ -16,6 +18,7 @@ const COMPARISON_ROWS = [
 ];
 
 function ComparePageInner() {
+  const { t, locale } = useTranslations();
   const searchParams = useSearchParams();
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -47,16 +50,17 @@ function ComparePageInner() {
   };
 
   const selectedDestinations = DESTINATIONS.filter((d: DestinationFull) =>
-    selected.includes(d.id ?? d.name)
-  );
+    selected.includes(d.id ?? d.name),
+  ).map((d) => localizeDestination(d, locale));
 
   return (
     <SiteLayout>
       <PageHero
-        title="مقارنة الوجهات"
+        title={t("comparePage.title")}
+        subtitle={t("comparePage.subtitle")}
         breadcrumb={[
-          { label: "الرئيسية", href: "/" },
-          { label: "مقارنة الوجهات" },
+          { label: t("nav.home"), href: "/home" },
+          { label: t("nav.compare") },
         ]}
       />
 

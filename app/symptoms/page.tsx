@@ -8,6 +8,7 @@ import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import Reveal from "@/components/site/Reveal";
 import { DESTINATIONS } from "@/data/siteData";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Symptom {
   id: string;
@@ -44,6 +45,7 @@ function calculateMatch(
 }
 
 export default function SymptomsPage() {
+  const { t } = useTranslations();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [showResults, setShowResults] = useState(false);
 
@@ -90,8 +92,8 @@ export default function SymptomsPage() {
   return (
     <SiteLayout>
       <PageHero
-        title="اكتشف وجهتك حسب حالتك"
-        subtitle="اختار الأعراض اللي عندك وخلينا نرشحلك الوجهة المناسبة"
+        title={t("symptomsPage.title")}
+        subtitle={t("symptomsPage.subtitle")}
         breadcrumb={[
           { label: "الرئيسية", href: "/home" },
           { label: "فاحص الأعراض" },

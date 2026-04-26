@@ -11,8 +11,10 @@ import {
   getUserState,
   type UserState,
 } from "@/lib/achievements";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 export default function AchievementsPage() {
+  const { t } = useTranslations();
   const [unlocked, setUnlocked] = useState<string[]>([]);
   const [state, setState] = useState<UserState | null>(null);
 
@@ -29,8 +31,8 @@ export default function AchievementsPage() {
   return (
     <SiteLayout>
       <PageHero
-        title="إنجازاتك في واحة"
-        subtitle="كل حاجة حققتها أثناء استكشافك للمنصة"
+        title={t("achievementsPage.title")}
+        subtitle={t("achievementsPage.subtitle")}
         breadcrumb={[
           { label: "الرئيسية", href: "/home" },
           { label: "الإنجازات" },

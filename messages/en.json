@@ -272,5 +272,51 @@
   "blogPost": {
     "publishedOn": "Published",
     "minutesRead": "minutes read"
+  },
+  "aboutPage": {
+    "title": "About Us",
+    "subtitle": "A digital editorial platform documenting healing through nature in Egypt"
+  },
+  "contactPage": {
+    "title": "Contact",
+    "subtitle": "We'd love to hear from you. Reach us by message or any of the channels below.",
+    "formTitle": "Send us a message",
+    "infoTitle": "Other ways to reach us"
+  },
+  "toursPage": {
+    "title": "360° Virtual Tours",
+    "subtitle": "Explore Egypt's wellness destinations in an immersive experience — as if you were there"
+  },
+  "mapPage": {
+    "title": "The Wellness Map of Egypt",
+    "subtitle": "All seven destinations on one interactive map"
+  },
+  "teamPage": {
+    "title": "Team",
+    "subtitle": "The people behind Waha"
+  },
+  "calendarPage": {
+    "title": "Seasonal Calendar",
+    "subtitle": "When each destination is at its best, throughout the year"
+  },
+  "comparePage": {
+    "title": "Compare Destinations",
+    "subtitle": "Pick up to three destinations and compare them side by side"
+  },
+  "symptomsPage": {
+    "title": "Symptom Checker",
+    "subtitle": "Tell us what you're treating, and we'll suggest the right destination"
+  },
+  "achievementsPage": {
+    "title": "My Achievements",
+    "subtitle": "Track your healing journey on Waha"
+  },
+  "therapyRoomPage": {
+    "title": "Therapy Room",
+    "subtitle": "An immersive guided meditation experience"
+  },
+  "legal": {
+    "privacyOnly": "This page is currently available in Arabic. An English version is coming soon.",
+    "viewArabic": "View in Arabic"
   }
 }

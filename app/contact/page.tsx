@@ -5,10 +5,12 @@ import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import Reveal from "@/components/site/Reveal";
 import { showToast } from "@/components/site/Toast";
+import { useTranslations } from "@/components/site/LocaleProvider";
 import { TEAM } from "@/data/siteData";
 import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY } from "@/lib/siteMeta";
 
 export default function ContactPage() {
+  const { t } = useTranslations();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -76,10 +78,11 @@ export default function ContactPage() {
   return (
     <SiteLayout>
       <PageHero
-        title="الفريق"
+        title={t("contactPage.title")}
+        subtitle={t("contactPage.subtitle")}
         breadcrumb={[
-          { label: "الرئيسية", href: "/home" },
-          { label: "الفريق والتواصل" },
+          { label: t("nav.home"), href: "/home" },
+          { label: t("nav.contact") },
         ]}
       />
 

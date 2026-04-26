@@ -245,7 +245,15 @@
       "Bash(curl -s -X POST http://localhost:3000/api/auth -H \"Content-Type: application/json\" -d '{\"password\":\"test\"}' --cookie-jar /tmp/cookies.txt)",
       "Bash(curl -s -X POST http://localhost:3000/api/auth -H \"Content-Type: application/json\" -d '{\"password\":\"Pola@0100450\"}' -i)",
       "Bash(curl -s -X POST https://wahaeg.com/api/admin-auth -H \"Content-Type: application/json\" -d '{\"password\":\"admin2026\"}')",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(grep -v \"^api$\")",
+      "Bash(grep -v \"^home$\")",
+      "Bash(grep -v \"^blog$\")",
+      "Bash(grep -v \"^contact$\")",
+      "Bash(grep -v \"^about$\")",
+      "Bash(grep -v \"^terms$\")",
+      "Bash(grep -v \"^privacy$\")",
+      "Bash(grep -v \"^tours$\")"
     ]
   }
 }

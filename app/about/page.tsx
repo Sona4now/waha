@@ -4,6 +4,7 @@ import Link from "next/link";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import Reveal from "@/components/site/Reveal";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const AWARENESS_GOALS = [
   {
@@ -100,11 +101,12 @@ const HEALTH_FOCUS = [
 ];
 
 export default function AboutPage() {
+  const { t } = useTranslations();
   return (
     <SiteLayout>
       <PageHero
-        title="من نحن"
-        subtitle="منصة إعلامية رقمية توثّق الاستشفاء من الطبيعة في مصر"
+        title={t("aboutPage.title")}
+        subtitle={t("aboutPage.subtitle")}
         breadcrumb={[
           { label: "الرئيسية", href: "/home" },
           { label: "من نحن" },
