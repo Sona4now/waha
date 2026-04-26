@@ -1,4 +1,10 @@
 import Link from "next/link";
+import dynamic from "next/dynamic";
+
+// Newsletter is interactive — load it client-side only.
+const NewsletterForm = dynamic(() => import("./NewsletterForm"), {
+  ssr: false,
+});
 
 export default function Footer() {
   return (
@@ -86,6 +92,12 @@ export default function Footer() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Newsletter — last block before the legal footer. Centered on mobile,
+            spans full width inside the constrained container. */}
+        <div className="mb-10 max-w-md mx-auto sm:mx-0">
+          <NewsletterForm />
         </div>
 
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-center">

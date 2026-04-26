@@ -30,6 +30,9 @@ const WhatsAppButton = dynamic(() => import("./WhatsAppButton"), {
   ssr: false,
 });
 const CookieConsent = dynamic(() => import("./CookieConsent"), { ssr: false });
+const PWAInstallPrompt = dynamic(() => import("./PWAInstallPrompt"), {
+  ssr: false,
+});
 
 export default function ClientWidgets() {
   return (
@@ -45,6 +48,7 @@ export default function ClientWidgets() {
       <DesktopOnlyCursor />
       <WhatsAppButton />
       <CookieConsent />
+      <PWAInstallPrompt />
     </>
   );
 }
