@@ -6,7 +6,6 @@ import MoodBoard from "@/components/site/MoodBoard";
 import AnimatedText from "@/components/site/AnimatedText";
 import TiltCard from "@/components/site/TiltCard";
 import MagneticButton from "@/components/site/MagneticButton";
-import SocialBar from "@/components/site/SocialBar";
 import FAQ from "@/components/site/FAQ";
 import type { FAQItem } from "@/components/site/FAQ";
 import Link from "next/link";
@@ -217,14 +216,6 @@ export default function HomePage() {
                   أعد التجربة
                 </Link>
               </div>
-
-              {/* Social rail — same treatment as the default hero. */}
-              <div className="mt-8 flex items-center gap-3 flex-wrap">
-                <span className="text-[11px] uppercase tracking-widest text-white/40 font-bold">
-                  تابعنا
-                </span>
-                <SocialBar size="md" variant="white" />
-              </div>
             </>
           ) : (
             <>
@@ -278,16 +269,6 @@ export default function HomePage() {
                     استكشف الأماكن
                   </Link>
                 </MagneticButton>
-              </div>
-
-              {/* Social rail under the hero CTAs — visible on first paint
-                  so users can follow us straight from the landing surface
-                  without scrolling all the way down to the footer. */}
-              <div className="mt-8 flex items-center gap-3 flex-wrap">
-                <span className="text-[11px] uppercase tracking-widest text-white/40 font-bold">
-                  تابعنا
-                </span>
-                <SocialBar size="md" variant="white" />
               </div>
             </>
           )}
