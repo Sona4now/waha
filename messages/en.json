@@ -231,5 +231,46 @@
     "showingAll": "Showing all {count} articles",
     "showingFiltered": "{shown} of {total} articles",
     "noResults": "No matches"
+  },
+  "blogPage": {
+    "title": "Wellness Tourism Blog — Egypt",
+    "subtitle": "16+ articles on natural therapy, the best wellness destinations, and travel tips",
+    "breadcrumb": "Blog",
+    "categories": {
+      "all": "All",
+      "knowledge": "Knowledge",
+      "destinations": "Destinations",
+      "health": "Health",
+      "tips": "Tips"
+    },
+    "featuredLabel": "Featured article",
+    "readArticle": "Read article",
+    "minRead": "min read",
+    "sortBy": "Sort by",
+    "sort": {
+      "newest": "Newest",
+      "oldest": "Oldest",
+      "shortest": "Shortest",
+      "longest": "Longest"
+    },
+    "showingAll": "Showing all {total} articles",
+    "showingFiltered": "{shown} of {total} articles",
+    "clearFilters": "Clear filters",
+    "noResultsTitle": "No matches",
+    "noSearchResults": "We tried to find \"{query}\" but found nothing",
+    "noResultsCategory": "No articles in this category yet",
+    "readingProgress": {
+      "read": "Read",
+      "continueLabel": "Continue where you left off",
+      "continueBtn": "Continue",
+      "readBtn": "Read"
+    },
+    "relatedDestinationsTitle": "✦ Book the wellness tourism mentioned in this article",
+    "alsoRead": "Also read",
+    "back": "Back to all articles"
+  },
+  "blogPost": {
+    "publishedOn": "Published",
+    "minutesRead": "minutes read"
   }
 }

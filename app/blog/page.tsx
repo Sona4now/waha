@@ -7,15 +7,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import { getBlogProgress } from "@/components/site/BlogReadingTracker";
+import { useTranslations } from "@/components/site/LocaleProvider";
 import { BLOG_POSTS, type BlogPost } from "@/data/siteData";
+import { localizeBlogPost } from "@/lib/localize";
+import { BLOG_CATEGORY_EN } from "@/data/translations/blog.en";
 
-/** Category filter — values match `post.category` in data/siteData.ts. */
+/**
+ * Category filter. The `id` matches `post.category` in data/siteData.ts
+ * (canonical Arabic key); the label resolves through t() at render time
+ * so it switches AR ↔ EN.
+ */
 const CATEGORIES = [
-  { id: "all", label: "الكل" },
-  { id: "معلومات", label: "معلومات" },
-  { id: "وجهات", label: "وجهات" },
-  { id: "صحة", label: "صحة" },
-  { id: "نصائح", label: "نصائح" },
+  { id: "all", labelKey: "blogPage.categories.all" },
+  { id: "معلومات", labelKey: "blogPage.categories.knowledge" },
+  { id: "وجهات", labelKey: "blogPage.categories.destinations" },
+  { id: "صحة", labelKey: "blogPage.categories.health" },
+  { id: "نصائح", labelKey: "blogPage.categories.tips" },
 ];
 
 const SORT_OPTIONS = [
@@ -47,9 +54,11 @@ function normalize(s: string): string {
 }
 
 export default function BlogPage() {
+  const { t, locale } = useTranslations();
   const [activeCategory, setActiveCategory] = useState("all");
   const [sort, setSort] = useState("newest");
   const [search, setSearch] = useState("");
+
 
   // Read per-post reading progress from localStorage. Updated on mount only;
   // we don't watch storage events because it changes only when the user
@@ -65,12 +74,17 @@ export default function BlogPage() {
   }, []);
 
   const filteredPosts = useMemo(() => {
-    let list =
+    // Filter by category against the ORIGINAL Arabic key (canonical in
+    // BLOG_POSTS), then map to localized for display. Keeps the filter
+    // chip values stable across locales.
+    let baseList =
       activeCategory === "all"
         ? [...BLOG_POSTS]
         : BLOG_POSTS.filter((post) => post.category === activeCategory);
 
-    // Search across title + excerpt
+    let list = baseList.map((p) => localizeBlogPost(p, locale));
+
+    // Search across (localized) title + excerpt so EN users can search EN.
     if (search.trim()) {
       const q = normalize(search);
       list = list.filter(
@@ -96,15 +110,18 @@ export default function BlogPage() {
     });
 
     return list;
-  }, [activeCategory, sort, search]);
+  }, [activeCategory, sort, search, locale]);
 
   /** Featured = latest article — only shown when no filter/search active. */
   const featured: BlogPost | null = useMemo(() => {
     if (activeCategory !== "all" || search.trim() || sort !== "newest") {
       return null;
     }
-    return [...BLOG_POSTS].sort((a, b) => b.date.localeCompare(a.date))[0] ?? null;
-  }, [activeCategory, search, sort]);
+    const latest = [...BLOG_POSTS].sort((a, b) =>
+      b.date.localeCompare(a.date),
+    )[0];
+    return latest ? localizeBlogPost(latest, locale) : null;
+  }, [activeCategory, search, sort, locale]);
 
   /** Posts to render in the grid (exclude featured to avoid duplication). */
   const gridPosts = useMemo(() => {
@@ -124,11 +141,11 @@ export default function BlogPage() {
   return (
     <SiteLayout>
       <PageHero
-        title="مدونة السياحة الاستشفائية في مصر"
-        subtitle="16+ مقال عن العلاج الطبيعي، أفضل الوجهات العلاجية، ونصائح قبل السفر"
+        title={t("blogPage.title")}
+        subtitle={t("blogPage.subtitle")}
         breadcrumb={[
-          { label: "الرئيسية", href: "/home" },
-          { label: "المدونة" },
+          { label: t("nav.home"), href: "/home" },
+          { label: t("blogPage.breadcrumb") },
         ]}
       />
 
@@ -149,7 +166,7 @@ export default function BlogPage() {
                 <div className="flex items-center gap-2 mb-4">
                   <span className="inline-block w-1 h-5 bg-[#91b149] rounded-full" />
                   <h2 className="text-xs font-bold text-[#1d5770] dark:text-[#91b149] uppercase tracking-wider">
-                    مقال مميّز
+                    {t("blogPage.featuredLabel")}
                   </h2>
                 </div>
                 <Link
@@ -191,7 +208,7 @@ export default function BlogPage() {
                         {featured.excerpt}
                       </p>
                       <span className="inline-flex items-center gap-2 text-sm font-display font-bold text-[#1d5770] dark:text-[#91b149] group-hover:gap-3 transition-all">
-                        <span>اقرأ المقال</span>
+                        <span>{t("blogPage.readArticle")}</span>
                         <span>←</span>
                       </span>
                     </div>
@@ -225,7 +242,7 @@ export default function BlogPage() {
                 type="search"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="ابحث في المقالات..."
+                placeholder={t("search.placeholder")}
                 // text-base (16px) prevents iOS zoom on focus
                 className="w-full pr-11 pl-4 py-3 bg-white dark:bg-[#162033] border border-gray-200 dark:border-[#1e3a5f] rounded-full text-base text-[#12394d] dark:text-white placeholder:text-[#7b7c7d] dark:placeholder:text-white/40 focus:outline-none focus:border-[#1d5770] dark:focus:border-[#91b149] focus:ring-2 focus:ring-[#1d5770]/10 transition-all"
               />
@@ -286,7 +303,7 @@ export default function BlogPage() {
                       : "bg-white dark:bg-[#162033] text-[#7b7c7d] dark:text-white/60 hover:bg-[#1d5770]/10 hover:text-[#1d5770] dark:hover:text-[#91b149] border border-gray-200 dark:border-[#1e3a5f]"
                   }`}
                 >
-                  {cat.label}
+                  {t(cat.labelKey)}
                 </button>
               );
             })}
@@ -298,21 +315,18 @@ export default function BlogPage() {
             dir="rtl"
           >
             <span>
-              {visibleCount === totalCount ? (
-                <>عرض كل <strong className="text-[#12394d] dark:text-white font-bold">{totalCount}</strong> مقال</>
-              ) : (
-                <>
-                  <strong className="text-[#12394d] dark:text-white font-bold">{visibleCount}</strong> من{" "}
-                  <strong className="text-[#12394d] dark:text-white font-bold">{totalCount}</strong> مقال
-                </>
-              )}
+              {visibleCount === totalCount
+                ? t("blogPage.showingAll").replace("{total}", String(totalCount))
+                : t("blogPage.showingFiltered")
+                    .replace("{shown}", String(visibleCount))
+                    .replace("{total}", String(totalCount))}
             </span>
             {(activeCategory !== "all" || search.trim() || sort !== "newest") && (
               <button
                 onClick={clearFilters}
                 className="text-[#1d5770] dark:text-[#91b149] hover:underline font-bold"
               >
-                مسح الفلاتر
+                {t("blogPage.clearFilters")}
               </button>
             )}
           </div>
@@ -388,12 +402,12 @@ export default function BlogPage() {
                           <div className="flex items-center justify-between text-[10px] mb-1">
                             <span className="text-[#91b149] font-bold">
                               {progress[post.id] >= 90
-                                ? "✓ قُرئ"
-                                : `${progress[post.id]}% قُرئ`}
+                                ? `✓ ${t("blogPage.readingProgress.read")}`
+                                : `${progress[post.id]}% ${t("blogPage.readingProgress.read")}`}
                             </span>
                             {progress[post.id] < 90 && (
                               <span className="text-[#7b7c7d] dark:text-white/40">
-                                كمل من حيث وقفت
+                                {t("blogPage.readingProgress.continueLabel")}
                               </span>
                             )}
                           </div>
@@ -414,8 +428,8 @@ export default function BlogPage() {
                         <span className="text-xs font-display font-bold text-[#1d5770] dark:text-[#91b149] group-hover:gap-2 inline-flex items-center gap-1 transition-all">
                           {progress[post.id] !== undefined &&
                           progress[post.id] < 90
-                            ? "كمّل"
-                            : "اقرأ"}{" "}
+                            ? t("blogPage.readingProgress.continueBtn")
+                            : t("blogPage.readingProgress.readBtn")}{" "}
                           <span>←</span>
                         </span>
                       </div>
@@ -450,18 +464,25 @@ export default function BlogPage() {
                 </svg>
               </div>
               <h3 className="font-display text-xl font-bold text-[#12394d] dark:text-white mb-2">
-                {search.trim() ? "مفيش نتائج للبحث" : "لا توجد مقالات في هذا التصنيف"}
+                {search.trim()
+                  ? t("blogPage.noResultsTitle")
+                  : t("blogPage.noResultsCategory")}
               </h3>
               <p className="text-[#7b7c7d] dark:text-white/50 text-sm mb-5">
                 {search.trim()
-                  ? `جربنا نلاقي "${search}" بس مفيش نتائج`
-                  : "اختار تصنيف مختلف عشان تشوف مقالات"}
+                  ? t("blogPage.noSearchResults").replace(
+                      "{query}",
+                      search,
+                    )
+                  : locale === "en"
+                    ? "Pick a different category to see articles"
+                    : "اختار تصنيف مختلف عشان تشوف مقالات"}
               </p>
               <button
                 onClick={clearFilters}
                 className="inline-flex items-center gap-2 rounded-full bg-[#1d5770] hover:bg-[#174860] text-white px-6 py-2.5 text-sm font-display font-bold transition-colors"
               >
-                مسح الفلاتر
+                {t("blogPage.clearFilters")}
               </button>
             </motion.div>
           )}

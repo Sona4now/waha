@@ -2,10 +2,17 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import SiteLayout from "@/components/site/SiteLayout";
 import BlogShareButton from "@/components/site/BlogShareButton";
 import BlogReadingTracker from "@/components/site/BlogReadingTracker";
 import JsonLd from "@/components/site/JsonLd";
+import {
+  LOCALE_COOKIE,
+  normaliseLocale,
+  getTranslation,
+} from "@/lib/i18n";
+import { localizeBlogPost, localizeDestination } from "@/lib/localize";
 import {
   BLOG_POSTS,
   DESTINATIONS,
@@ -101,11 +108,22 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getBlogPost(slug);
-  if (!post) notFound();
+  const rawPost = getBlogPost(slug);
+  if (!rawPost) notFound();
 
-  const related = relatedPosts(post);
-  const relatedDestinations = getRelatedDestinations(post);
+  // Read locale from cookie on the server so SSR markup, schema.org,
+  // and visible copy all match the user's preference on first paint.
+  const cookieStore = await cookies();
+  const locale = normaliseLocale(cookieStore.get(LOCALE_COOKIE)?.value);
+  const t = (key: string) => getTranslation(locale, key);
+
+  const post = localizeBlogPost(rawPost, locale);
+  const related = relatedPosts(rawPost).map((p) =>
+    localizeBlogPost(p, locale),
+  );
+  const relatedDestinations = getRelatedDestinations(rawPost).map((d) =>
+    localizeDestination(d, locale),
+  );
 
   return (
     <SiteLayout>
@@ -152,14 +170,16 @@ export default async function BlogPostPage({
               href="/blog"
               className="text-white/70 hover:text-white no-underline transition-colors"
             >
-              ← المدونة
+              ← {t("nav.blog")}
             </Link>
             <span className="text-white/30">·</span>
             <span className="rounded-full bg-[#91b149] px-3 py-1 text-white font-semibold">
               {post.category}
             </span>
             <span className="text-white/30">·</span>
-            <span className="text-white/70">{post.readTime} دقائق قراءة</span>
+            <span className="text-white/70">
+              {post.readTime} {t("blogPost.minutesRead")}
+            </span>
           </div>
           <h1 className="font-display text-3xl md:text-5xl font-black text-white leading-tight max-w-3xl mb-3">
             {post.title}
@@ -168,7 +188,7 @@ export default async function BlogPostPage({
             {post.excerpt}
           </p>
           <div className="mt-4 text-xs text-white/50">
-            نُشر في {fmtDate(post.date)}
+            {t("blogPost.publishedOn")} {fmtDate(post.date)}
           </div>
         </div>
       </header>
@@ -211,7 +231,7 @@ export default async function BlogPostPage({
           {relatedDestinations.length > 0 && (
             <div className="not-prose mt-10 rounded-2xl bg-gradient-to-br from-[#f0f7ed] to-white dark:from-[#162033] dark:to-[#0a151f] border border-[#91b149]/30 p-5 md:p-6">
               <p className="text-xs font-bold text-[#91b149] uppercase tracking-wider mb-3">
-                ✦ احجز السياحة الاستشفائية المذكورة في هذا المقال
+                {t("blogPage.relatedDestinationsTitle")}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
                 {relatedDestinations.map((d) => (
@@ -245,7 +265,7 @@ export default async function BlogPostPage({
               className="inline-flex items-center gap-2 text-[#1d5770] dark:text-[#91b149] font-display font-bold text-sm no-underline hover:gap-3 transition-all"
             >
               <span>←</span>
-              <span>العودة لكل المقالات</span>
+              <span>{t("blogPage.back")}</span>
             </Link>
             <BlogShareButton title={post.title} />
           </div>
@@ -260,7 +280,7 @@ export default async function BlogPostPage({
         >
           <div className="max-w-5xl mx-auto px-6">
             <h2 className="font-display text-2xl font-bold text-[#12394d] dark:text-white mb-8 text-center">
-              اقرأ أيضاً
+              {t("blogPage.alsoRead")}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {related.map((r) => (

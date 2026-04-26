@@ -231,5 +231,46 @@
     "showingAll": "عرض كل {count} مقال",
     "showingFiltered": "{shown} من {total} مقال",
     "noResults": "مفيش نتائج"
+  },
+  "blogPage": {
+    "title": "مدونة السياحة الاستشفائية في مصر",
+    "subtitle": "16+ مقال عن العلاج الطبيعي، أفضل الوجهات العلاجية، ونصائح قبل السفر",
+    "breadcrumb": "المدونة",
+    "categories": {
+      "all": "الكل",
+      "knowledge": "معلومات",
+      "destinations": "وجهات",
+      "health": "صحة",
+      "tips": "نصائح"
+    },
+    "featuredLabel": "مقال مميّز",
+    "readArticle": "اقرأ المقال",
+    "minRead": "د",
+    "sortBy": "ترتيب",
+    "sort": {
+      "newest": "الأحدث",
+      "oldest": "الأقدم",
+      "shortest": "الأقصر",
+      "longest": "الأطول"
+    },
+    "showingAll": "عرض كل {total} مقال",
+    "showingFiltered": "{shown} من {total} مقال",
+    "clearFilters": "مسح الفلاتر",
+    "noResultsTitle": "مفيش نتائج للبحث",
+    "noSearchResults": "جربنا نلاقي \"{query}\" بس مفيش نتائج",
+    "noResultsCategory": "لا توجد مقالات في هذا التصنيف",
+    "readingProgress": {
+      "read": "قُرئ",
+      "continueLabel": "كمل من حيث وقفت",
+      "continueBtn": "كمّل",
+      "readBtn": "اقرأ"
+    },
+    "relatedDestinationsTitle": "✦ احجز السياحة الاستشفائية المذكورة في هذا المقال",
+    "alsoRead": "اقرأ أيضاً",
+    "back": "العودة لكل المقالات"
+  },
+  "blogPost": {
+    "publishedOn": "نُشر في",
+    "minutesRead": "دقائق قراءة"
   }
 }

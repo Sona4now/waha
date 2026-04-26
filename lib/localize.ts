@@ -14,12 +14,16 @@
  */
 
 import type { Locale } from "./i18n";
-import type { DestinationFull } from "@/data/siteData";
+import type { DestinationFull, BlogPost } from "@/data/siteData";
 import type { EnvironmentChapter } from "@/data/environmentChapters";
 import type { DestinationPricing, Package } from "@/data/pricingPackages";
 import { DESTINATIONS_EN } from "@/data/translations/destinations.en";
 import { CHAPTERS_EN } from "@/data/translations/chapters.en";
 import { PRICING_EN } from "@/data/translations/packages.en";
+import {
+  BLOG_POSTS_EN,
+  BLOG_CATEGORY_EN,
+} from "@/data/translations/blog.en";
 
 export function localizeDestination(
   dest: DestinationFull,
@@ -60,6 +64,28 @@ export function localizeChapter(
     name: en.name ?? chapter.name,
     tagline: en.tagline ?? chapter.tagline,
     intro: en.intro ?? chapter.intro,
+  };
+}
+
+/**
+ * Blog-post localizer. Returns the post with English overlays applied
+ * (title, excerpt, category, content sections). Per-field fallback to
+ * Arabic. Used by the blog list page and the blog detail page.
+ */
+export function localizeBlogPost(post: BlogPost, locale: Locale): BlogPost {
+  if (locale !== "en") return post;
+  const en = BLOG_POSTS_EN[post.id];
+  // Category translation is the same map for every post.
+  const localisedCategory = BLOG_CATEGORY_EN[post.category] ?? post.category;
+  if (!en) {
+    return { ...post, category: localisedCategory };
+  }
+  return {
+    ...post,
+    title: en.title ?? post.title,
+    excerpt: en.excerpt ?? post.excerpt,
+    category: en.category ?? localisedCategory,
+    content: en.content ?? post.content,
   };
 }
 
