@@ -21,6 +21,7 @@ import Testimonials from "@/components/destination/Testimonials";
 import SmartRelated from "@/components/destination/SmartRelated";
 import PricingPackages from "@/components/destination/PricingPackages";
 import LeadCaptureForm from "@/components/destination/LeadCaptureForm";
+import RelatedArticles from "@/components/destination/RelatedArticles";
 import JsonLd from "@/components/site/JsonLd";
 import { getDestById } from "@/data/siteData";
 import { SITE_URL } from "@/lib/siteMeta";
@@ -28,7 +29,12 @@ import {
   destinationSchema,
   breadcrumbSchema,
   faqSchema,
+  reviewSchema,
 } from "@/lib/structuredData";
+import {
+  TESTIMONIALS_BY_DEST,
+  getDestinationRating,
+} from "@/data/testimonials";
 
 const BASE_TABS = [
   { key: "overview", label: "نبذة" },
@@ -907,7 +913,21 @@ export default function DestinationDetailPage() {
           1700 lines — diminishing returns vs current setup.) */}
       <JsonLd
         data={[
-          destinationSchema(dest),
+          // Including aggregateRating with real review count is the
+          // single biggest SERP-CTR win available — Google shows
+          // ★★★★☆ stars next to the result.
+          destinationSchema(dest, getDestinationRating(dest.id)),
+          // Per-review schemas for individual quotes
+          ...(TESTIMONIALS_BY_DEST[dest.id] ?? []).map((t) =>
+            reviewSchema({
+              author: t.name,
+              rating: t.rating,
+              body: t.quote,
+              date: t.date ?? "2025-01-01",
+              itemName: dest.name,
+              itemUrl: `${SITE_URL}/destination/${dest.id}`,
+            }),
+          ),
           breadcrumbSchema([
             { name: "الرئيسية", url: `${SITE_URL}/home` },
             { name: "الوجهات", url: `${SITE_URL}/destinations` },
@@ -1781,6 +1801,9 @@ export default function DestinationDetailPage() {
             <FeedbackWidget pageId={`dest-${dest.id}`} pageTitle={dest.name} />
           </div>
         </section>
+
+        {/* Articles that mention this destination — internal SEO linking */}
+        <RelatedArticles destinationId={dest.id} destinationName={dest.name} />
 
         {/* Smart Related Destinations */}
         <SmartRelated currentDest={dest} />

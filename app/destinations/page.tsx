@@ -191,8 +191,8 @@ export default function DestinationsPage() {
   return (
     <SiteLayout>
       <PageHero
-        title="الأماكن الاستشفائية"
-        subtitle="اكتشف وجهات الشفاء الطبيعية في قلب مصر"
+        title="السياحة الاستشفائية في مصر"
+        subtitle="7 وجهات علاجية طبيعية — من البحر الأحمر لصحاري سيوة وجبال سيناء"
       />
 
       <section className="py-10 md:py-16 px-4 bg-[#f5f8fa] dark:bg-[#0a151f]">

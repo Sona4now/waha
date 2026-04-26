@@ -223,18 +223,29 @@ export default function HomePage() {
                 <span className="w-1.5 h-1.5 rounded-full bg-[#91b149] animate-pulse" />
                 السياحة البيئية الطبيعية
               </div>
+              {/* SEO H1: exact target phrase. Single H1 per page is best
+                  practice for crawler ranking. Sub-headline is an h2. */}
               <AnimatedText
                 as="h1"
-                text="استكشف رحلة شفائك في قلب مصر"
+                text="السياحة الاستشفائية في مصر"
                 splitBy="word"
                 stagger={0.08}
                 delay={0.2}
                 direction="up"
-                className="text-2xl sm:text-4xl md:text-6xl font-black mb-5 font-display leading-tight max-w-[680px]"
+                className="text-3xl sm:text-5xl md:text-6xl font-black mb-3 font-display leading-tight max-w-[680px]"
+              />
+              <AnimatedText
+                as="h2"
+                text="استكشف رحلة شفائك في قلب الطبيعة"
+                splitBy="word"
+                stagger={0.05}
+                delay={0.6}
+                direction="up"
+                className="text-xl sm:text-2xl md:text-3xl font-bold mb-5 font-display leading-tight max-w-[680px] text-white/85"
               />
               <AnimatedText
                 as="p"
-                text="طبيعة مصر تمتلك سراً قديماً. مياه تعالج، هواء يجدد، وصمت يشفي. اكتشف الوجهة التي تناسب جسدك وروحك."
+                text="منصة واحة بتساعدك تختار وجهتك العلاجية في مصر — سفاجا (الصدفية والروماتيزم)، سيوة (المياه الكبريتية)، سيناء (الجبال والربو)، الفيوم، والواحات. حجز عبر واتساب وأسعار شفافة."
                 splitBy="word"
                 stagger={0.02}
                 delay={1}

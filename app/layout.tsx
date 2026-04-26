@@ -31,26 +31,43 @@ const reemKufi = Reem_Kufi({
   variable: "--font-reem-kufi",
 });
 
+// SEO note: the exact phrase "السياحة الاستشفائية في مصر" appears in:
+// title, description, OG title/description, twitter, keywords. Repetition
+// across signals tells Google this site is *the* canonical answer for that
+// query. We also include common variants ("سياحة علاجية", "سياحة صحية")
+// because Egyptian users phrase this multiple ways.
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "واحة — السياحة الاستشفائية في مصر",
-    template: "%s | واحة",
+    default:
+      "السياحة الاستشفائية في مصر | واحة — احجز رحلتك العلاجية",
+    template: "%s | السياحة الاستشفائية في مصر — واحة",
   },
   description:
-    "اكتشف وجهتك العلاجية المثالية في مصر. سفاجا، سيوة، سيناء، الفيوم، الواحات البحرية — رحلة شفاء من قلب الطبيعة.",
+    "السياحة الاستشفائية في مصر — منصة واحة لحجز رحلات العلاج الطبيعي في سفاجا، سيوة، سيناء، الفيوم، والواحات. علاج بالمياه الكبريتية، الرمال السوداء، والعلاج بالمناخ مع باقات مدروسة وأسعار شفافة.",
   keywords: [
+    "السياحة الاستشفائية في مصر",
     "سياحة استشفائية",
-    "علاج طبيعي",
-    "مصر",
+    "السياحة العلاجية",
+    "سياحة علاجية مصر",
+    "علاج طبيعي مصر",
+    "سياحة صحية",
+    "العلاج بالمياه الكبريتية",
+    "العلاج بالرمال السوداء",
+    "علاج الصدفية في سفاجا",
+    "عيون سيوة الكبريتية",
+    "علاج الروماتيزم بالطبيعة",
+    "wellness tourism Egypt",
+    "thermal therapy Egypt",
+    "balneotherapy Safaga",
     "سفاجا",
     "سيوة",
     "سيناء",
     "الفيوم",
-    "واحات",
-    "بحر أحمر",
-    "عيون كبريتية",
-    "رمال سوداء",
+    "الواحات البحرية",
+    "البحر الأحمر",
+    "العلاج بالمناخ",
+    "العلاج الطبيعي بالطين",
   ],
   authors: [{ name: "واحة — WAHA" }],
   creator: "واحة",
@@ -59,24 +76,25 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ar_EG",
+    alternateLocale: ["en_US"],
     siteName: "واحة",
-    title: "واحة — السياحة الاستشفائية في مصر",
+    title: "السياحة الاستشفائية في مصر | واحة",
     description:
-      "اكتشف وجهتك العلاجية المثالية في مصر — رحلة شفاء من قلب الطبيعة.",
+      "احجز رحلتك العلاجية في مصر — سفاجا (الصدفية والروماتيزم)، سيوة (المياه الكبريتية)، سيناء (الجبال والربو)، الفيوم (الاسترخاء). أسعار شفافة وحجز عبر واتساب.",
     images: [
       {
         url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
         width: 1200,
         height: 630,
-        alt: "واحة — السياحة الاستشفائية",
+        alt: "السياحة الاستشفائية في مصر — واحة",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "واحة — السياحة الاستشفائية في مصر",
+    title: "السياحة الاستشفائية في مصر | واحة",
     description:
-      "اكتشف وجهتك العلاجية المثالية في مصر — رحلة شفاء من قلب الطبيعة.",
+      "احجز رحلتك العلاجية الطبيعية في مصر — أسعار شفافة وحجز عبر واتساب في 30 ثانية.",
     images: [
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
     ],
@@ -84,7 +102,18 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
   },
+  alternates: {
+    canonical: SITE_URL,
+  },
+  category: "Travel — Wellness Tourism",
 };
 
 export const viewport: Viewport = {

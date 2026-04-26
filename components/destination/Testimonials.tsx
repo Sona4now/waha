@@ -1,239 +1,83 @@
 "use client";
 
+import { useState, useMemo } from "react";
 import { motion } from "framer-motion";
-
-interface Testimonial {
-  name: string;
-  role: string;
-  avatarColor: string;
-  quote: string;
-  rating: number;
-  condition?: string;
-  duration: string;
-}
-
-/**
- * Per-destination testimonials — real quotes from real users.
- * Strongest social proof to move user from browsing to planning.
- */
-const TESTIMONIALS_BY_DEST: Record<string, Testimonial[]> = {
-  safaga: [
-    {
-      name: "أحمد محمود",
-      role: "مهندس · 42 عام",
-      avatarColor: "#1d5770",
-      quote:
-        "بعد 14 يوم في سفاجا، قلت نسبة الصدفية عندي 70%. البحر والشمس معجزة فعلاً.",
-      rating: 5,
-      condition: "صدفية مزمنة",
-      duration: "14 يوم",
-    },
-    {
-      name: "نورا حسن",
-      role: "أم لطفلين · 38 عام",
-      avatarColor: "#91b149",
-      quote:
-        "الرمال السوداء غيرت حياتي. آلام مفاصلي قلت بشكل ملحوظ بعد الأسبوع الأول.",
-      rating: 5,
-      condition: "التهاب مفاصل",
-      duration: "10 أيام",
-    },
-    {
-      name: "كريم عبدالله",
-      role: "طبيب · 50 عام",
-      avatarColor: "#92400e",
-      quote:
-        "ذهبت متشككاً كطبيب، وعدت مؤمناً بفعالية العلاج الطبيعي. النتائج علمية حقاً.",
-      rating: 5,
-      duration: "21 يوم",
-    },
-  ],
-  siwa: [
-    {
-      name: "مريم السيد",
-      role: "معلمة · 34 عام",
-      avatarColor: "#78350f",
-      quote:
-        "سيوة أعادت لي السلام. الصمت والعيون الكبريتية مسحوا سنوات من التوتر.",
-      rating: 5,
-      condition: "قلق وتوتر مزمن",
-      duration: "14 يوم",
-    },
-    {
-      name: "عمر طارق",
-      role: "مصور · 29 عام",
-      avatarColor: "#91b149",
-      quote:
-        "تجربة روحانية كاملة. ليلة واحدة تحت نجوم سيوة غيرت نظرتي للحياة.",
-      rating: 5,
-      duration: "7 أيام",
-    },
-    {
-      name: "ليلى محمد",
-      role: "صاحبة أعمال · 45 عام",
-      avatarColor: "#b45309",
-      quote:
-        "عيون بئر واحد ساعدتني في التخلص من آلام الظهر المزمنة بعد 3 أسابيع.",
-      rating: 4,
-      condition: "آلام ظهر",
-      duration: "21 يوم",
-    },
-  ],
-  sinai: [
-    {
-      name: "يوسف إبراهيم",
-      role: "رياضي · 31 عام",
-      avatarColor: "#44403c",
-      quote: "هواء سيناء غير مسار الشفاء بالنسبة لي. الرئتين فتحت من أول يوم.",
-      rating: 5,
-      condition: "حساسية مزمنة",
-      duration: "10 أيام",
-    },
-    {
-      name: "سارة علي",
-      role: "صيدلانية · 36 عام",
-      avatarColor: "#1d5770",
-      quote:
-        "حمام موسى تجربة لا تُنسى. شعرت بطاقة جديدة بعد الجلسات الكبريتية.",
-      rating: 5,
-      duration: "7 أيام",
-    },
-    {
-      name: "حسين رمضان",
-      role: "متقاعد · 62 عام",
-      avatarColor: "#91b149",
-      quote:
-        "الأعشاب البدوية وهواء الجبل عالجوا الربو عندي أكتر من الأدوية.",
-      rating: 5,
-      condition: "ربو",
-      duration: "14 يوم",
-    },
-  ],
-  fayoum: [
-    {
-      name: "رنا محمد",
-      role: "مصممة · 28 عام",
-      avatarColor: "#065f46",
-      quote:
-        "ويكند واحد في الفيوم أحسن من إجازة كاملة في الخارج. ساعة من القاهرة وعالم تاني.",
-      rating: 5,
-      duration: "3 أيام",
-    },
-    {
-      name: "محمد أحمد",
-      role: "مهندس · 40 عام",
-      avatarColor: "#91b149",
-      quote:
-        "بحيرة قارون هدّأت أعصابي. صوت المياه والطيور علاج حقيقي للإجهاد.",
-      rating: 5,
-      condition: "إجهاد نفسي",
-      duration: "5 أيام",
-    },
-    {
-      name: "دينا فؤاد",
-      role: "محاسبة · 33 عام",
-      avatarColor: "#1d5770",
-      quote:
-        "وادي الحيتان تجربة علمية وروحانية. الأطفال أحبوها وتعلموا الكثير.",
-      rating: 4,
-      duration: "يومين",
-    },
-  ],
-  bahariya: [
-    {
-      name: "طارق يوسف",
-      role: "مغامر · 35 عام",
-      avatarColor: "#b45309",
-      quote:
-        "الصحراء البيضاء كوكب آخر. التخييم تحت النجوم تجربة لا توصف.",
-      rating: 5,
-      duration: "5 أيام",
-    },
-    {
-      name: "هبة سالم",
-      role: "طبيبة · 39 عام",
-      avatarColor: "#92400e",
-      quote:
-        "الدفن في الرمال الدافئة قلل آلام الروماتيزم عندي بنسبة 80%. علاج فرعوني حقيقي.",
-      rating: 5,
-      condition: "روماتيزم",
-      duration: "14 يوم",
-    },
-    {
-      name: "خالد ممدوح",
-      role: "رياضي · 27 عام",
-      avatarColor: "#1d5770",
-      quote: "الينابيع الساخنة + الرمال + السماء = تجربة استشفائية متكاملة.",
-      rating: 5,
-      duration: "7 أيام",
-    },
-  ],
-  "wadi-degla": [
-    {
-      name: "أحمد سامي",
-      role: "مدير تنفيذي · 45 عام",
-      avatarColor: "#78350f",
-      quote:
-        "15 دقيقة من البيت وكأني في كوكب تاني. الصمت والهواء نقي — Digital Detox حقيقي.",
-      rating: 5,
-      duration: "نصف يوم",
-    },
-    {
-      name: "منى خليل",
-      role: "رياضية · 30 عام",
-      avatarColor: "#91b149",
-      quote: "المسارات طويلة ومتنوعة. ماراثون وادي دجلة تجربة لازم تعيشها.",
-      rating: 5,
-      duration: "يوم كامل",
-    },
-    {
-      name: "عمرو حسن",
-      role: "مصور · 32 عام",
-      avatarColor: "#1d5770",
-      quote: "التخييم ليلة في المحمية غير نظرتي للحياة. النجوم مذهلة.",
-      rating: 5,
-      condition: "إجهاد نفسي",
-      duration: "يومين",
-    },
-  ],
-  "shagie-farms": [
-    {
-      name: "سلمى أحمد",
-      role: "أم · 36 عام",
-      avatarColor: "#ca8a04",
-      quote:
-        "أولادي قطفوا مانجو لأول مرة في حياتهم. يوم ممتع وتعليمي فعلاً.",
-      rating: 5,
-      duration: "يوم واحد",
-    },
-    {
-      name: "جيمس ميلر",
-      role: "سائح · أمريكي",
-      avatarColor: "#91b149",
-      quote: "The best agri-tourism experience I've had in the Middle East.",
-      rating: 5,
-      duration: "يوم واحد",
-    },
-    {
-      name: "ريم خالد",
-      role: "ربة منزل · 42 عام",
-      avatarColor: "#78350f",
-      quote:
-        "الأكل الفلاحي والجو الهادئ — شعور بالبعد عن المدينة في ساعة بس.",
-      rating: 5,
-      duration: "يوم واحد",
-    },
-  ],
-};
+import {
+  TESTIMONIALS_BY_DEST,
+  type Testimonial,
+} from "@/data/testimonials";
 
 interface Props {
   destId: string;
   destName: string;
 }
 
+/**
+ * Per-destination testimonials block.
+ *
+ * Data lives in `data/testimonials.ts` so server-side code (sitemap,
+ * JSON-LD AggregateRating) can read the same source without pulling this
+ * client component into the server graph.
+ *
+ * Two interactive layers on top of the static data:
+ * 1. Condition filter — when a user comes in from /symptoms with a
+ *    specific health concern, this surfaces only the testimonials from
+ *    people with that same condition. Targeted social proof converts
+ *    much harder than generic.
+ * 2. Aggregate rating banner — shows "X من 5 من Y تقييم" at the top so
+ *    the user immediately sees the social-proof headline before reading
+ *    individual quotes.
+ */
 export default function Testimonials({ destId, destName }: Props) {
-  const testimonials = TESTIMONIALS_BY_DEST[destId] || [];
-  if (testimonials.length === 0) return null;
+  const all = TESTIMONIALS_BY_DEST[destId] || [];
+
+  // Read the user's condition from /symptoms output if present.
+  // No useEffect — read at first render via lazy initialiser to avoid
+  // an extra paint cycle.
+  const [activeCondition, setActiveCondition] = useState<string>(() => {
+    if (typeof window === "undefined") return "all";
+    try {
+      const rec = JSON.parse(
+        localStorage.getItem("waaha_recommendation") || "{}",
+      );
+      return rec?.need || "all";
+    } catch {
+      return "all";
+    }
+  });
+
+  const conditions = useMemo(() => {
+    const set = new Set<string>();
+    all.forEach((t) => {
+      if (t.condition) set.add(t.condition);
+    });
+    return Array.from(set);
+  }, [all]);
+
+  const filtered = useMemo(() => {
+    if (activeCondition === "all") return all;
+    return all.filter(
+      (t) =>
+        t.condition?.includes(activeCondition) ||
+        // Soft match — if user's "need" is "جلد", match condition like
+        // "صدفية مزمنة" because صدفية is a skin condition.
+        (activeCondition === "جلد" &&
+          /صدفية|جلد|إكزيما/.test(t.condition || "")) ||
+        (activeCondition === "مفاصل" &&
+          /مفاصل|روماتيزم|ظهر/.test(t.condition || "")) ||
+        (activeCondition === "تنفس" &&
+          /ربو|حساسية|تنفس/.test(t.condition || "")) ||
+        (activeCondition === "استرخاء" &&
+          /قلق|توتر|نفسي|إجهاد/.test(t.condition || "")),
+    );
+  }, [all, activeCondition]);
+
+  if (all.length === 0) return null;
+
+  // Aggregate stats for the banner
+  const avgRating = all.reduce((s, t) => s + t.rating, 0) / all.length;
+  const matchedCount =
+    activeCondition === "all" ? null : filtered.length;
 
   return (
     <section
@@ -242,77 +86,145 @@ export default function Testimonials({ destId, destName }: Props) {
       dir="rtl"
     >
       <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center mb-10">
+        {/* Header + aggregate */}
+        <div className="text-center mb-8">
           <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
             تجارب حقيقية
           </div>
           <h2
-            className="text-2xl md:text-3xl font-bold text-[#12394d] dark:text-white"
+            className="text-2xl md:text-3xl font-bold text-[#12394d] dark:text-white mb-3"
             style={{ fontFamily: "var(--font-display)" }}
           >
             ناس زارت {destName} قبلك
           </h2>
+          <div className="inline-flex items-center gap-3 bg-[#f5f8fa] dark:bg-[#162033] rounded-full px-4 py-2 text-sm">
+            <span className="text-[#91b149] font-bold">
+              {"★".repeat(Math.round(avgRating))}
+              <span className="text-[#d0dde4] dark:text-[#1e3a5f]">
+                {"★".repeat(5 - Math.round(avgRating))}
+              </span>
+            </span>
+            <span className="text-[#12394d] dark:text-white font-bold">
+              {avgRating.toFixed(1)} من 5
+            </span>
+            <span className="text-[#7b7c7d] dark:text-white/50 text-xs">
+              · {all.length} تقييم
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              viewport={{ once: true }}
-              className="bg-[#f5f8fa] dark:bg-[#162033] border border-transparent dark:border-[#1e3a5f] rounded-2xl p-6 hover:shadow-lg dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)] transition-shadow"
+        {/* Filter chips — only render when there are conditions to filter by */}
+        {conditions.length > 1 && (
+          <div className="flex flex-wrap items-center justify-center gap-2 mb-8">
+            <button
+              onClick={() => setActiveCondition("all")}
+              className={`text-xs font-bold rounded-full px-3.5 py-1.5 transition-all ${
+                activeCondition === "all"
+                  ? "bg-[#1d5770] text-white"
+                  : "bg-[#f5f8fa] dark:bg-[#162033] text-[#7b7c7d] dark:text-white/60 hover:bg-[#1d5770]/10"
+              }`}
             >
-              {/* Quote */}
-              <div
-                className="text-4xl leading-none mb-3"
-                style={{ color: t.avatarColor }}
+              كل التجارب
+            </button>
+            {conditions.map((c) => (
+              <button
+                key={c}
+                onClick={() => setActiveCondition(c)}
+                className={`text-xs font-bold rounded-full px-3.5 py-1.5 transition-all ${
+                  activeCondition === c
+                    ? "bg-[#91b149] text-[#0a0f14]"
+                    : "bg-[#f5f8fa] dark:bg-[#162033] text-[#7b7c7d] dark:text-white/60 hover:bg-[#91b149]/15"
+                }`}
               >
-                &ldquo;
-              </div>
-              <p className="text-sm text-[#12394d] dark:text-white/80 leading-relaxed mb-5">
-                {t.quote}
-              </p>
+                {c}
+              </button>
+            ))}
+          </div>
+        )}
 
-              {/* Footer */}
-              <div className="flex items-center gap-3 pt-4 border-t border-[#d0dde4] dark:border-[#1e3a5f]">
-                <div
-                  className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: t.avatarColor }}
-                >
-                  <span className="text-white font-bold">
-                    {t.name.charAt(0)}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="font-bold text-sm text-[#12394d] dark:text-white truncate">
-                    {t.name}
-                  </div>
-                  <div className="text-[10px] text-[#7b7c7d] dark:text-white/40 truncate">
-                    {t.role}
-                  </div>
-                </div>
-                <div className="text-[#91b149] text-xs whitespace-nowrap">
-                  {"★".repeat(t.rating)}
-                </div>
-              </div>
+        {/* Targeted social-proof banner */}
+        {matchedCount !== null && matchedCount > 0 && (
+          <div className="mb-6 text-center">
+            <div className="inline-flex items-center gap-2 bg-[#91b149]/10 text-[#91b149] text-xs font-bold rounded-full px-4 py-2">
+              ✨ <span>{matchedCount}</span> شخص بحالة شبه حالتك تعالجوا هنا
+            </div>
+          </div>
+        )}
 
-              {/* Meta */}
-              <div className="flex items-center gap-2 mt-3 flex-wrap">
-                {t.condition && (
-                  <span className="px-2 py-0.5 bg-[#91b149]/15 text-[#91b149] text-[10px] font-bold rounded-full">
-                    {t.condition}
-                  </span>
-                )}
-                <span className="text-[10px] text-[#7b7c7d] dark:text-white/30">
-                  {t.duration}
-                </span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+        {filtered.length === 0 ? (
+          <div className="text-center py-10 text-[#7b7c7d] dark:text-white/50 text-sm">
+            مفيش تجارب لهذه الحالة في {destName} حالياً.{" "}
+            <button
+              onClick={() => setActiveCondition("all")}
+              className="text-[#1d5770] dark:text-[#91b149] font-bold hover:underline"
+            >
+              اعرض الكل
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {filtered.map((t, i) => (
+              <TestimonialCard key={`${t.name}-${i}`} t={t} index={i} />
+            ))}
+          </div>
+        )}
       </div>
     </section>
+  );
+}
+
+function TestimonialCard({ t, index }: { t: Testimonial; index: number }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ delay: index * 0.1 }}
+      viewport={{ once: true }}
+      className="bg-[#f5f8fa] dark:bg-[#162033] border border-transparent dark:border-[#1e3a5f] rounded-2xl p-6 hover:shadow-lg dark:hover:shadow-[0_10px_40px_rgba(0,0,0,0.4)] transition-shadow"
+    >
+      {/* Quote */}
+      <div
+        className="text-4xl leading-none mb-3"
+        style={{ color: t.avatarColor }}
+      >
+        &ldquo;
+      </div>
+      <p className="text-sm text-[#12394d] dark:text-white/80 leading-relaxed mb-5">
+        {t.quote}
+      </p>
+
+      {/* Footer */}
+      <div className="flex items-center gap-3 pt-4 border-t border-[#d0dde4] dark:border-[#1e3a5f]">
+        <div
+          className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ backgroundColor: t.avatarColor }}
+        >
+          <span className="text-white font-bold">{t.name.charAt(0)}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="font-bold text-sm text-[#12394d] dark:text-white truncate">
+            {t.name}
+          </div>
+          <div className="text-[10px] text-[#7b7c7d] dark:text-white/40 truncate">
+            {t.role}
+          </div>
+        </div>
+        <div className="text-[#91b149] text-xs whitespace-nowrap">
+          {"★".repeat(t.rating)}
+        </div>
+      </div>
+
+      {/* Meta */}
+      <div className="flex items-center gap-2 mt-3 flex-wrap">
+        {t.condition && (
+          <span className="px-2 py-0.5 bg-[#91b149]/15 text-[#91b149] text-[10px] font-bold rounded-full">
+            {t.condition}
+          </span>
+        )}
+        <span className="text-[10px] text-[#7b7c7d] dark:text-white/30">
+          {t.duration}
+        </span>
+      </div>
+    </motion.div>
   );
 }

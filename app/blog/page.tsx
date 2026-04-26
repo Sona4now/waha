@@ -110,8 +110,8 @@ export default function BlogPage() {
   return (
     <SiteLayout>
       <PageHero
-        title="المدونة"
-        subtitle="مقالات توعوية عن السياحة البيئية والاستشفاء من الطبيعة في مصر"
+        title="مدونة السياحة الاستشفائية في مصر"
+        subtitle="16+ مقال عن العلاج الطبيعي، أفضل الوجهات العلاجية، ونصائح قبل السفر"
         breadcrumb={[
           { label: "الرئيسية", href: "/home" },
           { label: "المدونة" },

@@ -5,9 +5,50 @@ import type { Metadata } from "next";
 import SiteLayout from "@/components/site/SiteLayout";
 import BlogShareButton from "@/components/site/BlogShareButton";
 import JsonLd from "@/components/site/JsonLd";
-import { BLOG_POSTS, getBlogPost, type BlogPost } from "@/data/siteData";
+import {
+  BLOG_POSTS,
+  DESTINATIONS,
+  getBlogPost,
+  type BlogPost,
+  type DestinationFull,
+} from "@/data/siteData";
 import { SITE_NAME, SITE_URL } from "@/lib/siteMeta";
 import { articleSchema, breadcrumbSchema } from "@/lib/structuredData";
+
+/**
+ * Map blog posts → relevant destinations for cross-linking.
+ *
+ * SEO win: each blog post gets 1-3 anchor links to destination pages,
+ * which Google uses both for crawl discovery and to attribute relevance.
+ * Destination pages also benefit because each gets multiple inbound
+ * internal links from topically-related articles.
+ *
+ * Strategy: scan post content for destination names + treatments, take
+ * the top 3 hits.
+ */
+function getRelatedDestinations(post: BlogPost): DestinationFull[] {
+  const haystack = (
+    post.title +
+    " " +
+    post.excerpt +
+    " " +
+    (post.content?.flatMap((s) => s.paragraphs).join(" ") ?? "")
+  ).toLowerCase();
+
+  const scored = DESTINATIONS.map((d) => {
+    let score = 0;
+    if (haystack.includes(d.name.toLowerCase())) score += 5;
+    if (haystack.includes(d.nameEn.toLowerCase())) score += 2;
+    for (const t of d.treatments ?? []) {
+      if (haystack.includes(t.toLowerCase())) score += 1;
+    }
+    return { d, score };
+  })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  return scored.slice(0, 3).map((x) => x.d);
+}
 
 export async function generateStaticParams() {
   return BLOG_POSTS.map((p) => ({ slug: p.id }));
@@ -63,6 +104,7 @@ export default async function BlogPostPage({
   if (!post) notFound();
 
   const related = relatedPosts(post);
+  const relatedDestinations = getRelatedDestinations(post);
 
   return (
     <SiteLayout>
@@ -156,6 +198,39 @@ export default async function BlogPostPage({
             <p className="text-[#7b7c7d] dark:text-white/60 italic">
               {post.excerpt}
             </p>
+          )}
+
+          {/* Smart cross-link: destinations mentioned in this article.
+              Improves SEO (internal anchor distribution) and conversion
+              (article reader → destination → lead form). */}
+          {relatedDestinations.length > 0 && (
+            <div className="not-prose mt-10 rounded-2xl bg-gradient-to-br from-[#f0f7ed] to-white dark:from-[#162033] dark:to-[#0a151f] border border-[#91b149]/30 p-5 md:p-6">
+              <p className="text-xs font-bold text-[#91b149] uppercase tracking-wider mb-3">
+                ✦ احجز السياحة الاستشفائية المذكورة في هذا المقال
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+                {relatedDestinations.map((d) => (
+                  <Link
+                    key={d.id}
+                    href={`/destination/${d.id}`}
+                    className="group flex items-center gap-3 bg-white dark:bg-[#0a151f] hover:bg-[#1d5770]/5 dark:hover:bg-[#91b149]/10 border border-gray-100 dark:border-[#1e3a5f] rounded-xl p-3 transition-all no-underline"
+                  >
+                    <span className="text-2xl flex-shrink-0">
+                      {d.envIcon}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-display font-bold text-[#12394d] dark:text-white group-hover:text-[#1d5770] dark:group-hover:text-[#91b149] transition-colors truncate">
+                        {d.name}
+                      </div>
+                      <div className="text-[11px] text-[#7b7c7d] dark:text-white/50 truncate">
+                        {d.pitch}
+                      </div>
+                    </div>
+                    <span className="text-[#91b149] flex-shrink-0">←</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
           )}
 
           {/* ── Footer: share + back ── */}
