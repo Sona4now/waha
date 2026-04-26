@@ -244,7 +244,8 @@
       "Bash(node /tmp/check_blog.mjs)",
       "Bash(curl -s -X POST http://localhost:3000/api/auth -H \"Content-Type: application/json\" -d '{\"password\":\"test\"}' --cookie-jar /tmp/cookies.txt)",
       "Bash(curl -s -X POST http://localhost:3000/api/auth -H \"Content-Type: application/json\" -d '{\"password\":\"Pola@0100450\"}' -i)",
-      "Bash(curl -s -X POST https://wahaeg.com/api/admin-auth -H \"Content-Type: application/json\" -d '{\"password\":\"admin2026\"}')"
+      "Bash(curl -s -X POST https://wahaeg.com/api/admin-auth -H \"Content-Type: application/json\" -d '{\"password\":\"admin2026\"}')",
+      "Bash(npm run *)"
     ]
   }
 }

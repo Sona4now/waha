@@ -1,10 +1,9 @@
 import Link from "next/link";
-import dynamic from "next/dynamic";
-
-// Newsletter is interactive — load it client-side only.
-const NewsletterForm = dynamic(() => import("./NewsletterForm"), {
-  ssr: false,
-});
+// NewsletterForm has its own `"use client"` directive — importing it
+// directly from this server component is fine; the React runtime knows to
+// hydrate just that subtree on the client. (We can't use dynamic with
+// ssr:false here — that pattern is only valid inside client components.)
+import NewsletterForm from "./NewsletterForm";
 
 export default function Footer() {
   return (
