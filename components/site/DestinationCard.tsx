@@ -5,6 +5,7 @@ import Image from "next/image";
 import { CompareButton } from "./ComparisonTray";
 import { envBadgeClasses } from "@/lib/envColors";
 import { getDestinationRating } from "@/data/testimonials";
+import { getSeasonLabel } from "@/lib/season";
 import type { DestinationFull } from "@/data/siteData";
 
 interface Props {
@@ -14,6 +15,12 @@ interface Props {
    * Computed by the parent using `relevanceScore` from `/destinations`.
    */
   isRecommended?: boolean;
+  /**
+   * Force horizontal (mobile-style) layout at all breakpoints. Used by the
+   * list-view density toggle on `/destinations` so users can see more
+   * cards per viewport.
+   */
+  compact?: boolean;
 }
 
 const MAX_MOBILE_CHIPS = 2;
@@ -29,11 +36,16 @@ const MAX_MOBILE_CHIPS = 2;
  * Price is the hero datapoint (`text-lg md:text-xl font-black`); env badge is
  * color-coded per `envClass`; treatments are truncated to 2 + "+N" on mobile.
  */
-export default function DestinationCard({ dest, isRecommended }: Props) {
+export default function DestinationCard({
+  dest,
+  isRecommended,
+  compact,
+}: Props) {
   const treatments = dest.treatments ?? [];
   const visibleMobile = treatments.slice(0, MAX_MOBILE_CHIPS);
   const extraMobile = Math.max(0, treatments.length - MAX_MOBILE_CHIPS);
   const rating = getDestinationRating(dest.id);
+  const seasonStatus = getSeasonLabel(dest.bestMonths, dest.okMonths);
 
   return (
     <div className="relative group h-full">
@@ -47,10 +59,20 @@ export default function DestinationCard({ dest, isRecommended }: Props) {
 
       <Link
         href={`/destination/${dest.id}`}
-        className="relative flex flex-row md:flex-col bg-white dark:bg-[#162033] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl dark:hover:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.6)] transition-all duration-500 md:hover:-translate-y-2 border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#91b149]/60 md:h-full no-underline"
+        className={`relative bg-white dark:bg-[#162033] rounded-2xl overflow-hidden shadow-md hover:shadow-2xl dark:hover:shadow-[0_25px_60px_-12px_rgba(0,0,0,0.6)] transition-all duration-500 md:hover:-translate-y-2 border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#91b149]/60 no-underline ${
+          compact
+            ? "flex flex-row h-32 md:h-36"
+            : "flex flex-row md:flex-col md:h-full"
+        }`}
       >
         {/* ── Image container ───────────────────────────────────────── */}
-        <div className="relative w-32 h-32 md:w-full md:h-52 flex-shrink-0 overflow-hidden">
+        <div
+          className={`relative flex-shrink-0 overflow-hidden ${
+            compact
+              ? "w-32 md:w-44 h-full"
+              : "w-32 h-32 md:w-full md:h-52"
+          }`}
+        >
           <Image
             src={dest.image}
             alt={`${dest.name} — وجهة استشفائية`}
@@ -87,6 +109,20 @@ export default function DestinationCard({ dest, isRecommended }: Props) {
           {rating.reviewCount > 0 && (
             <span className="hidden md:inline-flex absolute top-3 right-3 items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full text-white bg-[#91b149]/85 backdrop-blur-sm z-[1]">
               ★ {rating.ratingValue.toFixed(1)} ({rating.reviewCount})
+            </span>
+          )}
+
+          {/* Season badge — only when we're actually in this destination's
+              best season (greenlight) or ok season (yellow). Off-season →
+              no badge so we don't discourage off-season planners. */}
+          {seasonStatus === "best" && (
+            <span className="inline-flex absolute bottom-3 right-3 md:left-3 md:right-auto items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full text-[#0a0f14] bg-[#91b149] shadow-md z-[1]">
+              ✨ مثالي دلوقتي
+            </span>
+          )}
+          {seasonStatus === "ok" && (
+            <span className="hidden md:inline-flex absolute bottom-3 left-3 items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full text-white bg-[#d97706]/90 backdrop-blur-sm z-[1]">
+              🟡 موسم مقبول
             </span>
           )}
 

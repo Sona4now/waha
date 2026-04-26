@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -837,6 +837,18 @@ export default function DestinationDetailPage() {
   const id = params?.id as string;
   const dest = getDestById(id);
   const [activeTab, setActiveTab] = useState("overview");
+
+  // Track this destination as recently viewed so /destinations can surface
+  // a "شفت مؤخراً" rail on next visit. Most-recent-first, max 5.
+  useEffect(() => {
+    if (!id || typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem("waaha_recent_destinations");
+      const list: string[] = raw ? JSON.parse(raw) : [];
+      const next = [id, ...list.filter((x) => x !== id)].slice(0, 5);
+      localStorage.setItem("waaha_recent_destinations", JSON.stringify(next));
+    } catch {}
+  }, [id]);
 
   const handleShare = async () => {
     const url = window.location.href;
