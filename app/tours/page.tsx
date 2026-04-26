@@ -7,6 +7,7 @@ import Image from "next/image";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { TOURS_EN } from "@/data/translations/tours.en";
 
 interface Tour {
   id: string;
@@ -199,33 +200,52 @@ function buildKuulaUrl(id: string) {
   return `https://kuula.co/share/collection/${id}?${params}`;
 }
 
+// Localize a single tour: overlay English fields when locale === "en".
+function localizeTour(tour: Tour, locale: "ar" | "en"): Tour {
+  if (locale !== "en") return tour;
+  const en = TOURS_EN[tour.id];
+  if (!en) return tour;
+  return {
+    ...tour,
+    name: en.name ?? tour.name,
+    subtitle: en.subtitle ?? tour.subtitle,
+    destinationName: en.destinationName ?? tour.destinationName,
+    description: en.description ?? tour.description,
+  };
+}
+
 export default function ToursPage() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [activeFilter, setActiveFilter] = useState<
     "all" | "bahariya" | "siwa" | "shagie-farms"
   >("all");
   const [activeTour, setActiveTour] = useState<Tour | null>(null);
 
+  const localizedTours = TOURS.map((tour) => localizeTour(tour, locale));
   const filteredTours =
     activeFilter === "all"
-      ? TOURS
-      : TOURS.filter((t) => t.destination === activeFilter);
+      ? localizedTours
+      : localizedTours.filter((t) => t.destination === activeFilter);
 
   const filters = [
-    { id: "all" as const, label: "جميع الجولات", count: TOURS.length },
+    {
+      id: "all" as const,
+      label: locale === "en" ? "All tours" : "جميع الجولات",
+      count: TOURS.length,
+    },
     {
       id: "bahariya" as const,
-      label: "الواحات البحرية",
+      label: locale === "en" ? "Bahariya" : "الواحات البحرية",
       count: TOURS.filter((t) => t.destination === "bahariya").length,
     },
     {
       id: "siwa" as const,
-      label: "سيوة",
+      label: locale === "en" ? "Siwa" : "سيوة",
       count: TOURS.filter((t) => t.destination === "siwa").length,
     },
     {
       id: "shagie-farms" as const,
-      label: "مزارع شجيع",
+      label: locale === "en" ? "Shagie Farms" : "مزارع شجيع",
       count: TOURS.filter((t) => t.destination === "shagie-farms").length,
     },
   ];
@@ -262,11 +282,14 @@ export default function ToursPage() {
           </div>
           <div className="flex-1">
             <h3 className="font-bold font-display text-[#12394d] dark:text-white mb-1">
-              كيف تستخدم الجولات التفاعلية؟
+              {locale === "en"
+                ? "How to use the interactive tours"
+                : "كيف تستخدم الجولات التفاعلية؟"}
             </h3>
             <p className="text-sm text-[#7b7c7d] dark:text-white/60 leading-relaxed">
-              اسحب بالماوس أو إصبعك لتدوير المشهد · استخدم عجلة التمرير للتكبير
-              · اضغط على أيقونة VR للتجربة الغامرة · اضغط على الشاشة الكاملة لتجربة سينمائية
+              {locale === "en"
+                ? "Drag with your mouse or finger to rotate the scene · Scroll to zoom · Tap the VR icon for immersive mode · Use fullscreen for a cinematic view"
+                : "اسحب بالماوس أو إصبعك لتدوير المشهد · استخدم عجلة التمرير للتكبير · اضغط على أيقونة VR للتجربة الغامرة · اضغط على الشاشة الكاملة لتجربة سينمائية"}
             </p>
           </div>
         </div>
@@ -345,7 +368,9 @@ export default function ToursPage() {
                         d="M6 18L18 6M6 6l12 12"
                       />
                     </svg>
-                    <span className="hidden sm:inline">إغلاق</span>
+                    <span className="hidden sm:inline">
+                      {locale === "en" ? "Close" : "إغلاق"}
+                    </span>
                   </button>
                 </div>
 
@@ -373,7 +398,9 @@ export default function ToursPage() {
                     href={`/destination/${activeTour.destination}`}
                     className="inline-flex items-center gap-1.5 mt-3 text-[#91b149] hover:text-[#a3c45a] text-sm font-semibold transition-colors no-underline"
                   >
-                    اقرأ المزيد عن {activeTour.destinationName}
+                    {locale === "en"
+                      ? `Read more about ${activeTour.destinationName}`
+                      : `اقرأ المزيد عن ${activeTour.destinationName}`}
                     <svg
                       width="14"
                       height="14"
@@ -489,10 +516,10 @@ export default function ToursPage() {
                       <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" />
                       <circle cx="12" cy="12" r="3" />
                     </svg>
-                    تجربة غامرة
+                    {locale === "en" ? "Immersive experience" : "تجربة غامرة"}
                   </span>
                   <span className="text-xs font-bold text-[#1d5770] flex items-center gap-1 group-hover:gap-2 transition-all">
-                    استكشف
+                    {locale === "en" ? "Explore" : "استكشف"}
                     <svg
                       width="12"
                       height="12"
@@ -518,7 +545,9 @@ export default function ToursPage() {
         {filteredTours.length === 0 && (
           <div className="text-center py-16">
             <p className="text-[#7b7c7d] dark:text-white/50 text-sm mb-3">
-              لا توجد جولات متاحة حالياً
+              {locale === "en"
+                ? "No tours available right now"
+                : "لا توجد جولات متاحة حالياً"}
             </p>
           </div>
         )}

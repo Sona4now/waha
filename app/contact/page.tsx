@@ -10,7 +10,7 @@ import { TEAM } from "@/data/siteData";
 import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY } from "@/lib/siteMeta";
 
 export default function ContactPage() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -33,12 +33,22 @@ export default function ContactPage() {
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
-      showToast("البريد الإلكتروني غير صحيح", "error");
+      showToast(
+        locale === "en"
+          ? "Invalid email address"
+          : "البريد الإلكتروني غير صحيح",
+        "error",
+      );
       return;
     }
 
     if (formData.message.length < 10) {
-      showToast("الرسالة قصيرة جداً — اكتب 10 حروف على الأقل", "warning");
+      showToast(
+        locale === "en"
+          ? "Message too short — at least 10 characters"
+          : "الرسالة قصيرة جداً — اكتب 10 حروف على الأقل",
+        "warning",
+      );
       return;
     }
 
@@ -70,7 +80,12 @@ export default function ContactPage() {
 
     setTimeout(() => {
       setSending(false);
-      showToast("تم فتح تطبيق البريد — أرسل الرسالة من هناك", "success");
+      showToast(
+        locale === "en"
+          ? "Email app opened — send the message from there"
+          : "تم فتح تطبيق البريد — أرسل الرسالة من هناك",
+        "success",
+      );
       setFormData({ name: "", email: "", subject: "", message: "" });
     }, 800);
   };
@@ -88,13 +103,18 @@ export default function ContactPage() {
 
       {/* Team Section */}
       <section className="py-16 px-4 bg-[#f5f8fa] dark:bg-[#0a151f]">
-        <div className="max-w-6xl mx-auto" dir="rtl">
+        <div
+          className="max-w-6xl mx-auto"
+          dir={locale === "en" ? "ltr" : "rtl"}
+        >
           <Reveal>
             <h2 className="text-3xl font-bold mb-4 text-center text-[#12394d] dark:text-white font-display">
-              فريق العمل
+              {locale === "en" ? "The Team" : "فريق العمل"}
             </h2>
             <p className="text-center mb-12 max-w-2xl mx-auto text-[#7b7c7d] dark:text-white/50">
-              تعرّف على الفريق الأكاديمي القائم على هذا المشروع البحثي
+              {locale === "en"
+                ? "Meet the academic team behind this research project"
+                : "تعرّف على الفريق الأكاديمي القائم على هذا المشروع البحثي"}
             </p>
           </Reveal>
 
@@ -125,13 +145,18 @@ export default function ContactPage() {
 
       {/* Contact Form Section */}
       <section className="py-16 px-4 bg-white dark:bg-[#0d1b2a]">
-        <div className="max-w-4xl mx-auto" dir="rtl">
+        <div
+          className="max-w-4xl mx-auto"
+          dir={locale === "en" ? "ltr" : "rtl"}
+        >
           <Reveal>
             <h2 className="text-3xl font-bold mb-4 text-center text-[#12394d] dark:text-white font-display">
-              تواصل معنا
+              {t("contactPage.formTitle")}
             </h2>
             <p className="text-center mb-12 max-w-2xl mx-auto text-[#7b7c7d] dark:text-white/50">
-              لديك سؤال أو اقتراح؟ لا تتردد في التواصل معنا
+              {locale === "en"
+                ? "Have a question or suggestion? We'd love to hear from you."
+                : "لديك سؤال أو اقتراح؟ لا تتردد في التواصل معنا"}
             </p>
           </Reveal>
 
@@ -143,7 +168,7 @@ export default function ContactPage() {
               >
                 <div>
                   <label className="block text-sm font-bold mb-2 text-[#12394d] dark:text-white">
-                    الاسم
+                    {locale === "en" ? "Name" : "الاسم"}
                   </label>
                   <input
                     type="text"
@@ -151,14 +176,18 @@ export default function ContactPage() {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    placeholder="أدخل اسمك الكامل"
+                    placeholder={
+                      locale === "en"
+                        ? "Enter your full name"
+                        : "أدخل اسمك الكامل"
+                    }
                     className="w-full px-4 py-3 rounded-lg border border-[#d1d5db] dark:border-[#1e3a5f] bg-white dark:bg-[#0a151f] text-[#12394d] dark:text-white text-sm outline-none transition-colors focus:border-[#1d5770] dark:focus:border-[#91b149] placeholder:text-[#7b7c7d]/50"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-bold mb-2 text-[#12394d] dark:text-white">
-                    البريد الإلكتروني
+                    {locale === "en" ? "Email" : "البريد الإلكتروني"}
                   </label>
                   <input
                     type="email"
@@ -174,7 +203,7 @@ export default function ContactPage() {
 
                 <div>
                   <label className="block text-sm font-bold mb-2 text-[#12394d] dark:text-white">
-                    الموضوع
+                    {locale === "en" ? "Subject" : "الموضوع"}
                   </label>
                   <select
                     name="subject"
@@ -183,18 +212,30 @@ export default function ContactPage() {
                     required
                     className="w-full px-4 py-3 rounded-lg border border-[#d1d5db] dark:border-[#1e3a5f] bg-white dark:bg-[#0a151f] text-[#12394d] dark:text-white text-sm outline-none transition-colors focus:border-[#1d5770] dark:focus:border-[#91b149]"
                   >
-                    <option value="">اختر الموضوع</option>
-                    <option value="استفسار عام">استفسار عام</option>
-                    <option value="اقتراح">اقتراح</option>
-                    <option value="تعاون أكاديمي">تعاون أكاديمي</option>
-                    <option value="مشكلة تقنية">مشكلة تقنية</option>
-                    <option value="أخرى">أخرى</option>
+                    <option value="">
+                      {locale === "en" ? "Select a subject" : "اختر الموضوع"}
+                    </option>
+                    <option value="استفسار عام">
+                      {locale === "en" ? "General inquiry" : "استفسار عام"}
+                    </option>
+                    <option value="اقتراح">
+                      {locale === "en" ? "Suggestion" : "اقتراح"}
+                    </option>
+                    <option value="تعاون أكاديمي">
+                      {locale === "en" ? "Academic collaboration" : "تعاون أكاديمي"}
+                    </option>
+                    <option value="مشكلة تقنية">
+                      {locale === "en" ? "Technical issue" : "مشكلة تقنية"}
+                    </option>
+                    <option value="أخرى">
+                      {locale === "en" ? "Other" : "أخرى"}
+                    </option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-sm font-bold mb-2 text-[#12394d] dark:text-white">
-                    الرسالة
+                    {locale === "en" ? "Message" : "الرسالة"}
                   </label>
                   <textarea
                     name="message"
@@ -203,10 +244,17 @@ export default function ContactPage() {
                     required
                     rows={5}
                     maxLength={2000}
-                    placeholder="اكتب رسالتك هنا..."
+                    placeholder={
+                      locale === "en"
+                        ? "Write your message here..."
+                        : "اكتب رسالتك هنا..."
+                    }
                     className="w-full px-4 py-3 rounded-lg border border-[#d1d5db] dark:border-[#1e3a5f] bg-white dark:bg-[#0a151f] text-[#12394d] dark:text-white text-sm outline-none transition-colors focus:border-[#1d5770] dark:focus:border-[#91b149] resize-none placeholder:text-[#7b7c7d]/50"
                   />
-                  <p className="text-[10px] text-[#7b7c7d] mt-1 text-left" dir="ltr">
+                  <p
+                    className="text-[10px] text-[#7b7c7d] mt-1 text-left"
+                    dir="ltr"
+                  >
                     {formData.message.length} / 2000
                   </p>
                 </div>
@@ -216,7 +264,13 @@ export default function ContactPage() {
                   disabled={sending}
                   className="w-full py-3 rounded-lg bg-[#1d5770] hover:bg-[#174860] disabled:opacity-60 text-white font-bold text-sm transition-all"
                 >
-                  {sending ? "جاري الإرسال..." : "إرسال الرسالة"}
+                  {sending
+                    ? locale === "en"
+                      ? "Sending..."
+                      : "جاري الإرسال..."
+                    : locale === "en"
+                      ? "Send Message"
+                      : "إرسال الرسالة"}
                 </button>
               </form>
             </Reveal>
@@ -227,26 +281,36 @@ export default function ContactPage() {
                 {[
                   {
                     icon: "📧",
-                    title: "البريد الإلكتروني",
+                    title: locale === "en" ? "Email" : "البريد الإلكتروني",
                     info: CONTACT_EMAIL,
                     bg: "bg-[#1d5770]",
                   },
                   {
                     icon: "📱",
-                    title: "واتساب / تليفون",
+                    title:
+                      locale === "en"
+                        ? "WhatsApp / Phone"
+                        : "واتساب / تليفون",
                     info: CONTACT_PHONE_DISPLAY,
                     bg: "bg-[#25D366]",
                   },
                   {
                     icon: "💬",
-                    title: "المساعد الذكي",
-                    info: "تحدث مع مساعدنا الذكي في أي وقت",
+                    title:
+                      locale === "en" ? "AI Assistant" : "المساعد الذكي",
+                    info:
+                      locale === "en"
+                        ? "Chat with our AI assistant anytime"
+                        : "تحدث مع مساعدنا الذكي في أي وقت",
                     bg: "bg-[#91b149]",
                   },
                   {
                     icon: "🕐",
-                    title: "ساعات العمل",
-                    info: "السبت - الخميس: 9 صباحاً - 5 مساءً",
+                    title: locale === "en" ? "Office hours" : "ساعات العمل",
+                    info:
+                      locale === "en"
+                        ? "Saturday – Thursday: 9 AM – 5 PM"
+                        : "السبت - الخميس: 9 صباحاً - 5 مساءً",
                     bg: "bg-[#12394d]",
                   },
                 ].map((item, i) => (

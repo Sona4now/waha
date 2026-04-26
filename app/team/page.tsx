@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
+import { useTranslations } from "@/components/site/LocaleProvider";
 import TeamGate from "@/components/team/TeamGate";
 import MagazineView from "@/components/team/MagazineView";
 import HallOfFameView from "@/components/team/HallOfFameView";
@@ -31,6 +32,7 @@ const TABS = [
 ];
 
 export default function TeamPage() {
+  const { locale } = useTranslations();
   const [active, setActive] = useState(TABS[0].id);
   const activeTab = TABS.find((t) => t.id === active) || TABS[0];
   const ActiveComponent = activeTab.Component;
@@ -38,17 +40,22 @@ export default function TeamPage() {
   return (
     <TeamGate>
     <SiteLayout>
-      <div className="bg-[#070d15] min-h-screen" dir="rtl">
+      <div
+        className="bg-[#070d15] min-h-screen"
+        dir={locale === "en" ? "ltr" : "rtl"}
+      >
         {/* Page header */}
         <div className="pt-20 pb-8 px-6 text-center">
           <div className="text-[10px] uppercase tracking-[0.4em] text-[#91b149] font-bold mb-3">
             · The Team ·
           </div>
           <h1 className="font-display text-5xl md:text-7xl font-black text-white mb-4">
-            فريق واحة
+            {locale === "en" ? "Waha Team" : "فريق واحة"}
           </h1>
           <p className="text-white/50 text-sm max-w-md mx-auto">
-            اختر طريقة العرض — 11 تصميم مختلف للفريق
+            {locale === "en"
+              ? "Pick a view style — 11 different team layouts"
+              : "اختر طريقة العرض — 11 تصميم مختلف للفريق"}
           </p>
         </div>
 
@@ -74,9 +81,9 @@ export default function TeamPage() {
                     />
                   )}
                   <span className="relative flex items-center gap-2">
-                    <span>{tab.label}</span>
+                    <span>{locale === "en" ? tab.en : tab.label}</span>
                     <span className="text-[9px] uppercase tracking-widest opacity-60">
-                      {tab.en}
+                      {locale === "en" ? tab.label : tab.en}
                     </span>
                   </span>
                 </button>
