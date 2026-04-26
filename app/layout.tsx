@@ -126,6 +126,11 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: SITE_URL,
+    languages: {
+      "ar-EG": SITE_URL,
+      "en-US": SITE_URL,
+      "x-default": SITE_URL,
+    },
   },
   category: "Travel — Wellness Tourism",
 };
@@ -160,18 +165,37 @@ export default async function RootLayout({
             Page-specific schemas (TouristAttraction, Article, FAQPage,
             BreadcrumbList) are added in their respective pages via the
             JsonLd component.  */}
+        {/* Locale-aware hreflang alternates. With cookie-based locale
+            switching (single URL serves both languages), we declare the
+            same URL under both ar-EG and en-US plus x-default. Google
+            will treat them as alternates of one another. For stronger
+            EN SEO we'd migrate to per-locale URLs (e.g. /en/...) — that
+            structural change is out of scope here. */}
+        <link rel="alternate" hrefLang="ar-EG" href={SITE_URL} />
+        <link rel="alternate" hrefLang="en-US" href={SITE_URL} />
+        <link rel="alternate" hrefLang="x-default" href={SITE_URL} />
+        <meta
+          property="og:locale"
+          content={locale === "en" ? "en_US" : "ar_EG"}
+        />
+        <meta
+          property="og:locale:alternate"
+          content={locale === "en" ? "ar_EG" : "en_US"}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebSite",
-              name: "واحة — WAHA",
+              name: locale === "en" ? "Waha (واحة)" : "واحة — WAHA",
               alternateName: "Waaha Therapeutic Tourism",
               url: SITE_URL,
               description:
-                "منصة محتوى رقمية للتوعية حول السياحة البيئية والاستشفاء من الطبيعة في مصر",
-              inLanguage: "ar-EG",
+                locale === "en"
+                  ? "Digital editorial platform on wellness tourism and natural healing in Egypt"
+                  : "منصة محتوى رقمية للتوعية حول السياحة البيئية والاستشفاء من الطبيعة في مصر",
+              inLanguage: locale === "en" ? "en-US" : "ar-EG",
               publisher: {
                 "@type": "Organization",
                 name: "واحة — WAHA",
