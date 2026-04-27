@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useEffect } from "react";
 import Particles from "./Particles";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { useIntroVoice } from "@/hooks/useIntroVoice";
 
 interface Props {
   onDone: () => void;
@@ -11,6 +12,10 @@ interface Props {
 
 export default function ProcessingScreen({ onDone }: Props) {
   const { locale } = useTranslations();
+
+  // Speak "Mapping your journey" right as the rings start expanding.
+  useIntroVoice("processing", { delay: 500 });
+
   useEffect(() => {
     const t = setTimeout(onDone, 2500);
     return () => clearTimeout(t);

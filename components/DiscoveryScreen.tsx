@@ -3,15 +3,24 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { useIntroVoice } from "@/hooks/useIntroVoice";
+import type { IntroVoId } from "@/lib/introAudio";
 
 interface Props {
   onDone: () => void;
 }
 
-const panels = [
+const panels: {
+  word: string;
+  wordEn: string;
+  voId: IntroVoId;
+  image: string;
+  color: string;
+}[] = [
   {
     word: "البحر",
     wordEn: "The sea",
+    voId: "discovery-sea",
     image:
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80",
     color: "#0e7490",
@@ -19,6 +28,7 @@ const panels = [
   {
     word: "الصحراء",
     wordEn: "The desert",
+    voId: "discovery-desert",
     image:
       "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1920&q=80",
     color: "#d97706",
@@ -26,6 +36,7 @@ const panels = [
   {
     word: "الجبال",
     wordEn: "The mountains",
+    voId: "discovery-mountains",
     image:
       "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80",
     color: "#78716c",
@@ -33,6 +44,7 @@ const panels = [
   {
     word: "الواحات",
     wordEn: "The oases",
+    voId: "discovery-oasis",
     image:
       "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1920&q=80",
     color: "#16a34a",
@@ -42,6 +54,9 @@ const panels = [
 export default function DiscoveryScreen({ onDone }: Props) {
   const { locale } = useTranslations();
   const [current, setCurrent] = useState(0);
+
+  // Speak the environment name just after the new word fades in.
+  useIntroVoice(panels[current].voId, { delay: 400 });
 
   useEffect(() => {
     const interval = 2400;

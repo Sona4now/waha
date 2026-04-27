@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { Destination } from "@/data/destinations";
 import Particles from "./Particles";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { useIntroVoice } from "@/hooks/useIntroVoice";
+import type { IntroVoId } from "@/lib/introAudio";
 
 interface Props {
   destination: Destination;
@@ -14,6 +16,12 @@ interface Props {
 
 export default function RevealScreen({ destination, onExplore, on360, onShare }: Props) {
   const { locale } = useTranslations();
+
+  // Play the destination's reveal VO once the screen mounts. The
+  // 1200ms delay matches the heading's animation timing — the spoken
+  // name lands as the visual name finishes its fade-in.
+  useIntroVoice(`reveal-${destination.id}` as IntroVoId, { delay: 1200 });
+
   return (
     <motion.div
       className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"

@@ -3,18 +3,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslations } from "@/components/site/LocaleProvider";
-
-const SOUNDS: Record<string, string> = {
-  waves:
-    "https://cdn.freesound.org/previews/467/467539_5765668-lq.mp3",
-  wind:
-    "https://cdn.freesound.org/previews/530/530679_8079834-lq.mp3",
-  nature:
-    "https://cdn.freesound.org/previews/462/462807_7799498-lq.mp3",
-};
+import { resolveIntroAmbient, type IntroAmbient } from "@/lib/introAudio";
 
 interface Props {
-  track?: keyof typeof SOUNDS;
+  track?: IntroAmbient;
   volume?: number;
 }
 
@@ -26,10 +18,27 @@ export default function AmbientSound({
   const isEn = locale === "en";
   const [muted, setMuted] = useState(true);
   const [ready, setReady] = useState(false);
+  const [resolvedSrc, setResolvedSrc] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Resolve the actual URL for the requested track. Prefers a local file
+  // under /public/intro/ambient/intro__<track>.mp3 when available, falls
+  // back to the CDN preview otherwise. The probe happens once per track
+  // per session — see isIntroAudioAvailable() in lib/introAudio.ts.
   useEffect(() => {
-    const audio = new Audio(SOUNDS[track]);
+    let cancelled = false;
+    resolveIntroAmbient(track).then((src) => {
+      if (!cancelled) setResolvedSrc(src);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [track]);
+
+  // Wire up the <Audio> element once we have a URL.
+  useEffect(() => {
+    if (!resolvedSrc) return;
+    const audio = new Audio(resolvedSrc);
     audio.loop = true;
     audio.volume = volume;
     audio.preload = "auto";
@@ -43,7 +52,7 @@ export default function AmbientSound({
       audio.pause();
       audio.src = "";
     };
-  }, [track, volume]);
+  }, [resolvedSrc, volume]);
 
   const toggle = useCallback(() => {
     const audio = audioRef.current;
@@ -58,18 +67,18 @@ export default function AmbientSound({
     }
   }, [muted]);
 
-  // Update track
+  // When the track prop changes mid-session, swap in the new src without
+  // tearing down the audio element so playback stays continuous.
   useEffect(() => {
     const audio = audioRef.current;
-    if (!audio) return;
-    const src = SOUNDS[track];
-    if (audio.src !== src) {
+    if (!audio || !resolvedSrc) return;
+    if (audio.src !== resolvedSrc) {
       const wasPlaying = !audio.paused;
-      audio.src = src;
+      audio.src = resolvedSrc;
       audio.load();
       if (wasPlaying) audio.play().catch(() => {});
     }
-  }, [track]);
+  }, [resolvedSrc]);
 
   return (
     <motion.button

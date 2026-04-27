@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import Particles from "./Particles";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { useIntroVoice } from "@/hooks/useIntroVoice";
 
 interface Props {
   onDone: () => void;
@@ -24,6 +25,13 @@ export default function HookScreen({ onDone }: Props) {
   const lines = locale === "en" ? LINES_EN : LINES_AR;
   const [lineIndex, setLineIndex] = useState(0);
   const [visible, setVisible] = useState(true);
+
+  // VO timing matches the visual timing: line 1 enters at 0ms,
+  // line 2 enters at 3300ms. Voice clips kick off ~200ms after the
+  // text fades in so the spoken word feels in sync with what the
+  // user is seeing.
+  useIntroVoice(lineIndex === 0 ? "hook-1" : null, { delay: 200 });
+  useIntroVoice(lineIndex === 1 ? "hook-2" : null, { delay: 200 });
 
   useEffect(() => {
     const timers: ReturnType<typeof setTimeout>[] = [];

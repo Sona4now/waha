@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { Question, localizeQuestion } from "@/data/questions";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { useIntroVoice } from "@/hooks/useIntroVoice";
+import type { IntroVoId } from "@/lib/introAudio";
 
 interface Props {
   question: Question;
@@ -42,6 +44,18 @@ export default function QuestionStep({
   const [selected, setSelected] = useState<string | null>(null);
 
   const activeBg = hovered || selected;
+
+  // Map question step index → VO id. The clip is read 300ms after
+  // the question fades in (matching the heading animation delay).
+  const voId: IntroVoId | null =
+    stepIndex === 0
+      ? "q1"
+      : stepIndex === 1
+        ? "q2"
+        : stepIndex === 2
+          ? "q3"
+          : null;
+  useIntroVoice(voId, { delay: 300 });
 
   function handleSelect(id: string) {
     if (selected) return;

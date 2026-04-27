@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Destination } from "@/data/destinations";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { useIntroVoice } from "@/hooks/useIntroVoice";
 
 interface Props {
   destination: Destination;
@@ -11,6 +12,10 @@ interface Props {
 
 export default function TransitionScreen({ destination, onEnter }: Props) {
   const { locale } = useTranslations();
+
+  // Final spoken line of the cinematic intro — "Your journey has begun."
+  useIntroVoice("transition", { delay: 600 });
+
   return (
     <motion.div
       className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
