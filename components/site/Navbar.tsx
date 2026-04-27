@@ -55,15 +55,18 @@ export default function Navbar() {
           : "bg-white/80 dark:bg-[#0d1b2a]/80 backdrop-blur-sm"
       }`}
     >
-      <div className="max-w-[1280px] mx-auto px-6 h-full flex items-center justify-between">
+      <div className="max-w-[1280px] mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-2">
         {/* Logo */}
-        <Link href="/home" className="flex items-center gap-2.5 no-underline">
+        <Link
+          href="/home"
+          className="flex items-center gap-2 no-underline flex-shrink-0"
+        >
           <img
             src="/logo.png"
             alt={locale === "en" ? "Waaha" : "واحة"}
-            className="h-[54px] w-[54px] object-contain"
+            className="h-[44px] w-[44px] md:h-[50px] md:w-[50px] object-contain"
           />
-          <div className="text-[1.7rem] font-black leading-none font-display">
+          <div className="text-[1.4rem] md:text-[1.6rem] font-black leading-none font-display whitespace-nowrap">
             {locale === "en" ? (
               <>
                 <span className="text-[#1d5770] dark:text-[#4a9dc0]">WA</span>
@@ -78,13 +81,16 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Links */}
-        <ul className="hidden md:flex items-center gap-0.5 list-none">
+        {/* Desktop Links — flex-1 + min-w-0 lets the row shrink instead of
+            wrapping. Each link gets whitespace-nowrap so labels never split
+            across two lines, and the row uses smaller padding/gap in EN to
+            keep all 12 items visible on a 1280px viewport. */}
+        <ul className="hidden md:flex items-center gap-0 list-none flex-1 min-w-0 justify-center">
           {links.map((l) => (
-            <li key={l.href}>
+            <li key={l.href} className="flex-shrink-0">
               <Link
                 href={l.href}
-                className={`block px-3.5 py-2 text-[0.925rem] font-semibold rounded-[10px] transition-all duration-300 no-underline ${
+                className={`block px-2.5 py-2 text-[0.85rem] font-semibold rounded-[10px] transition-all duration-300 no-underline whitespace-nowrap ${
                   pathname === l.href
                     ? "text-[#1d5770] dark:text-[#91b149] bg-[#e4edf2] dark:bg-[#162033]"
                     : "text-[#12394d] dark:text-white/80 hover:text-[#1d5770] dark:hover:text-[#91b149] hover:bg-[#e4edf2] dark:hover:bg-[#162033]"
@@ -97,13 +103,13 @@ export default function Navbar() {
         </ul>
 
         {/* Right actions */}
-        <div className="flex items-center gap-1">
-          {/* Search button */}
+        <div className="flex items-center gap-0.5 flex-shrink-0">
+          {/* Search button — desktop only, icon-only at md, expanded at xl */}
           <button
             onClick={openSearch}
             aria-label={t("common.search")}
             title={t("common.search")}
-            className="hidden sm:flex items-center gap-2 px-3 py-1.5 text-xs text-[#7b7c7d] bg-[#f5f8fa] dark:bg-[#162033] hover:bg-[#e4edf2] dark:hover:bg-[#1e3a5f] rounded-full border border-[#d0dde4] dark:border-[#1e3a5f] transition-colors"
+            className="hidden md:flex items-center gap-1.5 px-2 lg:px-3 py-1.5 text-xs text-[#7b7c7d] bg-[#f5f8fa] dark:bg-[#162033] hover:bg-[#e4edf2] dark:hover:bg-[#1e3a5f] rounded-full border border-[#d0dde4] dark:border-[#1e3a5f] transition-colors"
           >
             <svg
               width="14"
@@ -118,8 +124,8 @@ export default function Navbar() {
               <circle cx="11" cy="11" r="8" />
               <line x1="21" y1="21" x2="16.65" y2="16.65" />
             </svg>
-            <span className="hidden md:inline">{t("common.search")}</span>
-            <kbd className="hidden md:inline-flex items-center px-1.5 py-0.5 text-[9px] font-mono font-semibold bg-white dark:bg-[#0a151f] border border-[#d0dde4] dark:border-[#1e3a5f] rounded">
+            <span className="hidden xl:inline">{t("common.search")}</span>
+            <kbd className="hidden xl:inline-flex items-center px-1.5 py-0.5 text-[9px] font-mono font-semibold bg-white dark:bg-[#0a151f] border border-[#d0dde4] dark:border-[#1e3a5f] rounded">
               {platformKey}K
             </kbd>
           </button>
@@ -128,7 +134,7 @@ export default function Navbar() {
           <button
             onClick={openSearch}
             aria-label={t("common.search")}
-            className="sm:hidden w-9 h-9 rounded-full flex items-center justify-center text-[#12394d] dark:text-white hover:bg-[#e4edf2] dark:hover:bg-[#162033] transition-colors"
+            className="md:hidden w-9 h-9 rounded-full flex items-center justify-center text-[#12394d] dark:text-white hover:bg-[#e4edf2] dark:hover:bg-[#162033] transition-colors"
           >
             <svg
               width="18"

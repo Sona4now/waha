@@ -11,7 +11,7 @@ import {
   useRecommendation,
   NEED_TO_TREATMENTS,
 } from "@/hooks/useRecommendation";
-import { THERAPEUTIC_SITES } from "@/lib/therapeuticSites";
+import { THERAPEUTIC_SITES, localizeSite } from "@/lib/therapeuticSites";
 import StoryOverlay, { type Act } from "@/components/map/StoryOverlay";
 import MapToolbar from "@/components/map/MapToolbar";
 import { playChime } from "@/lib/meditation/chimes";
@@ -113,8 +113,10 @@ export default function MapPage() {
 
   const focusedSubSites = useMemo(() => {
     if (!highlighted) return [];
-    return THERAPEUTIC_SITES.filter((s) => s.destinationId === highlighted);
-  }, [highlighted]);
+    return THERAPEUTIC_SITES.filter(
+      (s) => s.destinationId === highlighted,
+    ).map((s) => localizeSite(s, locale));
+  }, [highlighted, locale]);
 
   const handleSelectDestination = useCallback((id: string) => {
     setFreeExplore(true);
@@ -218,7 +220,7 @@ export default function MapPage() {
         <div className="absolute inset-0">
           <StoryMap
             destinations={DESTINATIONS.map((d) => localizeDestination(d, locale))}
-            subSites={THERAPEUTIC_SITES}
+            subSites={THERAPEUTIC_SITES.map((s) => localizeSite(s, locale))}
             recommendation={recommendation}
             highlighted={highlighted}
             showSubSites={showSubSites}

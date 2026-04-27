@@ -25,20 +25,25 @@ const CATEGORIES = [
   { id: "نصائح", labelKey: "blogPage.categories.tips" },
 ];
 
-const SORT_OPTIONS = [
-  { id: "newest", label: "الأحدث" },
-  { id: "oldest", label: "الأقدم" },
-  { id: "shortest", label: "الأقصر" },
-  { id: "longest", label: "الأطول" },
+const SORT_OPTIONS: { id: string; labelAr: string; labelEn: string }[] = [
+  { id: "newest", labelAr: "الأحدث", labelEn: "Newest" },
+  { id: "oldest", labelAr: "الأقدم", labelEn: "Oldest" },
+  { id: "shortest", labelAr: "الأقصر", labelEn: "Shortest" },
+  { id: "longest", labelAr: "الأطول", labelEn: "Longest" },
 ];
 
-function fmtDate(iso: string): string {
+function fmtDate(iso: string, locale: "ar" | "en"): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  const months = [
+  const monthsAr = [
     "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
     "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
   ];
+  const monthsEn = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+  const months = locale === "en" ? monthsEn : monthsAr;
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
@@ -161,7 +166,7 @@ export default function BlogPage() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                 className="mb-12"
-                dir="rtl"
+                dir={locale === "en" ? "ltr" : "rtl"}
               >
                 <div className="flex items-center gap-2 mb-4">
                   <span className="inline-block w-1 h-5 bg-[#91b149] rounded-full" />
@@ -192,13 +197,14 @@ export default function BlogPage() {
                     {/* Body */}
                     <div className="p-6 md:p-10 flex flex-col justify-center">
                       <div className="flex items-center gap-3 mb-3 text-xs text-[#7b7c7d] dark:text-white/50">
-                        <span>{fmtDate(featured.date)}</span>
+                        <span>{fmtDate(featured.date, locale)}</span>
                         <span className="text-[#d0dde4]">·</span>
                         <span className="flex items-center gap-1">
                           <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          {featured.readTime} دقائق قراءة
+                          {featured.readTime}{" "}
+                          {locale === "en" ? "min read" : "دقائق قراءة"}
                         </span>
                       </div>
                       <h3 className="font-display text-2xl md:text-3xl font-black text-[#12394d] dark:text-white mb-3 leading-tight group-hover:text-[#1d5770] dark:group-hover:text-[#91b149] transition-colors">
@@ -209,7 +215,7 @@ export default function BlogPage() {
                       </p>
                       <span className="inline-flex items-center gap-2 text-sm font-display font-bold text-[#1d5770] dark:text-[#91b149] group-hover:gap-3 transition-all">
                         <span>{t("blogPage.readArticle")}</span>
-                        <span>←</span>
+                        <span>{locale === "en" ? "→" : "←"}</span>
                       </span>
                     </div>
                   </div>
@@ -221,7 +227,7 @@ export default function BlogPage() {
           {/* ── Search + Sort Row ── */}
           <div
             className="mb-8 flex flex-col md:flex-row md:items-center gap-3"
-            dir="rtl"
+            dir={locale === "en" ? "ltr" : "rtl"}
           >
             {/* Search */}
             <div className="relative flex-1">
@@ -266,7 +272,7 @@ export default function BlogPage() {
               >
                 {SORT_OPTIONS.map((opt) => (
                   <option key={opt.id} value={opt.id}>
-                    {opt.label}
+                    {locale === "en" ? opt.labelEn : opt.labelAr}
                   </option>
                 ))}
               </select>
@@ -289,7 +295,7 @@ export default function BlogPage() {
           {/* ── Category Filter ── */}
           <div
             className="mb-6 flex flex-wrap items-center gap-2 md:gap-3 overflow-x-auto pb-2 md:pb-0 no-scrollbar"
-            dir="rtl"
+            dir={locale === "en" ? "ltr" : "rtl"}
           >
             {CATEGORIES.map((cat) => {
               const isActive = activeCategory === cat.id;
@@ -312,7 +318,7 @@ export default function BlogPage() {
           {/* ── Stats line ── */}
           <div
             className="mb-8 flex items-center justify-between text-xs md:text-sm text-[#7b7c7d] dark:text-white/50"
-            dir="rtl"
+            dir={locale === "en" ? "ltr" : "rtl"}
           >
             <span>
               {visibleCount === totalCount
@@ -335,7 +341,7 @@ export default function BlogPage() {
           <AnimatePresence mode="popLayout">
             <div
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
-              dir="rtl"
+              dir={locale === "en" ? "ltr" : "rtl"}
             >
               {gridPosts.map((post, i) => (
                 <motion.div
@@ -423,14 +429,14 @@ export default function BlogPage() {
                       {/* Meta */}
                       <div className="flex items-center justify-between border-t border-gray-100 dark:border-[#1e3a5f] pt-4 mt-auto">
                         <span className="text-xs text-[#7b7c7d] dark:text-white/50">
-                          {fmtDate(post.date)}
+                          {fmtDate(post.date, locale)}
                         </span>
                         <span className="text-xs font-display font-bold text-[#1d5770] dark:text-[#91b149] group-hover:gap-2 inline-flex items-center gap-1 transition-all">
                           {progress[post.id] !== undefined &&
                           progress[post.id] < 90
                             ? t("blogPage.readingProgress.continueBtn")
                             : t("blogPage.readingProgress.readBtn")}{" "}
-                          <span>←</span>
+                          <span>{locale === "en" ? "→" : "←"}</span>
                         </span>
                       </div>
                     </div>
@@ -446,7 +452,7 @@ export default function BlogPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               className="text-center py-20"
-              dir="rtl"
+              dir={locale === "en" ? "ltr" : "rtl"}
             >
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#1d5770]/10 dark:bg-[#91b149]/10 mb-5">
                 <svg

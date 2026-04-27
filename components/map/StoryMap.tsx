@@ -13,15 +13,21 @@ type MapStyle = "streets" | "satellite" | "terrain" | "dark";
 
 const TILE_CONFIG: Record<
   MapStyle,
-  { url: string; attribution: string; maxZoom: number; label: string; icon: string }
+  {
+    url: string;
+    attribution: string;
+    maxZoom: number;
+    label: string;
+    labelEn: string;
+    icon: string;
+  }
 > = {
-  // All tiles proxied through our own /api/tiles route so they're same-origin
-  // and bypass CSP/CORS/sandbox restrictions.
   streets: {
     url: "/api/tiles/streets/{z}/{x}/{y}",
     attribution: "&copy; OpenStreetMap &copy; CARTO",
     maxZoom: 19,
     label: "خريطة",
+    labelEn: "Map",
     icon: "🗺️",
   },
   satellite: {
@@ -29,6 +35,7 @@ const TILE_CONFIG: Record<
     attribution: "Tiles &copy; Esri, Maxar",
     maxZoom: 19,
     label: "أقمار",
+    labelEn: "Satellite",
     icon: "🛰️",
   },
   terrain: {
@@ -36,6 +43,7 @@ const TILE_CONFIG: Record<
     attribution: "© OpenStreetMap, SRTM | © OpenTopoMap",
     maxZoom: 17,
     label: "تضاريس",
+    labelEn: "Terrain",
     icon: "⛰️",
   },
   dark: {
@@ -43,6 +51,7 @@ const TILE_CONFIG: Record<
     attribution: "&copy; OpenStreetMap &copy; CARTO",
     maxZoom: 19,
     label: "ليلي",
+    labelEn: "Night",
     icon: "🌙",
   },
 };
@@ -791,8 +800,8 @@ function StyleSwitcher({
               key={s}
               onClick={() => onChange(s)}
               aria-pressed={active}
-              aria-label={cfg.label}
-              title={cfg.label}
+              aria-label={locale === "en" ? cfg.labelEn : cfg.label}
+              title={locale === "en" ? cfg.labelEn : cfg.label}
               style={{
                 display: "inline-flex",
                 alignItems: "center",
@@ -813,7 +822,9 @@ function StyleSwitcher({
               }}
             >
               <span style={{ fontSize: 15 }}>{cfg.icon}</span>
-              {!isSmall && <span>{cfg.label}</span>}
+              {!isSmall && (
+                <span>{locale === "en" ? cfg.labelEn : cfg.label}</span>
+              )}
             </button>
           );
         })}
