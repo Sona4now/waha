@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { DESTINATIONS } from "@/data/siteData";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { localizeDestination } from "@/lib/localize";
 
 interface VisitData {
   count: number;
@@ -74,8 +75,11 @@ export default function SmartWelcome() {
   if (HIDDEN_PATHS.includes(pathname)) return null;
   if (!visitData?.recommendationId) return null;
 
-  const dest = DESTINATIONS.find((d) => d.id === visitData.recommendationId);
-  if (!dest) return null;
+  const rawDest = DESTINATIONS.find(
+    (d) => d.id === visitData.recommendationId,
+  );
+  if (!rawDest) return null;
+  const dest = localizeDestination(rawDest, locale);
 
   const visitLabel =
     visitData.count === 2

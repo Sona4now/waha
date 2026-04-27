@@ -12,6 +12,7 @@ import type { FAQItem } from "@/components/site/FAQ";
 import Link from "next/link";
 import Image from "next/image";
 import { DESTINATIONS } from "@/data/siteData";
+import { localizeDestination } from "@/lib/localize";
 import { useEffect, useState, useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 
@@ -187,11 +188,11 @@ export default function HomePage() {
     } catch {}
   }, []);
 
-  const recDest = recommendation
+  const rawRecDest = recommendation
     ? DESTINATIONS.find((d) => d.id === recommendation.destinationId)
     : null;
-  const recDestName =
-    recDest && locale === "en" && recDest.nameEn ? recDest.nameEn : recDest?.name;
+  const recDest = rawRecDest ? localizeDestination(rawRecDest, locale) : null;
+  const recDestName = recDest?.name;
 
   return (
     <SiteLayout>
@@ -406,50 +407,52 @@ export default function HomePage() {
             </p>
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {DESTINATIONS.slice(0, 4).map((dest, i) => (
-              <Reveal key={dest.id} delay={i * 0.1}>
-                <TiltCard maxTilt={6} scale={1.03} className="h-full">
-                  <Link
-                    href={`/destination/${dest.id}`}
-                    className="block bg-white dark:bg-[#162033] rounded-[20px] overflow-hidden shadow-[0_2px_8px_rgba(29,87,112,0.07)] border border-[#d0dde4] dark:border-[#1e3a5f] hover:shadow-[0_20px_60px_rgba(29,87,112,0.2)] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-all duration-500 no-underline group h-full"
-                  >
-                    <div className="relative overflow-hidden h-[220px]">
-                      <Image
-                        src={dest.image}
-                        alt={dest.name}
-                        fill
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        placeholder="blur"
-                        blurDataURL={BLUR_DATA_URL}
-                        className="object-cover group-hover:scale-110 transition-transform duration-700"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                    </div>
-                    <div className="p-5">
-                      <span
-                        className={`inline-flex items-center gap-1 text-[0.75rem] font-bold px-2.5 py-1 rounded-full mb-2 ${
-                          dest.envClass === "env-sea"
-                            ? "bg-[#EBF8FF] text-[#0369a1]"
-                            : dest.envClass === "env-desert"
-                              ? "bg-[#FEF9EB] text-[#92400e]"
-                              : dest.envClass === "env-oasis"
-                                ? "bg-[#ECFDF5] text-[#065f46]"
-                                : "bg-[#F1F5F9] text-[#374151]"
-                        }`}
-                      >
-                        {dest.envIcon} {dest.environment}
-                      </span>
-                      <h3 className="text-lg font-bold text-[#12394d] dark:text-white mb-1.5 group-hover:text-[#91b149] transition-colors">
-                        {dest.name}
-                      </h3>
-                      <p className="text-[0.85rem] text-[#7b7c7d] dark:text-white/60 leading-relaxed line-clamp-2">
-                        {dest.description}
-                      </p>
-                    </div>
-                  </Link>
-                </TiltCard>
-              </Reveal>
-            ))}
+            {DESTINATIONS.slice(0, 4)
+              .map((d) => localizeDestination(d, locale))
+              .map((dest, i) => (
+                <Reveal key={dest.id} delay={i * 0.1}>
+                  <TiltCard maxTilt={6} scale={1.03} className="h-full">
+                    <Link
+                      href={`/destination/${dest.id}`}
+                      className="block bg-white dark:bg-[#162033] rounded-[20px] overflow-hidden shadow-[0_2px_8px_rgba(29,87,112,0.07)] border border-[#d0dde4] dark:border-[#1e3a5f] hover:shadow-[0_20px_60px_rgba(29,87,112,0.2)] dark:hover:shadow-[0_20px_60px_rgba(0,0,0,0.5)] transition-all duration-500 no-underline group h-full"
+                    >
+                      <div className="relative overflow-hidden h-[220px]">
+                        <Image
+                          src={dest.image}
+                          alt={dest.name}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          placeholder="blur"
+                          blurDataURL={BLUR_DATA_URL}
+                          className="object-cover group-hover:scale-110 transition-transform duration-700"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      </div>
+                      <div className="p-5">
+                        <span
+                          className={`inline-flex items-center gap-1 text-[0.75rem] font-bold px-2.5 py-1 rounded-full mb-2 ${
+                            dest.envClass === "env-sea"
+                              ? "bg-[#EBF8FF] text-[#0369a1]"
+                              : dest.envClass === "env-desert"
+                                ? "bg-[#FEF9EB] text-[#92400e]"
+                                : dest.envClass === "env-oasis"
+                                  ? "bg-[#ECFDF5] text-[#065f46]"
+                                  : "bg-[#F1F5F9] text-[#374151]"
+                          }`}
+                        >
+                          {dest.envIcon} {dest.environment}
+                        </span>
+                        <h3 className="text-lg font-bold text-[#12394d] dark:text-white mb-1.5 group-hover:text-[#91b149] transition-colors">
+                          {dest.name}
+                        </h3>
+                        <p className="text-[0.85rem] text-[#7b7c7d] dark:text-white/60 leading-relaxed line-clamp-2">
+                          {dest.description}
+                        </p>
+                      </div>
+                    </Link>
+                  </TiltCard>
+                </Reveal>
+              ))}
           </div>
           <Reveal delay={0.4}>
             <div className="text-center mt-10">
