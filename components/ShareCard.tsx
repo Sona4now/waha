@@ -11,28 +11,48 @@ interface Props {
   onClose: () => void;
 }
 
-const NEED_LABELS: Record<string, string> = {
+const NEED_LABELS_AR: Record<string, string> = {
   body: "راحة جسدية",
   mind: "صفاء نفسي",
   relax: "استرخاء",
 };
+const NEED_LABELS_EN: Record<string, string> = {
+  body: "Physical relief",
+  mind: "Mental clarity",
+  relax: "Relaxation",
+};
 
-const ENV_LABELS: Record<string, string> = {
+const ENV_LABELS_AR: Record<string, string> = {
   sea: "البحر",
   desert: "الصحراء",
   mountains: "الجبال",
   oasis: "الواحات",
 };
+const ENV_LABELS_EN: Record<string, string> = {
+  sea: "The sea",
+  desert: "The desert",
+  mountains: "The mountains",
+  oasis: "The oases",
+};
 
-const STYLE_LABELS: Record<string, string> = {
+const STYLE_LABELS_AR: Record<string, string> = {
   calm: "هادئة",
   exploratory: "استكشافية",
   deep: "عميقة",
+};
+const STYLE_LABELS_EN: Record<string, string> = {
+  calm: "Calm",
+  exploratory: "Exploratory",
+  deep: "Deep",
 };
 
 export default function ShareCard({ destination, answers, onClose }: Props) {
   const { locale } = useTranslations();
   const cardRef = useRef<HTMLDivElement>(null);
+  const NEED_LABELS = locale === "en" ? NEED_LABELS_EN : NEED_LABELS_AR;
+  const ENV_LABELS = locale === "en" ? ENV_LABELS_EN : ENV_LABELS_AR;
+  const STYLE_LABELS =
+    locale === "en" ? STYLE_LABELS_EN : STYLE_LABELS_AR;
   const [copied, setCopied] = useState(false);
 
   async function handleShare() {

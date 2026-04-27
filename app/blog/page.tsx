@@ -250,7 +250,7 @@ export default function BlogPage() {
                 <button
                   onClick={() => setSearch("")}
                   className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 text-[#7b7c7d] dark:text-white/50 hover:text-[#12394d] dark:hover:text-white flex items-center justify-center transition-colors text-sm"
-                  aria-label="مسح البحث"
+                  aria-label={locale === "en" ? "Clear search" : "مسح البحث"}
                 >
                   ✕
                 </button>

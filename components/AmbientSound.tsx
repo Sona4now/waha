@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const SOUNDS: Record<string, string> = {
   waves:
@@ -21,6 +22,8 @@ export default function AmbientSound({
   track = "nature",
   volume = 0.15,
 }: Props) {
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
   const [muted, setMuted] = useState(true);
   const [ready, setReady] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -75,7 +78,15 @@ export default function AmbientSound({
       transition={{ delay: 3, duration: 1 }}
       onClick={toggle}
       className="fixed top-5 left-5 z-50 w-10 h-10 rounded-full bg-white/[0.08] backdrop-blur-sm border border-white/15 flex items-center justify-center hover:bg-white/[0.15] transition-all duration-300 group"
-      title={muted ? "تشغيل الصوت" : "كتم الصوت"}
+      title={
+        muted
+          ? isEn
+            ? "Play sound"
+            : "تشغيل الصوت"
+          : isEn
+            ? "Mute sound"
+            : "كتم الصوت"
+      }
     >
       <AnimatePresence mode="wait">
         {muted ? (
