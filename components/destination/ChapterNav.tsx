@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ENVIRONMENT_CHAPTERS } from "@/data/environmentChapters";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { localizeChapter } from "@/lib/localize";
 
 /**
  * Sticky chapter navigation for the narrative /destinations page.
@@ -20,6 +21,7 @@ import { useTranslations } from "@/components/site/LocaleProvider";
  */
 export default function ChapterNav() {
   const { locale } = useTranslations();
+  const chapters = ENVIRONMENT_CHAPTERS.map((c) => localizeChapter(c, locale));
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -88,7 +90,7 @@ export default function ChapterNav() {
           className="hidden lg:flex fixed left-6 top-1/2 -translate-y-1/2 z-30 flex-col gap-3 no-print"
           aria-label={locale === "en" ? "Journey chapters" : "فصول الرحلة"}
         >
-          {ENVIRONMENT_CHAPTERS.map((c) => {
+          {chapters.map((c) => {
             const active = activeKey === c.key;
             return (
               <button

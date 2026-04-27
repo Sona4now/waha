@@ -8,6 +8,7 @@ import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { localizeDestination } from "@/lib/localize";
 
 /**
  * Seasonal calendar — 12-month view of which destinations are best to visit
@@ -87,13 +88,22 @@ export default function CalendarPage() {
   const [selectedMonth, setSelectedMonth] = useState<number>(now.getMonth());
 
   const destinationsForMonth = useMemo(() => {
+    // Score against canonical AR data (bestMonths is just numbers — locale
+    // doesn't matter), then localize each candidate before display.
     return DESTINATIONS.map((d) => ({
-      dest: d,
+      dest: localizeDestination(d, locale),
       intensity: intensityFor(d, selectedMonth),
     }))
       .sort((a, b) => b.intensity - a.intensity)
       .slice(0, 6);
-  }, [selectedMonth]);
+  }, [selectedMonth, locale]);
+
+  // The full heatmap row list — also localized so destination names render
+  // in the active locale.
+  const localizedDestinations = useMemo(
+    () => DESTINATIONS.map((d) => localizeDestination(d, locale)),
+    [locale],
+  );
 
   return (
     <SiteLayout>
@@ -140,7 +150,7 @@ export default function CalendarPage() {
                 <thead>
                   <tr className="border-b border-[#d0dde4] dark:border-[#1e3a5f]">
                     <th className="sticky right-0 bg-white dark:bg-[#162033] z-10 text-right text-[11px] font-bold text-[#7b7c7d] dark:text-white/60 p-3 w-40">
-                      الوجهة
+                      {locale === "en" ? "Destination" : "الوجهة"}
                     </th>
                     {MONTHS.map((m, i) => (
                       <th
@@ -158,7 +168,7 @@ export default function CalendarPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {DESTINATIONS.map((d) => (
+                  {localizedDestinations.map((d) => (
                     <tr
                       key={d.id}
                       className="border-b last:border-0 border-[#d0dde4]/60 dark:border-[#1e3a5f]/50"

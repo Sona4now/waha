@@ -5,6 +5,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { localizeDestination } from "@/lib/localize";
 
 interface Props {
   currentDest: DestinationFull;
@@ -18,6 +19,8 @@ interface Props {
  */
 export default function SmartRelated({ currentDest }: Props) {
   const { locale } = useTranslations();
+  // Score against canonical Arabic data (treatments + environment) so the
+  // matching is locale-stable, then localize each candidate for display.
   const scored = DESTINATIONS.filter((d) => d.id !== currentDest.id).map(
     (d) => {
       const sharedTreatments = d.treatments.filter((t) =>
@@ -25,7 +28,11 @@ export default function SmartRelated({ currentDest }: Props) {
       ).length;
       const sameEnv = d.environment === currentDest.environment ? 1 : 0;
       const score = sharedTreatments * 3 + sameEnv * 2;
-      return { dest: d, score, sharedTreatments };
+      return {
+        dest: localizeDestination(d, locale),
+        score,
+        sharedTreatments,
+      };
     },
   );
 

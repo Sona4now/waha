@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { DESTINATIONS, BLOG_POSTS } from "@/data/siteData";
+import { localizeBlogPost, localizeDestination } from "@/lib/localize";
 import { useTranslations } from "./LocaleProvider";
 import type { Locale } from "@/lib/i18n";
 
@@ -76,12 +77,14 @@ function buildIndex(locale: Locale): SearchItem[] {
   const L = PAGE_LABELS[locale === "en" ? "en" : "ar"];
   const isEn = locale === "en";
 
-  // Destinations
+  // Destinations — show localized title/subtitle, but keep both AR + EN
+  // values in the keyword pool so users can search in either language.
   DESTINATIONS.forEach((d) => {
+    const dl = localizeDestination(d, locale);
     index.push({
       id: `dest-${d.id}`,
       title: isEn ? d.nameEn : d.name,
-      subtitle: d.description,
+      subtitle: dl.description,
       category: L.destination,
       href: `/destination/${d.id}`,
       icon: d.envIcon,
@@ -89,14 +92,18 @@ function buildIndex(locale: Locale): SearchItem[] {
         d.name,
         d.nameEn,
         d.environment,
+        dl.environment,
         ...d.treatments,
+        ...(dl.treatments ?? []),
         d.description,
+        dl.description,
       ],
     });
   });
 
   // Blog posts — link to the specific article, not the listing page.
-  BLOG_POSTS.forEach((post) => {
+  BLOG_POSTS.forEach((rawPost) => {
+    const post = localizeBlogPost(rawPost, locale);
     index.push({
       id: `blog-${post.id}`,
       title: post.title,
@@ -104,7 +111,13 @@ function buildIndex(locale: Locale): SearchItem[] {
       category: L.article,
       href: `/blog/${post.id}`,
       icon: "📖",
-      keywords: [post.title, post.excerpt, post.category],
+      keywords: [
+        post.title,
+        rawPost.title,
+        post.excerpt,
+        rawPost.excerpt,
+        post.category,
+      ],
     });
   });
 

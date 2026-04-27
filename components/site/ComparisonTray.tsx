@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
+import { localizeDestination } from "@/lib/localize";
 import { showToast } from "./Toast";
 import { useTranslations } from "./LocaleProvider";
 
@@ -53,9 +54,10 @@ export function useComparison() {
         );
         return;
       }
-      const dest = DESTINATIONS.find((d) => d.id === id);
+      const rawDest = DESTINATIONS.find((d) => d.id === id);
       persist([...ids, id]);
-      if (dest) {
+      if (rawDest) {
+        const dest = localizeDestination(rawDest, locale);
         showToast(
           locale === "en"
             ? `Added ${dest.name} to comparison ✓`
@@ -107,7 +109,8 @@ export default function ComparisonTray() {
 
   const destinations = ids
     .map((id) => DESTINATIONS.find((d) => d.id === id))
-    .filter(Boolean) as DestinationFull[];
+    .filter((d): d is DestinationFull => Boolean(d))
+    .map((d) => localizeDestination(d, locale));
 
   function goToCompare() {
     const query = ids.join(",");

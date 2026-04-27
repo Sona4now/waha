@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { BLOG_POSTS, type BlogPost } from "@/data/siteData";
+import { localizeBlogPost } from "@/lib/localize";
 import { useTranslations } from "@/components/site/LocaleProvider";
 import type { Locale } from "@/lib/i18n";
 
@@ -70,10 +71,13 @@ export default function RelatedArticles({
   destinationName,
 }: Props) {
   const { locale } = useTranslations();
+  // Find candidates against canonical AR data, then localize each post
+  // before rendering so titles/excerpts/categories render in the active
+  // locale.
   const articles = findArticlesAboutDestination(
     destinationId,
     destinationName,
-  );
+  ).map((p) => localizeBlogPost(p, locale));
 
   if (articles.length === 0) return null;
 

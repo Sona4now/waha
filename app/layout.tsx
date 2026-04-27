@@ -50,90 +50,142 @@ const inter = Inter({
 // across signals tells Google this site is *the* canonical answer for that
 // query. We also include common variants ("سياحة علاجية", "سياحة صحية")
 // because Egyptian users phrase this multiple ways.
-export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
-  title: {
-    default:
-      "السياحة الاستشفائية في مصر | واحة — احجز رحلتك العلاجية",
-    template: "%s | السياحة الاستشفائية في مصر — واحة",
-  },
-  description:
-    "السياحة الاستشفائية في مصر — منصة واحة لحجز رحلات العلاج الطبيعي في سفاجا، سيوة، سيناء، الفيوم، والواحات. علاج بالمياه الكبريتية، الرمال السوداء، والعلاج بالمناخ مع باقات مدروسة وأسعار شفافة.",
-  keywords: [
-    "السياحة الاستشفائية في مصر",
-    "سياحة استشفائية",
-    "السياحة العلاجية",
-    "سياحة علاجية مصر",
-    "علاج طبيعي مصر",
-    "سياحة صحية",
-    "العلاج بالمياه الكبريتية",
-    "العلاج بالرمال السوداء",
-    "علاج الصدفية في سفاجا",
-    "عيون سيوة الكبريتية",
-    "علاج الروماتيزم بالطبيعة",
-    "wellness tourism Egypt",
-    "thermal therapy Egypt",
-    "balneotherapy Safaga",
-    "سفاجا",
-    "سيوة",
-    "سيناء",
-    "الفيوم",
-    "الواحات البحرية",
-    "البحر الأحمر",
-    "العلاج بالمناخ",
-    "العلاج الطبيعي بالطين",
-  ],
-  authors: [{ name: "واحة — WAHA" }],
-  creator: "واحة",
-  publisher: "واحة — WAHA",
-  manifest: "/manifest.json",
-  openGraph: {
-    type: "website",
-    locale: "ar_EG",
-    alternateLocale: ["en_US"],
-    siteName: "واحة",
-    title: "السياحة الاستشفائية في مصر | واحة",
-    description:
-      "احجز رحلتك العلاجية في مصر — سفاجا (الصدفية والروماتيزم)، سيوة (المياه الكبريتية)، سيناء (الجبال والربو)، الفيوم (الاسترخاء). أسعار شفافة وحجز عبر واتساب.",
-    images: [
-      {
-        url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
-        width: 1200,
-        height: 630,
-        alt: "السياحة الاستشفائية في مصر — واحة",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "السياحة الاستشفائية في مصر | واحة",
-    description:
-      "احجز رحلتك العلاجية الطبيعية في مصر — أسعار شفافة وحجز عبر واتساب في 30 ثانية.",
-    images: [
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
-    ],
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+//
+// generateMetadata is async and reads the locale cookie at request time,
+// so AR users see Arabic SEO copy and EN users see English copy.
+export async function generateMetadata(): Promise<Metadata> {
+  const cookieStore = await cookies();
+  const locale = normaliseLocale(cookieStore.get(LOCALE_COOKIE)?.value);
+  const isEn = locale === "en";
+
+  const title = isEn
+    ? "Therapeutic tourism in Egypt | Waaha — Book your healing trip"
+    : "السياحة الاستشفائية في مصر | واحة — احجز رحلتك العلاجية";
+
+  const description = isEn
+    ? "Therapeutic tourism in Egypt — Waaha is a platform for booking natural-therapy trips in Safaga, Siwa, Sinai, Fayoum, and the oases. Sulphur water, black sand, and climate therapy with curated packages and transparent prices."
+    : "السياحة الاستشفائية في مصر — منصة واحة لحجز رحلات العلاج الطبيعي في سفاجا، سيوة، سيناء، الفيوم، والواحات. علاج بالمياه الكبريتية، الرمال السوداء، والعلاج بالمناخ مع باقات مدروسة وأسعار شفافة.";
+
+  const ogTitle = isEn
+    ? "Therapeutic tourism in Egypt | Waaha"
+    : "السياحة الاستشفائية في مصر | واحة";
+
+  const ogDescription = isEn
+    ? "Book your therapeutic trip in Egypt — Safaga (psoriasis & rheumatism), Siwa (sulphur water), Sinai (mountains & asthma), Fayoum (relaxation). Transparent pricing and WhatsApp booking."
+    : "احجز رحلتك العلاجية في مصر — سفاجا (الصدفية والروماتيزم)، سيوة (المياه الكبريتية)، سيناء (الجبال والربو)، الفيوم (الاسترخاء). أسعار شفافة وحجز عبر واتساب.";
+
+  const twitterDescription = isEn
+    ? "Book your natural-therapy trip in Egypt — transparent pricing and WhatsApp booking in 30 seconds."
+    : "احجز رحلتك العلاجية الطبيعية في مصر — أسعار شفافة وحجز عبر واتساب في 30 ثانية.";
+
+  const ogAlt = isEn
+    ? "Therapeutic tourism in Egypt — Waaha"
+    : "السياحة الاستشفائية في مصر — واحة";
+
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: {
+      default: title,
+      template: isEn
+        ? "%s | Therapeutic tourism in Egypt — Waaha"
+        : "%s | السياحة الاستشفائية في مصر — واحة",
+    },
+    description,
+    keywords: isEn
+      ? [
+          "therapeutic tourism Egypt",
+          "wellness tourism Egypt",
+          "natural therapy Egypt",
+          "thermal therapy Egypt",
+          "balneotherapy Safaga",
+          "sulphur water therapy",
+          "black sand therapy",
+          "psoriasis treatment Safaga",
+          "Siwa sulphur springs",
+          "rheumatism natural therapy",
+          "Safaga",
+          "Siwa",
+          "Sinai",
+          "Fayoum",
+          "Bahariya Oasis",
+          "Red Sea",
+          "climatherapy",
+          "mud therapy",
+        ]
+      : [
+          "السياحة الاستشفائية في مصر",
+          "سياحة استشفائية",
+          "السياحة العلاجية",
+          "سياحة علاجية مصر",
+          "علاج طبيعي مصر",
+          "سياحة صحية",
+          "العلاج بالمياه الكبريتية",
+          "العلاج بالرمال السوداء",
+          "علاج الصدفية في سفاجا",
+          "عيون سيوة الكبريتية",
+          "علاج الروماتيزم بالطبيعة",
+          "wellness tourism Egypt",
+          "thermal therapy Egypt",
+          "balneotherapy Safaga",
+          "سفاجا",
+          "سيوة",
+          "سيناء",
+          "الفيوم",
+          "الواحات البحرية",
+          "البحر الأحمر",
+          "العلاج بالمناخ",
+          "العلاج الطبيعي بالطين",
+        ],
+    authors: [{ name: isEn ? "Waaha" : "واحة — WAHA" }],
+    creator: isEn ? "Waaha" : "واحة",
+    publisher: isEn ? "Waaha" : "واحة — WAHA",
+    manifest: "/manifest.json",
+    openGraph: {
+      type: "website",
+      locale: isEn ? "en_US" : "ar_EG",
+      alternateLocale: isEn ? ["ar_EG"] : ["en_US"],
+      siteName: isEn ? "Waaha" : "واحة",
+      title: ogTitle,
+      description: ogDescription,
+      images: [
+        {
+          url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+          width: 1200,
+          height: 630,
+          alt: ogAlt,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: ogTitle,
+      description: twitterDescription,
+      images: [
+        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80",
+      ],
+    },
+    robots: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
     },
-  },
-  alternates: {
-    canonical: SITE_URL,
-    languages: {
-      "ar-EG": SITE_URL,
-      "en-US": SITE_URL,
-      "x-default": SITE_URL,
+    alternates: {
+      canonical: SITE_URL,
+      languages: {
+        "ar-EG": SITE_URL,
+        "en-US": SITE_URL,
+        "x-default": SITE_URL,
+      },
     },
-  },
-  category: "Travel — Wellness Tourism",
-};
+    category: "Travel — Wellness Tourism",
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: "#1d5770",

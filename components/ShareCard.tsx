@@ -36,12 +36,15 @@ export default function ShareCard({ destination, answers, onClose }: Props) {
   const [copied, setCopied] = useState(false);
 
   async function handleShare() {
-    const text = `🌿 وجهتي الاستشفائية: ${destination.name}\n"${destination.poem}"\n\nاكتشف وجهتك على واحة — السياحة الاستشفائية في مصر`;
+    const text =
+      locale === "en"
+        ? `🌿 My therapeutic destination: ${destination.name}\n"${destination.poem}"\n\nDiscover your destination on Waaha — therapeutic tourism in Egypt`
+        : `🌿 وجهتي الاستشفائية: ${destination.name}\n"${destination.poem}"\n\nاكتشف وجهتك على واحة — السياحة الاستشفائية في مصر`;
 
     if (navigator.share) {
       try {
         await navigator.share({
-          title: `واحة — ${destination.name}`,
+          title: locale === "en" ? `Waaha — ${destination.name}` : `واحة — ${destination.name}`,
           text,
         });
       } catch {

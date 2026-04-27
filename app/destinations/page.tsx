@@ -11,6 +11,7 @@ import EnvironmentChapter from "@/components/destination/EnvironmentChapter";
 import ChapterNav from "@/components/destination/ChapterNav";
 import { useTranslations } from "@/components/site/LocaleProvider";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
+import { localizeDestination } from "@/lib/localize";
 import { TESTIMONIALS_BY_DEST } from "@/data/testimonials";
 import { ENVIRONMENT_CHAPTERS } from "@/data/environmentChapters";
 import { isInSeasonNow } from "@/lib/season";
@@ -161,7 +162,7 @@ const TREATMENT_LABEL_KEYS: Record<string, string> = {
 };
 
 export default function DestinationsPage() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [treatment, setTreatment] = useState("all");
   const [distance, setDistance] = useState("all");
   const [budget, setBudget] = useState("all");
@@ -317,7 +318,8 @@ export default function DestinationsPage() {
 
   const recentDestinations = recentlyViewed
     .map((id) => DESTINATIONS.find((d) => d.id === id))
-    .filter((d): d is DestinationFull => Boolean(d));
+    .filter((d): d is DestinationFull => Boolean(d))
+    .map((d) => localizeDestination(d, locale));
 
   /* ── Quick stats for the banner ── */
   const totalReviews = useMemo(() => {
@@ -737,7 +739,10 @@ export default function DestinationsPage() {
         </div>
       ) : (
         <section className="py-10 md:py-16 px-4 bg-[#f5f8fa] dark:bg-[#0a151f]">
-          <div className="max-w-6xl mx-auto" dir="rtl">
+          <div
+            className="max-w-6xl mx-auto"
+            dir={locale === "en" ? "ltr" : "rtl"}
+          >
             {filtered.length > 0 ? (
               <div
                 className={
