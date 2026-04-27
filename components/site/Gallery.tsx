@@ -2,6 +2,60 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "./LocaleProvider";
+
+// Translate Arabic category/caption labels coming from data into English.
+const CATEGORY_EN: Record<string, string> = {
+  الكل: "All",
+  طبيعة: "Nature",
+  الطبيعة: "Nature",
+  البحر: "Sea",
+  العلاج: "Therapy",
+  البحيرات: "Lakes",
+  العيون: "Springs",
+  التراث: "Heritage",
+  الجبال: "Mountains",
+  الآثار: "Antiquities",
+  الصحراء: "Desert",
+};
+
+const CAPTION_EN: Record<string, string> = {
+  "البحر الأحمر — سفاجا": "The Red Sea — Safaga",
+  "الشعاب المرجانية": "Coral reefs",
+  "مياه سفاجا الزرقاء": "The blue waters of Safaga",
+  "غروب الشمس في سفاجا": "Sunset in Safaga",
+  "الرمال الذهبية": "Golden sands",
+  "العلاج بالشمس": "Heliotherapy",
+  "واحة سيوة": "Siwa Oasis",
+  "بحيرات الملح": "Salt lakes",
+  "النخيل والزيتون": "Palms and olives",
+  "العيون الكبريتية": "Sulfur springs",
+  "الصحراء الغربية": "Western Desert",
+  "العمارة التقليدية": "Traditional architecture",
+  "جبال سيناء الشاهقة": "Towering Sinai mountains",
+  "وادي رم": "Wadi Rum",
+  "سانت كاترين": "Saint Catherine",
+  "البحر الأحمر من الجبل": "The Red Sea from the mountain",
+  "صخور ملونة": "Colored rocks",
+  "الصحراء الجبلية": "Mountain desert",
+  "بحيرة قارون": "Lake Qarun",
+  "الفيوم الخضراء": "Green Fayoum",
+  "وادي الحيتان": "Wadi El Hitan",
+  "شلالات وادي الريان": "Wadi El Rayan waterfalls",
+  "غروب الصحراء": "Desert sunset",
+  "قرية تونس": "Tunis Village",
+  "الصحراء البيضاء": "The White Desert",
+  "تكوينات صخرية": "Rock formations",
+  "سماء الصحراء": "Desert sky",
+  "العيون الحارة": "Hot springs",
+  "واحة بين الصحاري": "Oasis between deserts",
+  "جبل الكريستال": "Crystal Mountain",
+};
+
+function localizeLabel(label: string, isEn: boolean, dict: Record<string, string>) {
+  if (!isEn) return label;
+  return dict[label] ?? label;
+}
 
 export interface GalleryImage {
   url: string;
@@ -14,19 +68,30 @@ interface Props {
   title?: string;
 }
 
-export default function Gallery({ images, title = "معرض الصور" }: Props) {
-  const [activeCategory, setActiveCategory] = useState<string>("الكل");
+export default function Gallery({ images, title = "" }: Props) {
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
+  const ALL_LABEL = isEn ? "All" : "الكل";
+  const NATURE_FALLBACK = isEn ? "Nature" : "طبيعة";
+  const galleryTitle = title || (isEn ? "Image gallery" : "معرض الصور");
+  const resolvedTitle = galleryTitle;
+  const [activeCategory, setActiveCategory] = useState<string>(ALL_LABEL);
   const [lightboxIdx, setLightboxIdx] = useState<number | null>(null);
+
+  // Re-sync the "All" label if the locale changes mid-mount.
+  useEffect(() => {
+    setActiveCategory(ALL_LABEL);
+  }, [ALL_LABEL]);
 
   // Get unique categories
   const categories = Array.from(
-    new Set(["الكل", ...images.map((i) => i.category || "طبيعة")])
+    new Set([ALL_LABEL, ...images.map((i) => i.category || NATURE_FALLBACK)])
   );
 
   const filtered =
-    activeCategory === "الكل"
+    activeCategory === ALL_LABEL
       ? images
-      : images.filter((i) => (i.category || "طبيعة") === activeCategory);
+      : images.filter((i) => (i.category || NATURE_FALLBACK) === activeCategory);
 
   const openLightbox = useCallback((idx: number) => {
     setLightboxIdx(idx);
@@ -66,10 +131,12 @@ export default function Gallery({ images, title = "معرض الصور" }: Props
         <div className="flex items-center justify-between gap-4 mb-5 flex-wrap">
           <div>
             <h3 className="text-xl font-bold font-display text-[#12394d] dark:text-white">
-              {title}
+              {resolvedTitle}
             </h3>
             <p className="text-xs text-[#7b7c7d]">
-              {filtered.length} صورة — اضغط على أي صورة لتكبيرها
+              {isEn
+                ? `${filtered.length} ${filtered.length === 1 ? "image" : "images"} — click any image to enlarge`
+                : `${filtered.length} صورة — اضغط على أي صورة لتكبيرها`}
             </p>
           </div>
 
@@ -86,7 +153,7 @@ export default function Gallery({ images, title = "معرض الصور" }: Props
                       : "bg-[#f5f8fa] dark:bg-[#0a151f] text-[#7b7c7d] hover:text-[#1d5770] dark:hover:text-[#91b149]"
                   }`}
                 >
-                  {cat}
+                  {localizeLabel(cat, isEn, CATEGORY_EN)}
                 </button>
               ))}
             </div>
@@ -115,8 +182,8 @@ export default function Gallery({ images, title = "معرض الصور" }: Props
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               {img.caption && (
-                <div className="absolute bottom-2 right-2 left-2 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-right">
-                  {img.caption}
+                <div className={`absolute bottom-2 right-2 left-2 text-white text-xs font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${isEn ? "text-left" : "text-right"}`}>
+                  {localizeLabel(img.caption, isEn, CAPTION_EN)}
                 </div>
               )}
               {/* Zoom icon */}
@@ -156,7 +223,7 @@ export default function Gallery({ images, title = "معرض الصور" }: Props
             <button
               onClick={closeLightbox}
               className="absolute top-5 right-5 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
-              aria-label="إغلاق"
+              aria-label={isEn ? "Close" : "إغلاق"}
             >
               <svg
                 width="20"
@@ -183,7 +250,7 @@ export default function Gallery({ images, title = "معرض الصور" }: Props
                 prev();
               }}
               className="absolute right-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
-              aria-label="السابق"
+              aria-label={isEn ? "Previous" : "السابق"}
             >
               <svg
                 width="22"
@@ -204,7 +271,7 @@ export default function Gallery({ images, title = "معرض الصور" }: Props
                 next();
               }}
               className="absolute left-5 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors z-10"
-              aria-label="التالي"
+              aria-label={isEn ? "Next" : "التالي"}
             >
               <svg
                 width="22"
@@ -236,7 +303,7 @@ export default function Gallery({ images, title = "معرض الصور" }: Props
               {filtered[lightboxIdx].caption && (
                 <div className="absolute bottom-0 right-0 left-0 bg-gradient-to-t from-black/90 to-transparent p-6 rounded-b-xl">
                   <p className="text-white text-center font-semibold">
-                    {filtered[lightboxIdx].caption}
+                    {localizeLabel(filtered[lightboxIdx].caption!, isEn, CAPTION_EN)}
                   </p>
                 </div>
               )}

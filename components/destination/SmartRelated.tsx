@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   currentDest: DestinationFull;
@@ -16,6 +17,7 @@ interface Props {
  * 3. Distance proximity (for quick-getaway recommendations)
  */
 export default function SmartRelated({ currentDest }: Props) {
+  const { locale } = useTranslations();
   const scored = DESTINATIONS.filter((d) => d.id !== currentDest.id).map(
     (d) => {
       const sharedTreatments = d.treatments.filter((t) =>
@@ -33,18 +35,20 @@ export default function SmartRelated({ currentDest }: Props) {
     <section
       id="related"
       className="py-16 bg-[#f5f8fa] dark:bg-[#0a151f]"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-10">
           <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-            مقترحات مخصصة
+            {locale === "en" ? "Personalized picks" : "مقترحات مخصصة"}
           </div>
           <h2 className="text-2xl md:text-3xl font-bold text-[#12394d] dark:text-white font-display">
-            جرب دي كمان
+            {locale === "en" ? "Try these too" : "جرب دي كمان"}
           </h2>
           <p className="text-sm text-[#7b7c7d] dark:text-white/40 mt-2">
-            وجهات مشابهة لـ {currentDest.name} — بناءً على نوع العلاج والبيئة
+            {locale === "en"
+              ? `Destinations similar to ${currentDest.name} — based on treatment type and environment`
+              : `وجهات مشابهة لـ ${currentDest.name} — بناءً على نوع العلاج والبيئة`}
           </p>
         </div>
 
@@ -78,7 +82,9 @@ export default function SmartRelated({ currentDest }: Props) {
                     </span>
                     {item.sharedTreatments > 0 && (
                       <span className="px-2.5 py-0.5 bg-white/90 text-[#12394d] text-[10px] font-bold rounded-full">
-                        تشبه بـ {item.sharedTreatments} علاج
+                        {locale === "en"
+                          ? `${item.sharedTreatments} shared treatment${item.sharedTreatments > 1 ? "s" : ""}`
+                          : `تشبه بـ ${item.sharedTreatments} علاج`}
                       </span>
                     )}
                   </div>
@@ -94,7 +100,7 @@ export default function SmartRelated({ currentDest }: Props) {
 
                   <div className="flex items-center gap-3 text-[10px] text-[#7b7c7d] dark:text-white/40 pt-3 border-t border-[#d0dde4] dark:border-[#1e3a5f]">
                     {item.dest.distanceKm && (
-                      <span>📍 {item.dest.distanceKm} كم</span>
+                      <span>📍 {item.dest.distanceKm} {locale === "en" ? "km" : "كم"}</span>
                     )}
                     {item.dest.duration && <span>⏱️ {item.dest.duration}</span>}
                     {item.dest.costFrom && <span>💰 {item.dest.costFrom}</span>}

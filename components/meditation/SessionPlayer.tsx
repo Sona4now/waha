@@ -8,6 +8,7 @@ import {
   type Session,
 } from "@/lib/meditation/sessions";
 import { getEnvironment } from "@/lib/meditation/environments";
+import { useTranslations } from "@/components/site/LocaleProvider";
 import { useBreathCycle } from "@/hooks/meditation/useBreathCycle";
 import { useSessionTimer } from "@/hooks/meditation/useSessionTimer";
 import { useSessionAudio } from "@/hooks/meditation/useSessionAudio";
@@ -70,6 +71,7 @@ export default function SessionPlayer({
   onTick,
   onComplete,
 }: Props) {
+  const { locale } = useTranslations();
   const session: Session = useMemo(() => getSession(sessionId), [sessionId]);
   const env = useMemo(() => getEnvironment(session.env), [session.env]);
   const timings = useMemo(() => getTimings(session), [session]);
@@ -262,8 +264,8 @@ export default function SessionPlayer({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
       className="fixed inset-0 overflow-hidden select-none bg-[#070d15]"
-      dir="rtl"
-      aria-label={`جلسة ${session.name}`}
+      dir={locale === "en" ? "ltr" : "rtl"}
+      aria-label={locale === "en" ? `Session ${session.name}` : `جلسة ${session.name}`}
     >
       {/* ── Cross-fade gradient backdrop ──
            The gradient shifts slowly across the session (dawn → day → sunset
@@ -296,9 +298,9 @@ export default function SessionPlayer({
         <button
           onClick={endNow}
           className="text-white/70 hover:text-white text-xs bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/10 transition-colors"
-          aria-label="إنهاء الجلسة"
+          aria-label={locale === "en" ? "End session" : "إنهاء الجلسة"}
         >
-          ✕ إنهاء
+          {locale === "en" ? "✕ End" : "✕ إنهاء"}
         </button>
         <div className="text-white/70 text-xs font-display bg-black/30 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/10">
           {env.emoji} {session.name}
@@ -306,7 +308,7 @@ export default function SessionPlayer({
         <button
           onClick={() => setShowMixer((s) => !s)}
           aria-pressed={showMixer}
-          aria-label="إعدادات الصوت"
+          aria-label={locale === "en" ? "Audio settings" : "إعدادات الصوت"}
           className="text-white/70 hover:text-white text-xs bg-black/30 hover:bg-black/50 backdrop-blur-md rounded-full w-9 h-9 border border-white/10 flex items-center justify-center transition-colors"
         >
           🎚️
@@ -325,13 +327,15 @@ export default function SessionPlayer({
             className="text-center"
           >
             <div className="text-white/60 text-xs uppercase tracking-[0.4em] mb-4">
-              استعد...
+              {locale === "en" ? "Get ready..." : "استعد..."}
             </div>
             <div className="text-white font-display font-black text-9xl leading-none drop-shadow-2xl">
               {countdown > 0 ? countdown : "•"}
             </div>
             <div className="text-white/60 text-sm mt-6 max-w-xs mx-auto">
-              خد وضعية مريحة واغمض عينيك لو حبيت
+              {locale === "en"
+                ? "Find a comfortable position and close your eyes if you'd like"
+                : "خد وضعية مريحة واغمض عينيك لو حبيت"}
             </div>
           </motion.div>
         </div>
@@ -360,7 +364,7 @@ export default function SessionPlayer({
               aria-live="off"
             >
               <div className="text-white/50 text-[10px] uppercase tracking-[0.3em] font-bold mb-0.5">
-                الأنفاس
+                {locale === "en" ? "Breaths" : "الأنفاس"}
               </div>
               <div className="text-white/80 text-lg font-display font-black tabular-nums">
                 {breathCycles}
@@ -377,7 +381,7 @@ export default function SessionPlayer({
               className="absolute top-20 right-4 z-20 pointer-events-none"
             >
               <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-[#91b149] bg-[#91b149]/15 border border-[#91b149]/30 rounded-full px-2.5 py-1 backdrop-blur-md">
-                🌙 وضع النوم
+                {locale === "en" ? "🌙 Sleep mode" : "🌙 وضع النوم"}
               </span>
             </motion.div>
           )}
@@ -395,7 +399,9 @@ export default function SessionPlayer({
                 aria-live="polite"
               >
                 <div className="px-4 py-2 rounded-full bg-[#91b149]/20 backdrop-blur-md border border-[#91b149]/40 text-[#91b149] text-xs font-bold shadow-[0_4px_16px_rgba(145,177,73,0.25)]">
-                  🌟 {milestone} دورة — أحسنت
+                  {locale === "en"
+                    ? `🌟 ${milestone} cycles — Great work`
+                    : `🌟 ${milestone} دورة — أحسنت`}
                 </div>
               </motion.div>
             )}

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Destination } from "@/data/destinations";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   destination: Destination;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function TransitionScreen({ destination, onEnter }: Props) {
+  const { locale } = useTranslations();
   return (
     <motion.div
       className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
@@ -54,7 +56,7 @@ export default function TransitionScreen({ destination, onEnter }: Props) {
           transition={{ delay: 0.8, duration: 1.2, ease: "easeOut" }}
           className="font-display text-3xl sm:text-4xl md:text-6xl font-bold text-white leading-tight"
         >
-          رحلتك بدأت من هنا
+          {locale === "en" ? "Your journey begins here" : "رحلتك بدأت من هنا"}
         </motion.h1>
 
         <motion.p
@@ -63,7 +65,7 @@ export default function TransitionScreen({ destination, onEnter }: Props) {
           transition={{ delay: 1.5, duration: 1 }}
           className="font-display text-white/40 text-lg font-light"
         >
-          {destination.name} تنتظرك
+          {locale === "en" ? `${destination.name} awaits you` : `${destination.name} تنتظرك`}
         </motion.p>
 
         <motion.button
@@ -75,7 +77,7 @@ export default function TransitionScreen({ destination, onEnter }: Props) {
           whileTap={{ scale: 0.97 }}
           className="mt-4 md:mt-6 py-3.5 px-10 md:py-4 md:px-14 bg-white/[0.07] hover:bg-white/[0.14] border border-white/20 hover:border-white/50 text-white text-base md:text-lg font-semibold rounded-full backdrop-blur-sm transition-all duration-400"
         >
-          ادخل إلى الموقع
+          {locale === "en" ? "Enter the site" : "ادخل إلى الموقع"}
         </motion.button>
       </div>
 
@@ -86,7 +88,7 @@ export default function TransitionScreen({ destination, onEnter }: Props) {
         transition={{ delay: 2.6, duration: 1 }}
         className="absolute bottom-7 text-white/[0.12] text-[0.6rem] tracking-[0.35em] uppercase"
       >
-        واحة · السياحة الاستشفائية
+        {locale === "en" ? "Waha · Healing Tourism" : "واحة · السياحة الاستشفائية"}
       </motion.div>
     </motion.div>
   );

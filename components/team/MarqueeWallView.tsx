@@ -1,6 +1,7 @@
 "use client";
 
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const ROWS = [
   { members: TEAM_MEMBERS.slice(0, 6), speed: 40, dir: "right", size: "text-5xl md:text-7xl", color: "text-white" },
@@ -10,6 +11,7 @@ const ROWS = [
 ];
 
 export default function MarqueeWallView() {
+  const { locale } = useTranslations();
   return (
     <div className="bg-[#0a151f] py-16 md:py-24 overflow-hidden">
       <div className="text-center mb-12">
@@ -17,7 +19,7 @@ export default function MarqueeWallView() {
           · Marquee Wall ·
         </div>
         <h2 className="font-display text-3xl md:text-4xl font-black text-white">
-          جدار الأسماء
+          {locale === "en" ? "Wall of names" : "جدار الأسماء"}
         </h2>
       </div>
 

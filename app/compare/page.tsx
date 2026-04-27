@@ -10,11 +10,20 @@ import { useTranslations } from "@/components/site/LocaleProvider";
 import { localizeDestination } from "@/lib/localize";
 
 const COMPARISON_ROWS = [
-  { key: "environment", label: "البيئة" },
-  { key: "treatments", label: "العلاجات" },
-  { key: "bestMonths", label: "أفضل الأشهر" },
-  { key: "description", label: "الوصف" },
-  { key: "features", label: "المميزات" },
+  { key: "environment", ar: "البيئة", en: "Environment" },
+  { key: "treatments", ar: "العلاجات", en: "Treatments" },
+  { key: "bestMonths", ar: "أفضل الأشهر", en: "Best months" },
+  { key: "description", ar: "الوصف", en: "Description" },
+  { key: "features", ar: "المميزات", en: "Highlights" },
+];
+
+const MONTH_NAMES_AR = [
+  "يناير","فبراير","مارس","أبريل","مايو","يونيو",
+  "يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر",
+];
+const MONTH_NAMES_EN = [
+  "January","February","March","April","May","June",
+  "July","August","September","October","November","December",
 ];
 
 function ComparePageInner() {
@@ -65,18 +74,26 @@ function ComparePageInner() {
       />
 
       <section className="bg-[#f5f8fa] dark:bg-[#0a151f] py-16">
-        <div className="container mx-auto px-4" dir="rtl">
+        <div
+          className="container mx-auto px-4"
+          dir={locale === "en" ? "ltr" : "rtl"}
+        >
           {/* Destination Selection */}
           <div className="mb-12">
             <h2 className="font-display text-xl font-bold text-[#12394d] dark:text-white mb-2 text-center">
-              اختر الوجهات للمقارنة
+              {locale === "en"
+                ? "Pick destinations to compare"
+                : "اختر الوجهات للمقارنة"}
             </h2>
             <p className="text-[#7b7c7d] dark:text-white/60 text-sm text-center mb-6">
-              يمكنك اختيار من 2 إلى 3 وجهات
+              {locale === "en"
+                ? "You can pick 2 to 3 destinations"
+                : "يمكنك اختيار من 2 إلى 3 وجهات"}
             </p>
 
             <div className="flex flex-wrap justify-center gap-3">
-              {DESTINATIONS.map((dest: DestinationFull) => {
+              {DESTINATIONS.map((rawDest: DestinationFull) => {
+                const dest = localizeDestination(rawDest, locale);
                 const destId = dest.id ?? dest.name;
                 const isSelected = selected.includes(destId);
                 return (
@@ -132,7 +149,7 @@ function ComparePageInner() {
                 <thead>
                   <tr className="bg-[#12394d]">
                     <th className="px-6 py-4 font-display text-sm font-bold text-white border-l border-[#1d5770] w-36">
-                      عنصر المقارنة
+                      {locale === "en" ? "Compare by" : "عنصر المقارنة"}
                     </th>
                     {selectedDestinations.map((dest: DestinationFull) => (
                       <th
@@ -166,7 +183,7 @@ function ComparePageInner() {
                       } transition-colors hover:bg-[#1d5770]/5`}
                     >
                       <td className="px-6 py-4 font-display text-sm font-bold text-[#1d5770] border-l border-gray-200 dark:border-[#1e3a5f] whitespace-nowrap">
-                        {row.label}
+                        {locale === "en" ? row.en : row.ar}
                       </td>
                       {selectedDestinations.map((dest: DestinationFull) => {
                         // COMPARISON_ROWS.key values don't all line up perfectly with DestinationFull
@@ -194,7 +211,17 @@ function ComparePageInner() {
                                 )}
                               </ul>
                             ) : isArray ? (
-                              (raw as string[]).join("، ")
+                              row.key === "bestMonths"
+                                ? (raw as number[])
+                                    .map((m) =>
+                                      locale === "en"
+                                        ? MONTH_NAMES_EN[m - 1]
+                                        : MONTH_NAMES_AR[m - 1],
+                                    )
+                                    .join(locale === "en" ? ", " : "، ")
+                                : (raw as string[]).join(
+                                    locale === "en" ? ", " : "، ",
+                                  )
                             ) : typeof raw === "string" ? (
                               raw
                             ) : (
@@ -224,10 +251,14 @@ function ComparePageInner() {
                 />
               </svg>
               <p className="font-display text-lg font-bold text-[#12394d] dark:text-white mb-1">
-                اختر وجهتين على الأقل للمقارنة
+                {locale === "en"
+                  ? "Pick at least two destinations to compare"
+                  : "اختر وجهتين على الأقل للمقارنة"}
               </p>
               <p className="text-sm text-[#7b7c7d] dark:text-white/50">
-                قم باختيار الوجهات من القائمة أعلاه لعرض جدول المقارنة
+                {locale === "en"
+                  ? "Select destinations from the list above to see the comparison table"
+                  : "قم باختيار الوجهات من القائمة أعلاه لعرض جدول المقارنة"}
               </p>
             </div>
           )}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { SESSIONS, SESSION_TAGS, type Session } from "@/lib/meditation/sessions";
 import { getEnvironment } from "@/lib/meditation/environments";
 import type { Stats } from "@/hooks/meditation/useSessionHistory";
+import { useTranslations } from "@/components/site/LocaleProvider";
 import StreakBadge from "./StreakBadge";
 
 interface Props {
@@ -17,9 +18,9 @@ interface Props {
   onToggleFavorite: (id: string) => void;
 }
 
-function fmtMin(sec: number) {
-  if (sec < 60) return `${sec} ث`;
-  return `${Math.round(sec / 60)} د`;
+function fmtMin(sec: number, isEn: boolean) {
+  if (sec < 60) return isEn ? `${sec} s` : `${sec} ث`;
+  return isEn ? `${Math.round(sec / 60)} m` : `${Math.round(sec / 60)} د`;
 }
 
 export default function SessionLibrary({
@@ -30,6 +31,8 @@ export default function SessionLibrary({
   onPick,
   onToggleFavorite,
 }: Props) {
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
   const [filter, setFilter] = useState<string>("all");
 
   const filtered = useMemo(() => {
@@ -46,7 +49,7 @@ export default function SessionLibrary({
   return (
     <div
       className="min-h-screen bg-[#070d15] py-10 px-4 sm:py-16"
-      dir="rtl"
+      dir={isEn ? "ltr" : "rtl"}
     >
       <div className="max-w-4xl mx-auto">
         {/* Header */}
@@ -56,13 +59,15 @@ export default function SessionLibrary({
           className="text-center mb-10"
         >
           <div className="text-[10px] uppercase tracking-[0.5em] text-[#91b149] font-bold mb-3">
-            · غرفة التأمل ·
+            {isEn ? "· Meditation Room ·" : "· غرفة التأمل ·"}
           </div>
           <h1 className="font-display text-4xl sm:text-5xl font-black text-white mb-3">
-            غرفة التأمل
+            {isEn ? "Meditation Room" : "غرفة التأمل"}
           </h1>
           <p className="text-white/50 text-sm max-w-md mx-auto leading-relaxed">
-            اختر جلسة تناسب حالتك — تنفس، تأمل، واسترخِ مع الطبيعة المصرية
+            {isEn
+              ? "Pick a session that suits your mood — breathe, meditate, and unwind with Egyptian nature"
+              : "اختر جلسة تناسب حالتك — تنفس، تأمل، واسترخِ مع الطبيعة المصرية"}
           </p>
         </motion.header>
 
@@ -85,10 +90,10 @@ export default function SessionLibrary({
               </div>
               <div className="text-right">
                 <div className="text-[10px] text-[#91b149] font-bold uppercase tracking-widest">
-                  أكمل آخر جلسة
+                  {isEn ? "Continue last session" : "أكمل آخر جلسة"}
                 </div>
                 <div className="text-white font-bold text-sm">
-                  {lastSession.name} · {fmtMin(lastSession.duration)}
+                  {lastSession.name} · {fmtMin(lastSession.duration, isEn)}
                 </div>
               </div>
             </div>
@@ -103,7 +108,7 @@ export default function SessionLibrary({
           {[
             ...SESSION_TAGS,
             ...(favorites.length > 0
-              ? ([{ id: "favorites", label: "المفضلات", icon: "♥" }] as const)
+              ? ([{ id: "favorites", label: isEn ? "Favorites" : "المفضلات", icon: "♥" }] as const)
               : []),
           ].map((t) => (
             <button
@@ -142,7 +147,7 @@ export default function SessionLibrary({
                     <div className="text-3xl">{s.icon}</div>
                     <div className="flex items-center gap-1 text-white/70 text-[10px] font-bold bg-black/20 rounded-full px-2 py-1">
                       <span>⏱️</span>
-                      <span className="font-mono">{fmtMin(s.duration)}</span>
+                      <span className="font-mono">{fmtMin(s.duration, isEn)}</span>
                     </div>
                   </div>
                   <h3 className="text-white font-display font-bold text-base mb-1">
@@ -166,7 +171,15 @@ export default function SessionLibrary({
                     onToggleFavorite(s.id);
                   }}
                   aria-pressed={fav}
-                  aria-label={fav ? "إزالة من المفضلات" : "إضافة للمفضلات"}
+                  aria-label={
+                    fav
+                      ? isEn
+                        ? "Remove from favorites"
+                        : "إزالة من المفضلات"
+                      : isEn
+                        ? "Add to favorites"
+                        : "إضافة للمفضلات"
+                  }
                   className={`absolute top-3 left-3 w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
                     fav
                       ? "bg-red-500/80 text-white"
@@ -182,7 +195,9 @@ export default function SessionLibrary({
 
         {filtered.length === 0 && (
           <div className="text-center py-12 text-white/40 text-sm">
-            مفيش جلسات في التصنيف ده لسه.
+            {isEn
+              ? "No sessions in this category yet."
+              : "مفيش جلسات في التصنيف ده لسه."}
           </div>
         )}
 
@@ -191,7 +206,7 @@ export default function SessionLibrary({
             href="/home"
             className="text-white/30 hover:text-white/60 text-sm no-underline transition-colors"
           >
-            ← العودة للرئيسية
+            {isEn ? "← Back to home" : "← العودة للرئيسية"}
           </Link>
         </div>
       </div>

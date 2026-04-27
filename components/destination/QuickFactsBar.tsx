@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import type { DestinationFull } from "@/data/siteData";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   dest: DestinationFull;
@@ -13,39 +14,46 @@ interface Props {
  * answered in a single glance.
  */
 export default function QuickFactsBar({ dest }: Props) {
-  const bestMonthNames = ["", "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
-  const bestMonth = dest.bestMonths?.[0] ? bestMonthNames[dest.bestMonths[0]] : "طوال العام";
+  const { locale } = useTranslations();
+  const bestMonthNamesAr = ["", "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+  const bestMonthNamesEn = ["", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  const bestMonthNames = locale === "en" ? bestMonthNamesEn : bestMonthNamesAr;
+  const bestMonth = dest.bestMonths?.[0]
+    ? bestMonthNames[dest.bestMonths[0]]
+    : locale === "en" ? "Year-round" : "طوال العام";
 
   const facts = [
     {
       icon: "📍",
-      label: "المسافة من القاهرة",
-      value: dest.distanceKm ? `${dest.distanceKm} كم` : "—",
+      label: locale === "en" ? "Distance from Cairo" : "المسافة من القاهرة",
+      value: dest.distanceKm
+        ? `${dest.distanceKm} ${locale === "en" ? "km" : "كم"}`
+        : "—",
     },
     {
       icon: "⏱️",
-      label: "المدة المثالية",
+      label: locale === "en" ? "Ideal duration" : "المدة المثالية",
       value: dest.duration || "—",
     },
     {
       icon: "💰",
-      label: "التكلفة",
+      label: locale === "en" ? "Cost" : "التكلفة",
       value: dest.costFrom || "—",
     },
     {
       icon: "🌡️",
-      label: "أفضل موعد",
+      label: locale === "en" ? "Best time" : "أفضل موعد",
       value: bestMonth,
     },
     {
       icon: "⭐",
-      label: "الصعوبة",
-      value: dest.difficulty || "سهل",
+      label: locale === "en" ? "Difficulty" : "الصعوبة",
+      value: dest.difficulty || (locale === "en" ? "Easy" : "سهل"),
     },
     {
       icon: "👥",
-      label: "مناسبة لـ",
-      value: dest.audience || "الجميع",
+      label: locale === "en" ? "Suitable for" : "مناسبة لـ",
+      value: dest.audience || (locale === "en" ? "Everyone" : "الجميع"),
     },
   ];
 

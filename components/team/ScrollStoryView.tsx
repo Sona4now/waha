@@ -3,6 +3,7 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const GRADIENTS = [
   "from-[#91b149] via-[#6a8435] to-[#12394d]",
@@ -62,6 +63,7 @@ function Section({
 }
 
 export default function ScrollStoryView() {
+  const { locale } = useTranslations();
   return (
     <div className="bg-[#070d15]">
       {/* Intro */}
@@ -71,9 +73,11 @@ export default function ScrollStoryView() {
             · Scroll Story ·
           </div>
           <h2 className="font-display text-4xl md:text-6xl font-black text-white mb-4">
-            اسكرول لتعرفهم
+            {locale === "en" ? "Scroll to meet them" : "اسكرول لتعرفهم"}
           </h2>
-          <p className="text-white/50 text-sm">↓ ابدأ الرحلة ↓</p>
+          <p className="text-white/50 text-sm">
+            {locale === "en" ? "↓ Begin the journey ↓" : "↓ ابدأ الرحلة ↓"}
+          </p>
         </div>
       </div>
 
@@ -89,7 +93,7 @@ export default function ScrollStoryView() {
 
       <div className="min-h-[40vh] flex items-center justify-center bg-[#070d15]">
         <div className="text-center text-white/30 text-xs uppercase tracking-[0.3em]">
-          — نهاية القصة —
+          {locale === "en" ? "— End of story —" : "— نهاية القصة —"}
         </div>
       </div>
     </div>

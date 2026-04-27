@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 // Precomputed pseudo-random orbit positions in a 100x100 canvas
 const POSITIONS = [
@@ -41,6 +42,7 @@ const COLORS = [
 ];
 
 export default function OrbClusterView() {
+  const { locale } = useTranslations();
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
@@ -49,7 +51,7 @@ export default function OrbClusterView() {
         · Orb Cluster ·
       </div>
       <h2 className="font-display text-3xl md:text-4xl font-black text-white mb-10">
-        الفريق المتراقص
+        {locale === "en" ? "The dancing team" : "الفريق المتراقص"}
       </h2>
 
       <div className="relative w-full max-w-[720px] h-[560px]">

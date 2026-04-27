@@ -3,12 +3,15 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Mood {
   id: string;
-  label: string;
+  labelAr: string;
+  labelEn: string;
   emoji: string;
-  description: string;
+  descriptionAr: string;
+  descriptionEn: string;
   destId: string;
   color: string;
 }
@@ -16,49 +19,61 @@ interface Mood {
 const MOODS: Mood[] = [
   {
     id: "calm",
-    label: "هادئ",
+    labelAr: "هادئ",
+    labelEn: "Calm",
     emoji: "😌",
-    description: "بحتاج استرخاء وسكينة",
+    descriptionAr: "بحتاج استرخاء وسكينة",
+    descriptionEn: "I need relaxation and peace",
     destId: "fayoum",
     color: "#0d9488",
   },
   {
     id: "stressed",
-    label: "متوتر",
+    labelAr: "متوتر",
+    labelEn: "Stressed",
     emoji: "😰",
-    description: "بحتاج هدوء وصفاء ذهن",
+    descriptionAr: "بحتاج هدوء وصفاء ذهن",
+    descriptionEn: "I need quiet and clarity",
     destId: "siwa",
     color: "#7c3aed",
   },
   {
     id: "tired",
-    label: "مُتعب",
+    labelAr: "مُتعب",
+    labelEn: "Tired",
     emoji: "💪",
-    description: "بحتاج تجدد نشاط",
+    descriptionAr: "بحتاج تجدد نشاط",
+    descriptionEn: "I need a refresh of energy",
     destId: "safaga",
     color: "#0284c7",
   },
   {
     id: "sick",
-    label: "عياّن",
+    labelAr: "عياّن",
+    labelEn: "Unwell",
     emoji: "🤒",
-    description: "بحتاج علاج طبيعي",
+    descriptionAr: "بحتاج علاج طبيعي",
+    descriptionEn: "I need natural therapy",
     destId: "safaga",
     color: "#dc2626",
   },
   {
     id: "meditative",
-    label: "متأمل",
+    labelAr: "متأمل",
+    labelEn: "Meditative",
     emoji: "🧘",
-    description: "بحتاج صمت وتأمل",
+    descriptionAr: "بحتاج صمت وتأمل",
+    descriptionEn: "I need silence and reflection",
     destId: "bahariya",
     color: "#b45309",
   },
   {
     id: "energetic",
-    label: "نشيط",
+    labelAr: "نشيط",
+    labelEn: "Energetic",
     emoji: "⚡",
-    description: "بحتاج مغامرة",
+    descriptionAr: "بحتاج مغامرة",
+    descriptionEn: "I need an adventure",
     destId: "sinai",
     color: "#ea580c",
   },
@@ -66,6 +81,7 @@ const MOODS: Mood[] = [
 
 export default function MoodBoard() {
   const router = useRouter();
+  const { locale } = useTranslations();
   const [selected, setSelected] = useState<Mood | null>(null);
 
   function handleSelect(mood: Mood) {
@@ -84,10 +100,12 @@ export default function MoodBoard() {
           <span className="w-6 h-px bg-[#91b149]" />
         </div>
         <h3 className="text-2xl md:text-3xl font-bold font-display text-[#12394d] dark:text-white mb-2">
-          إنت حاسس إزاي النهاردة؟
+          {locale === "en" ? "How are you feeling today?" : "إنت حاسس إزاي النهاردة؟"}
         </h3>
         <p className="text-sm text-[#7b7c7d] max-w-md mx-auto">
-          اختار مزاجك وخلينا نرشحلك الوجهة المناسبة
+          {locale === "en"
+            ? "Pick your mood and we'll suggest the right destination"
+            : "اختار مزاجك وخلينا نرشحلك الوجهة المناسبة"}
         </p>
       </div>
 
@@ -138,10 +156,10 @@ export default function MoodBoard() {
                   className="font-bold font-display text-lg mb-1 transition-colors"
                   style={{ color: isSelected ? mood.color : undefined }}
                 >
-                  {mood.label}
+                  {locale === "en" ? mood.labelEn : mood.labelAr}
                 </div>
                 <p className="text-[11px] text-[#7b7c7d] dark:text-white/50 leading-relaxed">
-                  {mood.description}
+                  {locale === "en" ? mood.descriptionEn : mood.descriptionAr}
                 </p>
               </div>
 
@@ -153,7 +171,7 @@ export default function MoodBoard() {
                     className="absolute inset-x-0 bottom-2 text-[10px] font-bold"
                     style={{ color: mood.color }}
                   >
-                    جاري التوجيه...
+                    {locale === "en" ? "Routing..." : "جاري التوجيه..."}
                   </motion.div>
                 )}
               </AnimatePresence>

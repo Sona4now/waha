@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { showToast } from "@/components/site/Toast";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   destName: string;
@@ -16,6 +17,7 @@ interface Props {
  * regardless of where they are on the page.
  */
 export default function StickyBottomBar({ destName, destId }: Props) {
+  const { locale } = useTranslations();
   const [visible, setVisible] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -47,11 +49,21 @@ export default function StickyBottomBar({ destName, destId }: Props) {
       if (favs.includes(destId)) {
         updated = favs.filter((id) => id !== destId);
         setSaved(false);
-        showToast(`تم حذف ${destName} من المفضلة`, "info");
+        showToast(
+          locale === "en"
+            ? `Removed ${destName} from favorites`
+            : `تم حذف ${destName} من المفضلة`,
+          "info"
+        );
       } else {
         updated = [...favs, destId];
         setSaved(true);
-        showToast(`تم حفظ ${destName} للمفضلة`, "success");
+        showToast(
+          locale === "en"
+            ? `Saved ${destName} to favorites`
+            : `تم حفظ ${destName} للمفضلة`,
+          "success"
+        );
       }
       localStorage.setItem("waaha_favorites", JSON.stringify(updated));
     } catch {}
@@ -60,8 +72,11 @@ export default function StickyBottomBar({ destName, destId }: Props) {
   const handleShare = async () => {
     const url = typeof window !== "undefined" ? window.location.href : "";
     const shareData = {
-      title: `${destName} — واحة`,
-      text: `اكتشف ${destName} — وجهة استشفائية على موقع واحة`,
+      title: locale === "en" ? `${destName} — WAHA` : `${destName} — واحة`,
+      text:
+        locale === "en"
+          ? `Discover ${destName} — a wellness destination on WAHA`
+          : `اكتشف ${destName} — وجهة استشفائية على موقع واحة`,
       url,
     };
     if (typeof navigator !== "undefined" && navigator.share) {
@@ -73,7 +88,7 @@ export default function StickyBottomBar({ destName, destId }: Props) {
     } else if (typeof navigator !== "undefined" && navigator.clipboard) {
       try {
         await navigator.clipboard.writeText(url);
-        showToast("تم نسخ الرابط", "success");
+        showToast(locale === "en" ? "Link copied" : "تم نسخ الرابط", "success");
       } catch {}
     }
   };
@@ -87,7 +102,7 @@ export default function StickyBottomBar({ destName, destId }: Props) {
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 28 }}
           className="fixed bottom-16 md:bottom-6 left-4 right-4 md:left-1/2 md:right-auto md:-translate-x-1/2 md:w-auto z-[70] no-print"
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
         >
           <div className="flex items-center gap-2 bg-[#12394d]/95 dark:bg-[#0a151f]/95 backdrop-blur-xl border border-white/10 rounded-full shadow-[0_12px_40px_-8px_rgba(0,0,0,0.5)] p-2">
             {/* Save */}
@@ -98,7 +113,15 @@ export default function StickyBottomBar({ destName, destId }: Props) {
                   ? "bg-[#91b149] text-white"
                   : "bg-white/10 hover:bg-white/20 text-white/70"
               }`}
-              aria-label={saved ? "إزالة من المفضلة" : "حفظ للمفضلة"}
+              aria-label={
+                saved
+                  ? locale === "en"
+                    ? "Remove from favorites"
+                    : "إزالة من المفضلة"
+                  : locale === "en"
+                    ? "Save to favorites"
+                    : "حفظ للمفضلة"
+              }
             >
               <svg
                 width="18"
@@ -118,7 +141,7 @@ export default function StickyBottomBar({ destName, destId }: Props) {
             <button
               onClick={handleShare}
               className="flex-shrink-0 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white/70 flex items-center justify-center transition-colors"
-              aria-label="مشاركة"
+              aria-label={locale === "en" ? "Share" : "مشاركة"}
             >
               <svg
                 width="18"
@@ -144,7 +167,7 @@ export default function StickyBottomBar({ destName, destId }: Props) {
               className="px-4 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-bold flex items-center gap-2 transition-colors no-underline"
             >
               <span>💬</span>
-              <span className="hidden sm:inline">اسأل AI</span>
+              <span className="hidden sm:inline">{locale === "en" ? "Ask AI" : "اسأل AI"}</span>
             </Link>
 
             {/* Plan trip — primary CTA */}
@@ -153,7 +176,7 @@ export default function StickyBottomBar({ destName, destId }: Props) {
               className="px-5 h-11 rounded-full bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white text-xs sm:text-sm font-bold flex items-center gap-2 no-underline shadow-[0_4px_12px_rgba(145,177,73,0.4)] hover:shadow-[0_6px_20px_rgba(145,177,73,0.6)] transition-shadow"
             >
               <span>🗺️</span>
-              <span>اخطط الرحلة</span>
+              <span>{locale === "en" ? "Plan trip" : "اخطط الرحلة"}</span>
             </Link>
           </div>
         </motion.div>

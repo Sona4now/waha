@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const AUTH_ENDPOINT = "/api/team-auth";
 const STORAGE_KEY = "waaha_team_unlocked";
@@ -17,6 +18,7 @@ interface Props {
  * not after closing the tab.
  */
 export default function TeamGate({ children }: Props) {
+  const { locale } = useTranslations();
   const [unlocked, setUnlocked] = useState(false);
   const [checking, setChecking] = useState(true);
   const [password, setPassword] = useState("");
@@ -76,7 +78,7 @@ export default function TeamGate({ children }: Props) {
   return (
     <div
       className="fixed inset-0 flex items-center justify-center bg-[#070d15] overflow-hidden"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       {/* Background gradient */}
       <div className="absolute inset-0">
@@ -124,10 +126,12 @@ export default function TeamGate({ children }: Props) {
               · Team Access ·
             </div>
             <h1 className="font-display text-2xl sm:text-3xl font-black text-white mb-2">
-              فريق واحة
+              {locale === "en" ? "WAHA team" : "فريق واحة"}
             </h1>
             <p className="text-white/40 text-sm">
-              هذه الصفحة محمية بكلمة مرور
+              {locale === "en"
+                ? "This page is password protected"
+                : "هذه الصفحة محمية بكلمة مرور"}
             </p>
           </div>
 
@@ -144,7 +148,7 @@ export default function TeamGate({ children }: Props) {
                 setPassword(e.target.value);
                 if (error) setError(false);
               }}
-              placeholder="أدخل كلمة المرور"
+              placeholder={locale === "en" ? "Enter password" : "أدخل كلمة المرور"}
               autoFocus
               className={`w-full px-5 py-4 bg-white/[0.04] border rounded-xl text-white text-center text-lg tracking-widest placeholder:text-white/20 placeholder:text-sm placeholder:tracking-normal focus:outline-none transition-all duration-300 ${
                 error
@@ -161,7 +165,7 @@ export default function TeamGate({ children }: Props) {
                   exit={{ opacity: 0 }}
                   className="text-red-400 text-sm text-center"
                 >
-                  كلمة المرور غير صحيحة
+                  {locale === "en" ? "Incorrect password" : "كلمة المرور غير صحيحة"}
                 </motion.p>
               )}
             </AnimatePresence>
@@ -171,7 +175,13 @@ export default function TeamGate({ children }: Props) {
               disabled={!password || submitting}
               className="w-full py-4 bg-gradient-to-l from-[#91b149] to-[#6a8435] disabled:from-white/10 disabled:to-white/10 disabled:text-white/30 text-[#0a0f14] font-bold text-sm rounded-xl transition-all duration-300 hover:shadow-[0_8px_24px_rgba(145,177,73,0.4)]"
             >
-              {submitting ? "جاري التحقق..." : "دخول"}
+              {submitting
+                ? locale === "en"
+                  ? "Verifying..."
+                  : "جاري التحقق..."
+                : locale === "en"
+                  ? "Enter"
+                  : "دخول"}
             </button>
           </motion.form>
 
@@ -180,7 +190,7 @@ export default function TeamGate({ children }: Props) {
               href="/home"
               className="text-white/20 hover:text-white/40 text-xs no-underline transition-colors"
             >
-              ← العودة للرئيسية
+              {locale === "en" ? "← Back to home" : "← العودة للرئيسية"}
             </Link>
           </div>
         </motion.div>

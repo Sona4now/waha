@@ -10,6 +10,7 @@ import {
   ENVIRONMENT_LABELS,
   type Recommendation,
 } from "@/hooks/useRecommendation";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 export type Act =
   | "welcome"
@@ -70,14 +71,15 @@ export default function StoryOverlay({
   focusedSubSites,
   onSkip,
 }: Props) {
+  const { locale } = useTranslations();
   const [collapsed, setCollapsed] = useState(false);
 
   const needLabel = recommendation.need
-    ? NEED_LABELS[recommendation.need] || "الشفاء"
-    : "الشفاء";
+    ? NEED_LABELS[recommendation.need] || (locale === "en" ? "Healing" : "الشفاء")
+    : (locale === "en" ? "Healing" : "الشفاء");
   const envLabel = recommendation.environment
-    ? ENVIRONMENT_LABELS[recommendation.environment] || "الطبيعة"
-    : "الطبيعة";
+    ? ENVIRONMENT_LABELS[recommendation.environment] || (locale === "en" ? "Nature" : "الطبيعة")
+    : (locale === "en" ? "Nature" : "الطبيعة");
 
   const stepIndex = useMemo(() => ACT_ORDER.indexOf(act), [act]);
   const canGoPrev = stepIndex > 0;
@@ -125,13 +127,13 @@ export default function StoryOverlay({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 20 }}
           onClick={() => setCollapsed(false)}
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
           className="flex items-center gap-2 bg-[#12394d]/95 backdrop-blur-xl border border-white/15 rounded-full px-4 py-2.5 shadow-[0_10px_30px_-8px_rgba(0,0,0,0.5)] text-white text-sm font-bold"
-          aria-label="فتح القصة"
+          aria-label={locale === "en" ? "Open story" : "فتح القصة"}
         >
           <span className="text-base">{destination.envIcon}</span>
           <span>{destination.name}</span>
-          <span className="text-white/50 text-xs">· رجّع القصة</span>
+          <span className="text-white/50 text-xs">{locale === "en" ? "· back to story" : "· رجّع القصة"}</span>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="18 15 12 9 6 15" />
           </svg>
@@ -140,6 +142,7 @@ export default function StoryOverlay({
         <OverlayCard
           act={act}
           stepIndex={stepIndex}
+          locale={locale}
           onCollapse={() => setCollapsed(true)}
           onPrev={canGoPrev ? goPrev : undefined}
           onNext={canGoNext ? goNext : undefined}
@@ -154,10 +157,12 @@ export default function StoryOverlay({
                   </div>
                   <div className="text-5xl mb-4" aria-hidden="true">🗺️</div>
                   <h2 className="text-xl md:text-2xl font-display font-black text-white mb-2">
-                    أهلاً بك من جديد
+                    {locale === "en" ? "Welcome back" : "أهلاً بك من جديد"}
                   </h2>
                   <p className="text-white/65 text-sm leading-relaxed max-w-xs mx-auto">
-                    إحنا فاكرين رحلتك — خلينا نوريك الخريطة من زاوية مختلفة
+                    {locale === "en"
+                      ? "We remember your journey — let us show you the map from a new angle"
+                      : "إحنا فاكرين رحلتك — خلينا نوريك الخريطة من زاوية مختلفة"}
                   </p>
                 </div>
               </ActSlide>
@@ -167,15 +172,15 @@ export default function StoryOverlay({
               <ActSlide key="context">
                 <div className="text-center">
                   <div className="text-[10px] uppercase tracking-[0.4em] text-[#91b149] font-bold mb-3">
-                    من إجاباتك السابقة
+                    {locale === "en" ? "From your previous answers" : "من إجاباتك السابقة"}
                   </div>
                   <div className="flex flex-col gap-2 mb-3">
-                    <StatLine label="كنت بتدور على" value={needLabel} />
-                    <StatLine label="في بيئة" value={envLabel} />
-                    <StatLine label="لقيناك وجهة" value={destination.name} />
+                    <StatLine label={locale === "en" ? "You were looking for" : "كنت بتدور على"} value={needLabel} />
+                    <StatLine label={locale === "en" ? "In an environment" : "في بيئة"} value={envLabel} />
+                    <StatLine label={locale === "en" ? "We found your destination" : "لقيناك وجهة"} value={destination.name} />
                   </div>
                   <p className="text-white/50 text-xs">
-                    دلوقتي هنطير ليها على الخريطة…
+                    {locale === "en" ? "Now we'll fly there on the map…" : "دلوقتي هنطير ليها على الخريطة…"}
                   </p>
                 </div>
               </ActSlide>
@@ -193,7 +198,7 @@ export default function StoryOverlay({
                     {destination.envIcon}
                   </motion.div>
                   <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-1">
-                    نطير إلى
+                    {locale === "en" ? "Flying to" : "نطير إلى"}
                   </div>
                   <div className="text-lg font-display font-black text-white">
                     {destination.name}
@@ -210,7 +215,7 @@ export default function StoryOverlay({
                   </div>
                   <div>
                     <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold">
-                      وجهتك ⭐
+                      {locale === "en" ? "Your destination ⭐" : "وجهتك ⭐"}
                     </div>
                     <div className="text-lg font-display font-black text-white">
                       {destination.name}
@@ -235,13 +240,13 @@ export default function StoryOverlay({
                     onClick={() => onActChange("sites")}
                     className="w-full py-2.5 bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white font-bold rounded-full text-sm hover:shadow-[0_6px_18px_rgba(145,177,73,0.4)] transition-shadow"
                   >
-                    ورّيني المواقع العلاجية جوّاها
+                    {locale === "en" ? "Show me the therapeutic sites inside" : "ورّيني المواقع العلاجية جوّاها"}
                   </button>
                   <Link
                     href={`/destination/${destination.id}`}
                     className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full text-sm no-underline text-center transition-colors"
                   >
-                    اكتشف {destination.name} بالكامل
+                    {locale === "en" ? `Discover all of ${destination.name}` : `اكتشف ${destination.name} بالكامل`}
                   </Link>
                 </div>
               </ActSlide>
@@ -250,10 +255,12 @@ export default function StoryOverlay({
             {act === "sites" && (
               <ActSlide key="sites">
                 <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-                  مواقع {destination.name} العلاجية
+                  {locale === "en" ? `${destination.name} therapeutic sites` : `مواقع ${destination.name} العلاجية`}
                 </div>
                 <h3 className="text-base font-display font-black text-white mb-3">
-                  {focusedSubSites.length} موقع تقدر تزوره
+                  {locale === "en"
+                    ? `${focusedSubSites.length} sites you can visit`
+                    : `${focusedSubSites.length} موقع تقدر تزوره`}
                 </h3>
                 {focusedSubSites.length > 0 ? (
                   <div className="max-h-48 overflow-y-auto space-y-2 pr-1 mb-3 custom-scroll">
@@ -288,14 +295,16 @@ export default function StoryOverlay({
                   </div>
                 ) : (
                   <p className="text-white/50 text-xs mb-3">
-                    لسه بنوثق المواقع الداخلية للوجهة دي — قريباً.
+                    {locale === "en"
+                      ? "We're still documenting the inner sites for this destination — coming soon."
+                      : "لسه بنوثق المواقع الداخلية للوجهة دي — قريباً."}
                   </p>
                 )}
                 <button
                   onClick={() => onActChange("compare")}
                   className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full text-sm transition-colors"
                 >
-                  قارن مع وجهات تانية مناسبة
+                  {locale === "en" ? "Compare with other suitable destinations" : "قارن مع وجهات تانية مناسبة"}
                 </button>
               </ActSlide>
             )}
@@ -303,10 +312,10 @@ export default function StoryOverlay({
             {act === "compare" && (
               <ActSlide key="compare">
                 <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-                  مقارنة
+                  {locale === "en" ? "Comparison" : "مقارنة"}
                 </div>
                 <h3 className="text-base font-display font-black text-white mb-3">
-                  وجهات تانية مناسبة لحالتك
+                  {locale === "en" ? "Other destinations suitable for you" : "وجهات تانية مناسبة لحالتك"}
                 </h3>
                 <div className="space-y-2 mb-3">
                   {compatibleDestinations.slice(0, 3).map((d) => (
@@ -337,7 +346,7 @@ export default function StoryOverlay({
                   onClick={onSkip}
                   className="w-full py-2 text-white/60 hover:text-white text-xs font-bold transition-colors"
                 >
-                  استكشف الخريطة بحرية
+                  {locale === "en" ? "Explore the map freely" : "استكشف الخريطة بحرية"}
                 </button>
               </ActSlide>
             )}
@@ -353,6 +362,7 @@ export default function StoryOverlay({
 function OverlayCard({
   act,
   stepIndex,
+  locale,
   children,
   onCollapse,
   onPrev,
@@ -361,6 +371,7 @@ function OverlayCard({
 }: {
   act: Act;
   stepIndex: number;
+  locale: string;
   children: React.ReactNode;
   onCollapse: () => void;
   onPrev?: () => void;
@@ -370,13 +381,13 @@ function OverlayCard({
   return (
     <div
       className="bg-[#12394d]/95 dark:bg-[#0a151f]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.5)] overflow-hidden w-full max-w-sm flex flex-col max-h-[min(72vh,520px)]"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
       role="region"
-      aria-label="قصة الخريطة"
+      aria-label={locale === "en" ? "Map story" : "قصة الخريطة"}
     >
       {/* Header: progress dots + collapse */}
       <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5">
-        <div className="flex items-center gap-1.5" aria-label={`الخطوة ${stepIndex + 1} من ${ACT_ORDER.length}`}>
+        <div className="flex items-center gap-1.5" aria-label={locale === "en" ? `Step ${stepIndex + 1} of ${ACT_ORDER.length}` : `الخطوة ${stepIndex + 1} من ${ACT_ORDER.length}`}>
           {ACT_ORDER.map((a, i) => (
             <span
               key={a}
@@ -393,7 +404,7 @@ function OverlayCard({
         </div>
         <button
           onClick={onCollapse}
-          aria-label="تصغير"
+          aria-label={locale === "en" ? "Minimize" : "تصغير"}
           className="text-white/50 hover:text-white p-1 rounded transition-colors"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -417,27 +428,27 @@ function OverlayCard({
         <button
           onClick={onPrev}
           disabled={!onPrev}
-          aria-label="الخطوة السابقة"
+          aria-label={locale === "en" ? "Previous step" : "الخطوة السابقة"}
           className="text-white/60 hover:text-white disabled:text-white/15 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-1.5 transition-colors"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="9 18 15 12 9 6" />
           </svg>
-          <span>السابق</span>
+          <span>{locale === "en" ? "Previous" : "السابق"}</span>
         </button>
         <button
           onClick={onSkip}
           className="text-white/40 hover:text-white/80 text-[11px] font-bold transition-colors"
         >
-          تخطي القصة
+          {locale === "en" ? "Skip story" : "تخطي القصة"}
         </button>
         <button
           onClick={onNext}
           disabled={!onNext}
-          aria-label="الخطوة التالية"
+          aria-label={locale === "en" ? "Next step" : "الخطوة التالية"}
           className="text-[#91b149] hover:text-[#a3c45a] disabled:text-white/15 disabled:cursor-not-allowed text-xs font-bold flex items-center gap-1.5 transition-colors"
         >
-          <span>التالي</span>
+          <span>{locale === "en" ? "Next" : "التالي"}</span>
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="15 18 9 12 15 6" />
           </svg>
@@ -445,7 +456,9 @@ function OverlayCard({
       </div>
 
       <span className="sr-only">
-        {`الخطوة ${stepIndex + 1} من ${ACT_ORDER.length} — ${act}`}
+        {locale === "en"
+          ? `Step ${stepIndex + 1} of ${ACT_ORDER.length} — ${act}`
+          : `الخطوة ${stepIndex + 1} من ${ACT_ORDER.length} — ${act}`}
       </span>
     </div>
   );

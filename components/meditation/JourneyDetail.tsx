@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import type { Journey, JourneyProgress } from "@/lib/meditation/journeys";
 import { SESSIONS } from "@/lib/meditation/sessions";
 import { nextDayFor, dayLockInfo } from "@/lib/meditation/journeys";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   journey: Journey;
@@ -23,6 +24,7 @@ export default function JourneyDetail({
   onBack,
   onStartDay,
 }: Props) {
+  const { locale } = useTranslations();
   const entry = progress[journey.id];
   const completedCount = entry?.completedDays.length ?? 0;
   const nextDay = nextDayFor(journey, progress);
@@ -37,7 +39,7 @@ export default function JourneyDetail({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.4 }}
       className="min-h-screen bg-[#070d15]"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       {/* Cover */}
       <div className="relative h-[45vh] min-h-[280px] overflow-hidden">
@@ -58,12 +60,12 @@ export default function JourneyDetail({
           onClick={onBack}
           className="absolute top-4 right-4 z-10 text-white/85 hover:text-white text-xs bg-black/30 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/10 transition-colors inline-flex items-center gap-1.5"
           style={{ top: "max(16px, env(safe-area-inset-top))" }}
-          aria-label="رجوع"
+          aria-label={locale === "en" ? "Back" : "رجوع"}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="9 18 15 12 9 6" />
           </svg>
-          <span>رجوع</span>
+          <span>{locale === "en" ? "Back" : "رجوع"}</span>
         </button>
 
         {/* Hero content */}
@@ -109,17 +111,23 @@ export default function JourneyDetail({
             className="w-full py-3.5 bg-gradient-to-l from-[#91b149] to-[#6a8435] text-[#0a0f14] font-bold rounded-full text-sm hover:shadow-[0_8px_24px_rgba(145,177,73,0.4)] transition-shadow"
           >
             {completedCount === 0
-              ? `ابدأ اليوم 1 — ${journey.days[0]?.teaser}`
+              ? locale === "en"
+                ? `Start day 1 — ${journey.days[0]?.teaser}`
+                : `ابدأ اليوم 1 — ${journey.days[0]?.teaser}`
               : completedCount === totalDays
-                ? "ابدأ الرحلة من جديد"
-                : `كمّل — يوم ${nextDay}`}
+                ? locale === "en"
+                  ? "Start journey again"
+                  : "ابدأ الرحلة من جديد"
+                : locale === "en"
+                  ? `Continue — day ${nextDay}`
+                  : `كمّل — يوم ${nextDay}`}
           </button>
         </motion.div>
 
         {/* Day list */}
         <div className="space-y-2">
           <p className="text-[10px] uppercase tracking-[0.4em] text-[#91b149] font-bold px-1 mb-2">
-            الأيام
+            {locale === "en" ? "Days" : "الأيام"}
           </p>
           {journey.days.map((d, i) => {
             const session = SESSIONS.find((s) => s.id === d.sessionId);
@@ -142,7 +150,7 @@ export default function JourneyDetail({
                       ? "bg-[#12394d]/40 border-white/10 hover:bg-[#12394d]/60"
                       : "bg-white/5 border-white/5 opacity-60 cursor-not-allowed"
                 }`}
-                aria-label={`يوم ${d.day}: ${d.teaser} — ${lock.label}`}
+                aria-label={locale === "en" ? `Day ${d.day}: ${d.teaser} — ${lock.label}` : `يوم ${d.day}: ${d.teaser} — ${lock.label}`}
               >
                 {/* Day number / status badge */}
                 <div
@@ -163,7 +171,7 @@ export default function JourneyDetail({
                   </div>
                   {session && (
                     <div className="text-white/50 text-[11px] mt-0.5 truncate">
-                      {session.name} · {Math.round(session.duration / 60)} دقيقة
+                      {session.name} · {Math.round(session.duration / 60)} {locale === "en" ? "min" : "دقيقة"}
                     </div>
                   )}
                   {/* Show the lock-state label so users know exactly when a

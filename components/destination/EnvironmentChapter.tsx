@@ -11,9 +11,13 @@ import { TESTIMONIALS_BY_DEST } from "@/data/testimonials";
 import { isInSeasonNow } from "@/lib/season";
 import { localizeChapter, localizeDestination } from "@/lib/localize";
 
-const MONTH_NAMES = [
+const MONTH_NAMES_AR = [
   "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
   "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
+];
+const MONTH_NAMES_EN = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
 
 interface Props {
@@ -76,6 +80,7 @@ export default function EnvironmentChapter({
    *  show the chapter's overall "season window" as a list of month names.
    *  We dedupe and keep at most 4 to avoid wall-of-months. */
   const peakMonths = useMemo(() => {
+    const monthNames = locale === "en" ? MONTH_NAMES_EN : MONTH_NAMES_AR;
     const months = new Set<number>();
     destinations.forEach((d) => {
       d.bestMonths?.forEach((m) => months.add(m));
@@ -83,8 +88,8 @@ export default function EnvironmentChapter({
     return Array.from(months)
       .sort((a, b) => a - b)
       .slice(0, 4)
-      .map((m) => MONTH_NAMES[m - 1]);
-  }, [destinations]);
+      .map((m) => monthNames[m - 1]);
+  }, [destinations, locale]);
 
   /** Highest-rated testimonial across all destinations in this chapter.
    *  We surface this as a poetic quote BEFORE the cards so the chapter
@@ -120,7 +125,11 @@ export default function EnvironmentChapter({
     <section
       id={`chapter-${chapter.key}`}
       className="relative"
-      aria-label={`الفصل ${chapter.number}: ${chapter.name}`}
+      aria-label={
+        locale === "en"
+          ? `Chapter ${chapter.number}: ${chapter.name}`
+          : `الفصل ${chapter.number}: ${chapter.name}`
+      }
     >
       {/* ── Parallax hero ─────────────────────────────────────────────── */}
       <div
@@ -133,7 +142,11 @@ export default function EnvironmentChapter({
         >
           <Image
             src={chapter.heroImage}
-            alt={`${chapter.name} — السياحة الاستشفائية في مصر`}
+            alt={
+              locale === "en"
+                ? `${chapter.name} — wellness tourism in Egypt`
+                : `${chapter.name} — السياحة الاستشفائية في مصر`
+            }
             fill
             sizes="100vw"
             priority={index === 0}
@@ -149,7 +162,7 @@ export default function EnvironmentChapter({
         />
 
         {/* Content */}
-        <div className="relative h-full flex items-end" dir="rtl">
+        <div className="relative h-full flex items-end" dir={locale === "en" ? "ltr" : "rtl"}>
           <div className="max-w-5xl mx-auto px-6 md:px-8 pb-16 md:pb-24 w-full">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
@@ -195,7 +208,7 @@ export default function EnvironmentChapter({
       {/* ── Editorial body ────────────────────────────────────────────── */}
       <div
         className="bg-[#f5f8fa] dark:bg-[#0a151f] py-12 md:py-20"
-        dir="rtl"
+        dir={locale === "en" ? "ltr" : "rtl"}
       >
         <div className="max-w-5xl mx-auto px-4 md:px-8">
           {/* Editorial intro paragraph */}
@@ -226,23 +239,47 @@ export default function EnvironmentChapter({
             className="grid grid-cols-3 gap-3 md:gap-5 mb-10"
           >
             <FactTile
-              label={destinations.length === 1 ? "وجهة واحدة" : "عدد الوجهات"}
+              label={
+                destinations.length === 1
+                  ? locale === "en"
+                    ? "One destination"
+                    : "وجهة واحدة"
+                  : locale === "en"
+                    ? "Destination count"
+                    : "عدد الوجهات"
+              }
               value={String(destinations.length)}
               accent={chapter.accent}
             />
             {avgDistance !== null && (
               <FactTile
-                label="متوسط البعد عن القاهرة"
-                value={`${avgDistance} كم`}
+                label={
+                  locale === "en"
+                    ? "Avg. distance from Cairo"
+                    : "متوسط البعد عن القاهرة"
+                }
+                value={`${avgDistance} ${locale === "en" ? "km" : "كم"}`}
                 accent={chapter.accent}
               />
             )}
             <FactTile
-              label="أفضل شهور الزيارة"
-              value={peakMonths.length > 0 ? peakMonths.join(" · ") : "السنة كاملة"}
+              label={locale === "en" ? "Best months to visit" : "أفضل شهور الزيارة"}
+              value={
+                peakMonths.length > 0
+                  ? peakMonths.join(" · ")
+                  : locale === "en"
+                    ? "Year-round"
+                    : "السنة كاملة"
+              }
               accent={chapter.accent}
               highlight={inSeasonNow}
-              highlightLabel={inSeasonNow ? "الآن ✨" : undefined}
+              highlightLabel={
+                inSeasonNow
+                  ? locale === "en"
+                    ? "Now ✨"
+                    : "الآن ✨"
+                  : undefined
+              }
               compact
             />
           </motion.div>

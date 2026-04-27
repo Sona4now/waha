@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Particles from "./Particles";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   onStart: () => void;
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function EntryScreen({ onStart, onSkip }: Props) {
+  const { locale } = useTranslations();
   return (
     <motion.div
       className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
@@ -40,7 +42,7 @@ export default function EntryScreen({ onStart, onSkip }: Props) {
         {/* Logo */}
         <motion.img
           src="/logo.png"
-          alt="واحة"
+          alt={locale === "en" ? "Waha" : "واحة"}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5, duration: 1.2, ease: "easeOut" }}
@@ -54,7 +56,7 @@ export default function EntryScreen({ onStart, onSkip }: Props) {
           transition={{ delay: 1, duration: 1 }}
           className="text-[0.7rem] tracking-[0.35em] text-[#91b149]/70 uppercase font-light"
         >
-          السياحة الاستشفائية · مصر
+          {locale === "en" ? "Healing Tourism · Egypt" : "السياحة الاستشفائية · مصر"}
         </motion.span>
 
         {/* Title */}
@@ -64,7 +66,7 @@ export default function EntryScreen({ onStart, onSkip }: Props) {
           transition={{ delay: 1.5, duration: 1.2, ease: "easeOut" }}
           className="font-display text-4xl md:text-7xl font-bold text-white leading-tight"
         >
-          ابدأ رحلة الشفاء
+          {locale === "en" ? "Begin your healing journey" : "ابدأ رحلة الشفاء"}
         </motion.h1>
 
         {/* Divider */}
@@ -86,13 +88,13 @@ export default function EntryScreen({ onStart, onSkip }: Props) {
             onClick={onStart}
             className="w-full py-4 px-8 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-base rounded-full transition-all duration-300 hover:scale-[1.03] active:scale-95 shadow-[0_4px_30px_rgba(145,177,73,0.3)]"
           >
-            ابدأ التجربة
+            {locale === "en" ? "Begin the experience" : "ابدأ التجربة"}
           </button>
           <button
             onClick={onSkip}
             className="w-full py-3.5 px-8 border border-white/20 hover:border-white/50 text-white/50 hover:text-white/80 text-sm rounded-full transition-all duration-300"
           >
-            ادخل للموقع مباشرة
+            {locale === "en" ? "Skip to site" : "ادخل للموقع مباشرة"}
           </button>
         </motion.div>
       </div>
@@ -104,7 +106,7 @@ export default function EntryScreen({ onStart, onSkip }: Props) {
         transition={{ delay: 3.2, duration: 1 }}
         className="absolute bottom-6 text-white/10 text-[0.65rem] tracking-[0.3em] uppercase"
       >
-        واحة
+        {locale === "en" ? "Waha" : "واحة"}
       </motion.div>
     </motion.div>
   );

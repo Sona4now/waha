@@ -3,6 +3,7 @@
 import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 // Admin password verified via API — see /api/admin-auth
 const ADMIN_AUTH_ENDPOINT = "/api/admin-auth";
@@ -25,6 +26,8 @@ interface LocalStats {
 }
 
 export default function AdminPage() {
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
   const [authenticated, setAuthenticated] = useState(false);
   const [password, setPassword] = useState("");
   const [error, setError] = useState(false);
@@ -109,7 +112,9 @@ export default function AdminPage() {
   function resetAllData() {
     if (
       !confirm(
-        "هل أنت متأكد؟ ده هيمسح كل بيانات الزوار (localStorage) من جهازك فقط."
+        isEn
+          ? "Are you sure? This will erase all visitor data (localStorage) from your device only."
+          : "هل أنت متأكد؟ ده هيمسح كل بيانات الزوار (localStorage) من جهازك فقط.",
       )
     )
       return;
@@ -132,15 +137,20 @@ export default function AdminPage() {
   if (!authenticated) {
     return (
       <SiteLayout>
-        <section className="min-h-[70vh] flex items-center justify-center px-6">
+        <section
+          className="min-h-[70vh] flex items-center justify-center px-6"
+          dir={isEn ? "ltr" : "rtl"}
+        >
           <div className="w-full max-w-sm">
             <div className="text-center mb-8">
               <div className="text-5xl mb-4">🔐</div>
               <h1 className="text-2xl font-bold font-display text-[#12394d] dark:text-white mb-2">
-                لوحة التحكم
+                {isEn ? "Admin panel" : "لوحة التحكم"}
               </h1>
               <p className="text-sm text-[#7b7c7d]">
-                مخصصة للمشرفين الأكاديميين فقط
+                {isEn
+                  ? "For academic supervisors only"
+                  : "مخصصة للمشرفين الأكاديميين فقط"}
               </p>
             </div>
 
@@ -149,7 +159,7 @@ export default function AdminPage() {
               className="bg-white dark:bg-[#162033] rounded-2xl border border-[#d0dde4] dark:border-[#1e3a5f] p-6 shadow-lg"
             >
               <label className="block text-xs font-semibold text-[#12394d] dark:text-white mb-2">
-                كلمة المرور
+                {isEn ? "Password" : "كلمة المرور"}
               </label>
               <input
                 type="password"
@@ -161,7 +171,7 @@ export default function AdminPage() {
               />
               {error && (
                 <p className="text-red-500 text-xs mt-2 text-center animate-pulse">
-                  كلمة المرور غير صحيحة
+                  {isEn ? "Incorrect password" : "كلمة المرور غير صحيحة"}
                 </p>
               )}
               <button
@@ -169,10 +179,12 @@ export default function AdminPage() {
                 disabled={!password}
                 className="w-full mt-4 py-3 bg-gradient-to-l from-[#91b149] to-[#6a8435] disabled:opacity-40 text-white font-bold text-sm rounded-xl transition-all hover:shadow-lg"
               >
-                دخول
+                {isEn ? "Enter" : "دخول"}
               </button>
               <p className="text-[10px] text-[#7b7c7d] text-center mt-3">
-                البيانات محلية — من جهازك فقط
+                {isEn
+                  ? "Data is local — from your device only"
+                  : "البيانات محلية — من جهازك فقط"}
               </p>
             </form>
           </div>
@@ -181,22 +193,49 @@ export default function AdminPage() {
     );
   }
 
+  const STATS_LABELS = isEn
+    ? {
+        visits: "User visits",
+        favorites: "Favorites",
+        comparisons: "Comparisons",
+        helpful: "Positive ratings",
+        feedback: "Feedback entries",
+        tours: "360° tours watched",
+        achievements: "Achievements unlocked",
+        engagement: "Engagement rate",
+      }
+    : {
+        visits: "زيارات المستخدم",
+        favorites: "المفضلة",
+        comparisons: "المقارنات",
+        helpful: "تقييمات إيجابية",
+        feedback: "ردود الفعل",
+        tours: "جولات 360° شوهدت",
+        achievements: "إنجازات مفتوحة",
+        engagement: "معدل التفاعل",
+      };
+
   return (
     <SiteLayout>
-      <section className="py-16 bg-[#f5f8fa] dark:bg-[#0a151f] min-h-screen">
+      <section
+        className="py-16 bg-[#f5f8fa] dark:bg-[#0a151f] min-h-screen"
+        dir={isEn ? "ltr" : "rtl"}
+      >
         <div className="max-w-6xl mx-auto px-6">
           {/* Header */}
           <div className="flex items-center justify-between mb-10 flex-wrap gap-4">
             <div>
               <div className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
                 <span className="w-2 h-2 rounded-full bg-[#91b149] animate-pulse" />
-                لوحة الإدارة
+                {isEn ? "Admin panel" : "لوحة الإدارة"}
               </div>
               <h1 className="text-3xl md:text-4xl font-bold font-display text-[#12394d] dark:text-white">
-                لوحة تحكم المشرفين
+                {isEn ? "Supervisor dashboard" : "لوحة تحكم المشرفين"}
               </h1>
               <p className="text-sm text-[#7b7c7d] mt-1">
-                إحصائيات وردود الفعل المجمعة من المستخدمين
+                {isEn
+                  ? "User stats and aggregated feedback"
+                  : "إحصائيات وردود الفعل المجمعة من المستخدمين"}
               </p>
             </div>
             <div className="flex gap-2">
@@ -204,13 +243,13 @@ export default function AdminPage() {
                 onClick={loadData}
                 className="px-4 py-2 rounded-full bg-white dark:bg-[#162033] border border-[#d0dde4] dark:border-[#1e3a5f] text-[#12394d] dark:text-white text-xs font-semibold hover:border-[#1d5770] transition-all"
               >
-                🔄 تحديث
+                🔄 {isEn ? "Refresh" : "تحديث"}
               </button>
               <button
                 onClick={handleLogout}
                 className="px-4 py-2 rounded-full bg-white dark:bg-[#162033] border border-[#d0dde4] dark:border-[#1e3a5f] text-[#12394d] dark:text-white text-xs font-semibold hover:border-red-500 hover:text-red-500 transition-all"
               >
-                خروج
+                {isEn ? "Sign out" : "خروج"}
               </button>
             </div>
           </div>
@@ -219,14 +258,14 @@ export default function AdminPage() {
           {stats && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
               {[
-                { icon: "👥", label: "زيارات المستخدم", value: stats.totalVisits },
-                { icon: "❤️", label: "المفضلة", value: stats.favoritesCount },
-                { icon: "⚖️", label: "المقارنات", value: stats.comparisonsCount },
-                { icon: "👍", label: "تقييمات إيجابية", value: stats.helpfulVotes },
-                { icon: "💬", label: "ردود الفعل", value: stats.feedbackCount },
-                { icon: "🎥", label: "جولات 360° شوهدت", value: stats.tourViews },
-                { icon: "🏆", label: "إنجازات مفتوحة", value: stats.achievementsUnlocked },
-                { icon: "⭐", label: "معدل التفاعل", value: `${Math.round((stats.helpfulVotes + stats.feedbackCount) * 100) / 100}` },
+                { icon: "👥", label: STATS_LABELS.visits, value: stats.totalVisits },
+                { icon: "❤️", label: STATS_LABELS.favorites, value: stats.favoritesCount },
+                { icon: "⚖️", label: STATS_LABELS.comparisons, value: stats.comparisonsCount },
+                { icon: "👍", label: STATS_LABELS.helpful, value: stats.helpfulVotes },
+                { icon: "💬", label: STATS_LABELS.feedback, value: stats.feedbackCount },
+                { icon: "🎥", label: STATS_LABELS.tours, value: stats.tourViews },
+                { icon: "🏆", label: STATS_LABELS.achievements, value: stats.achievementsUnlocked },
+                { icon: "⭐", label: STATS_LABELS.engagement, value: `${Math.round((stats.helpfulVotes + stats.feedbackCount) * 100) / 100}` },
               ].map((stat, i) => (
                 <motion.div
                   key={stat.label}
@@ -252,10 +291,12 @@ export default function AdminPage() {
             <div className="p-5 border-b border-[#d0dde4] dark:border-[#1e3a5f] flex items-center justify-between">
               <div>
                 <h2 className="font-bold font-display text-lg text-[#12394d] dark:text-white">
-                  ردود فعل المستخدمين
+                  {isEn ? "User feedback" : "ردود فعل المستخدمين"}
                 </h2>
                 <p className="text-xs text-[#7b7c7d]">
-                  {feedback.length} رد فعل
+                  {isEn
+                    ? `${feedback.length} entries`
+                    : `${feedback.length} رد فعل`}
                 </p>
               </div>
             </div>
@@ -265,7 +306,7 @@ export default function AdminPage() {
                 <div className="p-12 text-center">
                   <div className="text-4xl mb-3">📭</div>
                   <p className="text-sm text-[#7b7c7d]">
-                    لا توجد ردود فعل بعد
+                    {isEn ? "No feedback yet" : "لا توجد ردود فعل بعد"}
                   </p>
                 </div>
               ) : (
@@ -286,7 +327,7 @@ export default function AdminPage() {
                         </div>
                         <span className="text-[10px] text-[#7b7c7d]">
                           {new Date(item.timestamp).toLocaleDateString(
-                            "ar-EG"
+                            isEn ? "en-GB" : "ar-EG",
                           )}
                         </span>
                       </div>
@@ -303,25 +344,27 @@ export default function AdminPage() {
           {/* Danger zone */}
           <div className="mt-10 p-5 rounded-2xl border-2 border-red-200 dark:border-red-900/40 bg-red-50 dark:bg-red-900/10">
             <h3 className="font-bold text-red-600 dark:text-red-400 mb-2 text-sm">
-              ⚠️ منطقة خطرة
+              ⚠️ {isEn ? "Danger zone" : "منطقة خطرة"}
             </h3>
             <p className="text-xs text-red-500 dark:text-red-400/80 mb-3">
-              يمحو كل البيانات المحلية من جهازك فقط. لن يؤثر على البيانات
-              الحقيقية للمستخدمين.
+              {isEn
+                ? "Erases all local data from your device only. Will not affect real user data."
+                : "يمحو كل البيانات المحلية من جهازك فقط. لن يؤثر على البيانات الحقيقية للمستخدمين."}
             </p>
             <button
               onClick={resetAllData}
               className="px-5 py-2 rounded-full bg-red-500 hover:bg-red-600 text-white text-xs font-bold transition-all"
             >
-              مسح كل البيانات المحلية
+              {isEn ? "Erase all local data" : "مسح كل البيانات المحلية"}
             </button>
           </div>
 
           {/* Note */}
           <div className="mt-6 text-center text-xs text-[#7b7c7d]">
             <p>
-              البيانات المعروضة هنا هي من localStorage لجهازك الحالي. للحصول
-              على إحصائيات حقيقية من جميع الزوار، استخدم Vercel Analytics.
+              {isEn
+                ? "Data shown here is from localStorage on your current device. For real visitor statistics across all users, use Vercel Analytics."
+                : "البيانات المعروضة هنا هي من localStorage لجهازك الحالي. للحصول على إحصائيات حقيقية من جميع الزوار، استخدم Vercel Analytics."}
             </p>
           </div>
         </div>

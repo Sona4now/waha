@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
 import { showToast } from "./Toast";
+import { useTranslations } from "./LocaleProvider";
 
 const STORAGE_KEY = "waaha_comparison";
 const MAX_ITEMS = 3;
@@ -13,6 +14,7 @@ const MAX_ITEMS = 3;
 const CHANGE_EVENT = "waaha_comparison_change";
 
 export function useComparison() {
+  const { locale } = useTranslations();
   const [ids, setIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -43,16 +45,26 @@ export function useComparison() {
     (id: string) => {
       if (ids.includes(id)) return;
       if (ids.length >= MAX_ITEMS) {
-        showToast("الحد الأقصى 3 وجهات للمقارنة", "warning");
+        showToast(
+          locale === "en"
+            ? "Maximum 3 destinations to compare"
+            : "الحد الأقصى 3 وجهات للمقارنة",
+          "warning"
+        );
         return;
       }
       const dest = DESTINATIONS.find((d) => d.id === id);
       persist([...ids, id]);
       if (dest) {
-        showToast(`تمت إضافة ${dest.name} للمقارنة ✓`, "success");
+        showToast(
+          locale === "en"
+            ? `Added ${dest.name} to comparison ✓`
+            : `تمت إضافة ${dest.name} للمقارنة ✓`,
+          "success"
+        );
       }
     },
-    [ids, persist]
+    [ids, persist, locale]
   );
 
   const remove = useCallback(
@@ -87,6 +99,7 @@ const HIDDEN_PATHS = ["/", "/gate", "/compare"];
 export default function ComparisonTray() {
   const router = useRouter();
   const pathname = usePathname();
+  const { locale } = useTranslations();
   const { ids, remove, clear } = useComparison();
 
   if (HIDDEN_PATHS.includes(pathname)) return null;
@@ -108,7 +121,7 @@ export default function ComparisonTray() {
         animate={{ y: 0, opacity: 1 }}
         exit={{ y: 100, opacity: 0 }}
         transition={{ type: "spring", stiffness: 280, damping: 30 }}
-        dir="rtl"
+        dir={locale === "en" ? "ltr" : "rtl"}
         className="fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[90] w-[95%] max-w-2xl"
       >
         <div className="bg-white/95 dark:bg-[#0d1b2a]/95 backdrop-blur-xl rounded-2xl shadow-[0_20px_60px_-12px_rgba(29,87,112,0.35)] border border-[#d0dde4] dark:border-[#1e3a5f] overflow-hidden">
@@ -116,7 +129,7 @@ export default function ComparisonTray() {
             {/* Label */}
             <div className="hidden sm:flex flex-col items-start flex-shrink-0 border-l border-[#d0dde4] dark:border-[#1e3a5f] pl-3">
               <span className="text-[10px] text-[#7b7c7d] uppercase tracking-wider">
-                المقارنة
+                {locale === "en" ? "Compare" : "المقارنة"}
               </span>
               <span className="text-sm font-bold text-[#12394d] dark:text-white">
                 {ids.length} / {MAX_ITEMS}
@@ -146,7 +159,7 @@ export default function ComparisonTray() {
                     <button
                       onClick={() => remove(d.id)}
                       className="w-4 h-4 rounded-full bg-[#d0dde4] dark:bg-[#1e3a5f] hover:bg-red-500 dark:hover:bg-red-500 text-[#7b7c7d] hover:text-white flex items-center justify-center transition-colors group-hover:bg-red-100 dark:group-hover:bg-red-900/40"
-                      aria-label={`إزالة ${d.name}`}
+                      aria-label={locale === "en" ? `Remove ${d.name}` : `إزالة ${d.name}`}
                     >
                       <svg
                         width="8"
@@ -179,8 +192,8 @@ export default function ComparisonTray() {
               <button
                 onClick={clear}
                 className="w-8 h-8 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 text-[#7b7c7d] hover:text-red-500 flex items-center justify-center transition-colors"
-                title="مسح الكل"
-                aria-label="مسح الكل"
+                title={locale === "en" ? "Clear all" : "مسح الكل"}
+                aria-label={locale === "en" ? "Clear all" : "مسح الكل"}
               >
                 <svg
                   width="14"
@@ -207,7 +220,7 @@ export default function ComparisonTray() {
               >
                 {ids.length >= 2 ? (
                   <>
-                    قارن الآن
+                    {locale === "en" ? "Compare now" : "قارن الآن"}
                     <svg
                       width="12"
                       height="12"
@@ -221,6 +234,8 @@ export default function ComparisonTray() {
                       <path d="M5 12h14M12 5l7 7-7 7" />
                     </svg>
                   </>
+                ) : locale === "en" ? (
+                  `Pick ${2 - ids.length}+`
                 ) : (
                   `اختر ${2 - ids.length}+`
                 )}
@@ -235,6 +250,7 @@ export default function ComparisonTray() {
 
 // Compact "Add to compare" button for destination cards
 export function CompareButton({ id }: { id: string }) {
+  const { locale } = useTranslations();
   const { has, toggle, count } = useComparison();
   const isAdded = has(id);
   const isFull = count >= MAX_ITEMS && !isAdded;
@@ -263,12 +279,26 @@ export function CompareButton({ id }: { id: string }) {
       }`}
       title={
         isAdded
-          ? "إزالة من المقارنة"
+          ? locale === "en"
+            ? "Remove from comparison"
+            : "إزالة من المقارنة"
           : isFull
-            ? "الحد الأقصى 3 وجهات"
+            ? locale === "en"
+              ? "Maximum 3 destinations"
+              : "الحد الأقصى 3 وجهات"
+            : locale === "en"
+              ? "Add to comparison"
+              : "أضف للمقارنة"
+      }
+      aria-label={
+        isAdded
+          ? locale === "en"
+            ? "Remove from comparison"
+            : "إزالة من المقارنة"
+          : locale === "en"
+            ? "Add to comparison"
             : "أضف للمقارنة"
       }
-      aria-label={isAdded ? "إزالة من المقارنة" : "أضف للمقارنة"}
     >
       {isAdded ? (
         <>
@@ -286,7 +316,7 @@ export function CompareButton({ id }: { id: string }) {
             <polyline points="20 6 9 17 4 12" />
           </svg>
           <span className="hidden md:group-hover:inline text-[11px] font-bold whitespace-nowrap">
-            مُضاف
+            {locale === "en" ? "Added" : "مُضاف"}
           </span>
         </>
       ) : (
@@ -309,7 +339,7 @@ export function CompareButton({ id }: { id: string }) {
             <path d="M16 7l-3 7a3 3 0 0 0 6 0l-3-7" />
           </svg>
           <span className="hidden md:group-hover:inline text-[11px] font-bold whitespace-nowrap">
-            قارن
+            {locale === "en" ? "Compare" : "قارن"}
           </span>
         </>
       )}

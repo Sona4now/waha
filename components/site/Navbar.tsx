@@ -29,7 +29,7 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [platformKey, setPlatformKey] = useState("Ctrl");
   const pathname = usePathname();
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const links = linkDefs.map((l) => ({ ...l, label: t(l.key) }));
 
   useEffect(() => {
@@ -60,12 +60,21 @@ export default function Navbar() {
         <Link href="/home" className="flex items-center gap-2.5 no-underline">
           <img
             src="/logo.png"
-            alt="واحة"
+            alt={locale === "en" ? "Waaha" : "واحة"}
             className="h-[54px] w-[54px] object-contain"
           />
           <div className="text-[1.7rem] font-black leading-none font-display">
-            <span className="text-[#1d5770] dark:text-[#4a9dc0]">وا</span>
-            <span className="text-[#91b149]">حة</span>
+            {locale === "en" ? (
+              <>
+                <span className="text-[#1d5770] dark:text-[#4a9dc0]">WA</span>
+                <span className="text-[#91b149]">HA</span>
+              </>
+            ) : (
+              <>
+                <span className="text-[#1d5770] dark:text-[#4a9dc0]">وا</span>
+                <span className="text-[#91b149]">حة</span>
+              </>
+            )}
           </div>
         </Link>
 

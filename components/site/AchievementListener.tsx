@@ -3,8 +3,11 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { Achievement } from "@/lib/achievements";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 export default function AchievementListener() {
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
   const [current, setCurrent] = useState<Achievement | null>(null);
 
   useEffect(() => {
@@ -46,13 +49,17 @@ export default function AchievementListener() {
               </motion.div>
               <div className="flex-1">
                 <div className="text-[10px] uppercase tracking-wider text-white/70 font-bold mb-1">
-                  ✨ إنجاز جديد
+                  {isEn ? "✨ New achievement" : "✨ إنجاز جديد"}
                 </div>
                 <h3 className="font-bold font-display text-lg leading-tight">
-                  {current.title}
+                  {isEn
+                    ? current.titleEn ?? current.title
+                    : current.title}
                 </h3>
                 <p className="text-xs text-white/80 mt-0.5">
-                  {current.description}
+                  {isEn
+                    ? current.descriptionEn ?? current.description
+                    : current.description}
                 </p>
               </div>
             </div>

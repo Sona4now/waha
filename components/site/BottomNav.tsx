@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const items = [
   {
     href: "/home",
-    label: "الرئيسية",
+    labelKey: "nav.home",
     icon: (active: boolean) => (
       <svg
         width="22"
@@ -25,7 +26,7 @@ const items = [
   },
   {
     href: "/destinations",
-    label: "الأماكن",
+    labelKey: "nav.destinations",
     icon: (active: boolean) => (
       <svg
         width="22"
@@ -44,7 +45,7 @@ const items = [
   },
   {
     href: "/tours",
-    label: "جولات 360°",
+    labelKey: "nav.tours",
     icon: (active: boolean) => (
       <svg
         width="22"
@@ -64,7 +65,7 @@ const items = [
   },
   {
     href: "/map",
-    label: "الخريطة",
+    labelKey: "nav.map",
     icon: (active: boolean) => (
       <svg
         width="22"
@@ -84,7 +85,7 @@ const items = [
   },
   {
     href: "/blog",
-    label: "المدونة",
+    labelKey: "nav.blog",
     icon: (active: boolean) => (
       <svg
         width="22"
@@ -106,6 +107,7 @@ const items = [
 const HIDDEN_PATHS = ["/", "/gate", "/therapy-room", "/map"];
 
 export default function BottomNav() {
+  const { t, locale } = useTranslations();
   const pathname = usePathname();
 
   if (HIDDEN_PATHS.includes(pathname)) return null;
@@ -113,8 +115,8 @@ export default function BottomNav() {
   return (
     <nav
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white dark:bg-[#0d1b2a] border-t border-[#d0dde4] dark:border-[#1e3a5f] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-[env(safe-area-inset-bottom)]"
-      dir="rtl"
-      aria-label="شريط التنقل السفلي"
+      dir={locale === "en" ? "ltr" : "rtl"}
+      aria-label={locale === "en" ? "Bottom navigation" : "شريط التنقل السفلي"}
     >
       <div className="flex items-center justify-around h-16">
         {items.map((item) => {
@@ -138,7 +140,7 @@ export default function BottomNav() {
                   <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-[#91b149]" />
                 )}
               </div>
-              <span className="text-[9px] font-semibold">{item.label}</span>
+              <span className="text-[9px] font-semibold">{t(item.labelKey)}</span>
             </Link>
           );
         })}

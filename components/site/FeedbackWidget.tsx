@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { showToast } from "./Toast";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   pageId: string;
@@ -12,6 +13,7 @@ interface Props {
 type Reaction = "helpful" | "not-helpful" | null;
 
 export default function FeedbackWidget({ pageId, pageTitle }: Props) {
+  const { locale } = useTranslations();
   const [reaction, setReaction] = useState<Reaction>(null);
   const [comment, setComment] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -33,7 +35,10 @@ export default function FeedbackWidget({ pageId, pageTitle }: Props) {
         }
       } catch {}
       setTimeout(() => setSubmitted(true), 500);
-      showToast("شكراً على تقييمك ❤️", "success");
+      showToast(
+        locale === "en" ? "Thanks for your feedback ❤️" : "شكراً على تقييمك ❤️",
+        "success"
+      );
     }
   }
 
@@ -52,7 +57,12 @@ export default function FeedbackWidget({ pageId, pageTitle }: Props) {
       localStorage.setItem("waaha_feedback", JSON.stringify(feedback));
     } catch {}
     setSubmitted(true);
-    showToast("شكراً — سنأخذ ملاحظاتك في الاعتبار", "success");
+    showToast(
+      locale === "en"
+        ? "Thanks — we'll take your feedback into account"
+        : "شكراً — سنأخذ ملاحظاتك في الاعتبار",
+      "success"
+    );
   }
 
   if (submitted) {
@@ -64,10 +74,12 @@ export default function FeedbackWidget({ pageId, pageTitle }: Props) {
       >
         <div className="text-4xl mb-2">🙏</div>
         <h3 className="font-bold font-display text-lg text-[#12394d] dark:text-white mb-1">
-          شكراً على تفاعلك
+          {locale === "en" ? "Thanks for engaging" : "شكراً على تفاعلك"}
         </h3>
         <p className="text-xs text-[#7b7c7d] dark:text-white/60">
-          ملاحظاتك بتساعدنا نحسّن المحتوى
+          {locale === "en"
+            ? "Your feedback helps us improve the content"
+            : "ملاحظاتك بتساعدنا نحسّن المحتوى"}
         </p>
       </motion.div>
     );
@@ -78,10 +90,12 @@ export default function FeedbackWidget({ pageId, pageTitle }: Props) {
       <div className="text-center mb-5">
         <div className="text-3xl mb-2">💬</div>
         <h3 className="font-bold font-display text-base text-[#12394d] dark:text-white mb-1">
-          هل المعلومات دي ساعدتك؟
+          {locale === "en" ? "Did this information help you?" : "هل المعلومات دي ساعدتك؟"}
         </h3>
         <p className="text-xs text-[#7b7c7d]">
-          رأيك مهم لتحسين المحتوى المقدم
+          {locale === "en"
+            ? "Your opinion helps us improve the content"
+            : "رأيك مهم لتحسين المحتوى المقدم"}
         </p>
       </div>
 
@@ -97,7 +111,7 @@ export default function FeedbackWidget({ pageId, pageTitle }: Props) {
           }`}
         >
           <span className="text-lg">👍</span>
-          ساعدني
+          {locale === "en" ? "Helped me" : "ساعدني"}
         </motion.button>
         <motion.button
           whileHover={{ scale: 1.05 }}
@@ -110,7 +124,7 @@ export default function FeedbackWidget({ pageId, pageTitle }: Props) {
           }`}
         >
           <span className="text-lg">👎</span>
-          ناقص
+          {locale === "en" ? "Lacking" : "ناقص"}
         </motion.button>
       </div>
 
@@ -125,12 +139,18 @@ export default function FeedbackWidget({ pageId, pageTitle }: Props) {
           >
             <div className="mt-5 pt-5 border-t border-[#d0dde4] dark:border-[#1e3a5f]">
               <label className="block text-xs font-semibold text-[#12394d] dark:text-white mb-2">
-                إيه اللي تحب نضيفه أو نحسّنه؟
+                {locale === "en"
+                  ? "What would you like us to add or improve?"
+                  : "إيه اللي تحب نضيفه أو نحسّنه؟"}
               </label>
               <textarea
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="ساعدنا نفهم احتياجاتك..."
+                placeholder={
+                  locale === "en"
+                    ? "Help us understand your needs..."
+                    : "ساعدنا نفهم احتياجاتك..."
+                }
                 className="w-full px-4 py-3 bg-[#f5f8fa] dark:bg-[#0a151f] border border-[#d0dde4] dark:border-[#1e3a5f] rounded-xl text-sm text-[#12394d] dark:text-white placeholder:text-[#7b7c7d] focus:outline-none focus:border-[#1d5770] dark:focus:border-[#91b149] transition-all resize-none"
                 rows={3}
                 maxLength={500}
@@ -144,7 +164,7 @@ export default function FeedbackWidget({ pageId, pageTitle }: Props) {
                   disabled={!comment.trim()}
                   className="px-5 py-2 rounded-full bg-[#1d5770] hover:bg-[#174860] disabled:bg-[#d0dde4] disabled:cursor-not-allowed text-white text-xs font-bold transition-all"
                 >
-                  إرسال الملاحظات
+                  {locale === "en" ? "Send feedback" : "إرسال الملاحظات"}
                 </button>
               </div>
             </div>

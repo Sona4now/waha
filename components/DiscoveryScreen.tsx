@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   onDone: () => void;
@@ -10,24 +11,28 @@ interface Props {
 const panels = [
   {
     word: "البحر",
+    wordEn: "The sea",
     image:
       "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80",
     color: "#0e7490",
   },
   {
     word: "الصحراء",
+    wordEn: "The desert",
     image:
       "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1920&q=80",
     color: "#d97706",
   },
   {
     word: "الجبال",
+    wordEn: "The mountains",
     image:
       "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80",
     color: "#78716c",
   },
   {
     word: "الواحات",
+    wordEn: "The oases",
     image:
       "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1920&q=80",
     color: "#16a34a",
@@ -35,6 +40,7 @@ const panels = [
 ];
 
 export default function DiscoveryScreen({ onDone }: Props) {
+  const { locale } = useTranslations();
   const [current, setCurrent] = useState(0);
 
   useEffect(() => {
@@ -91,7 +97,7 @@ export default function DiscoveryScreen({ onDone }: Props) {
               textShadow: `0 0 60px ${panels[current].color}66, 0 4px 30px rgba(0,0,0,0.7)`,
             }}
           >
-            {panels[current].word}
+            {locale === "en" ? panels[current].wordEn : panels[current].word}
           </span>
         </motion.div>
       </AnimatePresence>

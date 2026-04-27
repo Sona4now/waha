@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   beforeImage: string;
@@ -16,12 +17,16 @@ interface Props {
 export default function BeforeAfter({
   beforeImage,
   afterImage,
-  beforeLabel = "قبل",
-  afterLabel = "بعد",
+  beforeLabel,
+  afterLabel,
   title,
   description,
   improvementPercent,
 }: Props) {
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
+  const beforeText = beforeLabel ?? (isEn ? "Before" : "قبل");
+  const afterText = afterLabel ?? (isEn ? "After" : "بعد");
   const [position, setPosition] = useState(50);
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -106,7 +111,9 @@ export default function BeforeAfter({
           </div>
           {improvementPercent !== undefined && (
             <div className="bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">
-              نسبة التحسن: {improvementPercent}%
+              {isEn
+                ? `Improvement: ${improvementPercent}%`
+                : `نسبة التحسن: ${improvementPercent}%`}
             </div>
           )}
         </div>
@@ -124,7 +131,7 @@ export default function BeforeAfter({
         {/* After image (full) */}
         <img
           src={afterImage}
-          alt={afterLabel}
+          alt={afterText}
           className="absolute inset-0 w-full h-full object-cover"
           draggable={false}
         />
@@ -136,7 +143,7 @@ export default function BeforeAfter({
         >
           <img
             src={beforeImage}
-            alt={beforeLabel}
+            alt={beforeText}
             className="absolute inset-0 w-full h-full object-cover"
             draggable={false}
           />
@@ -147,13 +154,13 @@ export default function BeforeAfter({
           className="absolute top-4 right-4 bg-black/70 backdrop-blur-sm text-white px-3 py-1 rounded-full text-xs font-bold transition-opacity"
           style={{ opacity: position < 90 ? 1 : 0 }}
         >
-          {beforeLabel}
+          {beforeText}
         </div>
         <div
           className="absolute top-4 left-4 bg-[#91b149] text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg transition-opacity"
           style={{ opacity: position > 10 ? 1 : 0 }}
         >
-          {afterLabel}
+          {afterText}
         </div>
 
         {/* Divider line */}
@@ -204,7 +211,7 @@ export default function BeforeAfter({
             transition={{ duration: 5, times: [0, 0.1, 0.9, 1] }}
             className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/70 backdrop-blur-sm text-white text-xs px-3 py-1.5 rounded-full pointer-events-none"
           >
-            ↔ اسحب لرؤية الفرق
+            {isEn ? "↔ Drag to see the difference" : "↔ اسحب لرؤية الفرق"}
           </motion.div>
         )}
       </div>

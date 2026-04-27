@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useMemo, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { DESTINATIONS, BLOG_POSTS } from "@/data/siteData";
+import { useTranslations } from "./LocaleProvider";
+import type { Locale } from "@/lib/i18n";
 
 type SearchItem = {
   id: string;
@@ -15,17 +17,72 @@ type SearchItem = {
   keywords: string[];
 };
 
+const PAGE_LABELS = {
+  ar: {
+    home: "الصفحة الرئيسية",
+    destinations: "جميع الوجهات",
+    map: "الخريطة التفاعلية",
+    tours: "جولات 360° الافتراضية",
+    compare: "مقارنة الوجهات",
+    blog: "المدونة",
+    about: "من نحن",
+    contact: "الفريق والتواصل",
+    page: "صفحة",
+    destination: "وجهة",
+    article: "مقالة",
+    treatment: "علاج",
+  },
+  en: {
+    home: "Home",
+    destinations: "All destinations",
+    map: "Interactive map",
+    tours: "Virtual 360° tours",
+    compare: "Compare destinations",
+    blog: "Blog",
+    about: "About us",
+    contact: "Team & contact",
+    page: "Page",
+    destination: "Destination",
+    article: "Article",
+    treatment: "Treatment",
+  },
+} as const;
+
+const TREATMENTS_AR = [
+  { name: "الصدفية", icon: "🩺", dest: "safaga" },
+  { name: "الروماتويد", icon: "🦴", dest: "safaga" },
+  { name: "آلام المفاصل", icon: "🦴", dest: "siwa" },
+  { name: "الجهاز التنفسي", icon: "🫁", dest: "sinai" },
+  { name: "الاسترخاء النفسي", icon: "🧘", dest: "fayoum" },
+  { name: "التوتر", icon: "😌", dest: "bahariya" },
+  { name: "الأمراض الجلدية", icon: "✨", dest: "safaga" },
+  { name: "الجيوب الأنفية", icon: "🫁", dest: "siwa" },
+];
+
+const TREATMENTS_EN = [
+  { name: "Psoriasis", icon: "🩺", dest: "safaga" },
+  { name: "Rheumatoid arthritis", icon: "🦴", dest: "safaga" },
+  { name: "Joint pain", icon: "🦴", dest: "siwa" },
+  { name: "Respiratory health", icon: "🫁", dest: "sinai" },
+  { name: "Mental relaxation", icon: "🧘", dest: "fayoum" },
+  { name: "Stress relief", icon: "😌", dest: "bahariya" },
+  { name: "Skin conditions", icon: "✨", dest: "safaga" },
+  { name: "Sinus health", icon: "🫁", dest: "siwa" },
+];
+
 // Build the searchable index
-function buildIndex(): SearchItem[] {
+function buildIndex(locale: Locale): SearchItem[] {
   const index: SearchItem[] = [];
+  const L = PAGE_LABELS[locale === "en" ? "en" : "ar"];
+  const isEn = locale === "en";
 
   // Destinations
   DESTINATIONS.forEach((d) => {
     index.push({
       id: `dest-${d.id}`,
-      title: d.name,
+      title: isEn ? d.nameEn : d.name,
       subtitle: d.description,
-      category: "وجهة",
+      category: L.destination,
       href: `/destination/${d.id}`,
       icon: d.envIcon,
       keywords: [
@@ -44,7 +101,7 @@ function buildIndex(): SearchItem[] {
       id: `blog-${post.id}`,
       title: post.title,
       subtitle: post.excerpt,
-      category: "مقالة",
+      category: L.article,
       href: `/blog/${post.id}`,
       icon: "📖",
       keywords: [post.title, post.excerpt, post.category],
@@ -55,56 +112,56 @@ function buildIndex(): SearchItem[] {
   const pages = [
     {
       id: "home",
-      title: "الصفحة الرئيسية",
+      title: L.home,
       href: "/home",
       icon: "🏠",
       keywords: ["home", "رئيسية"],
     },
     {
       id: "destinations",
-      title: "جميع الوجهات",
+      title: L.destinations,
       href: "/destinations",
       icon: "🗺️",
       keywords: ["destinations", "أماكن", "وجهات"],
     },
     {
       id: "map",
-      title: "الخريطة التفاعلية",
+      title: L.map,
       href: "/map",
       icon: "📍",
       keywords: ["map", "خريطة"],
     },
     {
       id: "tours",
-      title: "جولات 360° الافتراضية",
+      title: L.tours,
       href: "/tours",
       icon: "🎥",
       keywords: ["tours", "360", "جولات", "افتراضية"],
     },
     {
       id: "compare",
-      title: "مقارنة الوجهات",
+      title: L.compare,
       href: "/compare",
       icon: "⚖️",
       keywords: ["compare", "مقارنة"],
     },
     {
       id: "blog",
-      title: "المدونة",
+      title: L.blog,
       href: "/blog",
       icon: "📰",
       keywords: ["blog", "مدونة", "مقالات"],
     },
     {
       id: "about",
-      title: "من نحن",
+      title: L.about,
       href: "/about",
       icon: "ℹ️",
       keywords: ["about", "عن المشروع", "من نحن"],
     },
     {
       id: "contact",
-      title: "الفريق والتواصل",
+      title: L.contact,
       href: "/contact",
       icon: "👥",
       keywords: ["contact", "فريق", "تواصل"],
@@ -115,8 +172,8 @@ function buildIndex(): SearchItem[] {
     index.push({
       id: `page-${p.id}`,
       title: p.title,
-      subtitle: "صفحة",
-      category: "صفحة",
+      subtitle: L.page,
+      category: L.page,
       href: p.href,
       icon: p.icon,
       keywords: p.keywords,
@@ -124,26 +181,19 @@ function buildIndex(): SearchItem[] {
   });
 
   // Treatments / symptoms
-  const treatments = [
-    { name: "الصدفية", icon: "🩺", dest: "safaga" },
-    { name: "الروماتويد", icon: "🦴", dest: "safaga" },
-    { name: "آلام المفاصل", icon: "🦴", dest: "siwa" },
-    { name: "الجهاز التنفسي", icon: "🫁", dest: "sinai" },
-    { name: "الاسترخاء النفسي", icon: "🧘", dest: "fayoum" },
-    { name: "التوتر", icon: "😌", dest: "bahariya" },
-    { name: "الأمراض الجلدية", icon: "✨", dest: "safaga" },
-    { name: "الجيوب الأنفية", icon: "🫁", dest: "siwa" },
-  ];
+  const treatments = isEn ? TREATMENTS_EN : TREATMENTS_AR;
 
-  treatments.forEach((t) => {
+  treatments.forEach((tr) => {
     index.push({
-      id: `treatment-${t.name}`,
-      title: `علاج ${t.name}`,
-      subtitle: `اكتشف أفضل وجهة لعلاج ${t.name}`,
-      category: "علاج",
-      href: `/destination/${t.dest}`,
-      icon: t.icon,
-      keywords: [t.name],
+      id: `treatment-${tr.name}`,
+      title: isEn ? `${tr.name} therapy` : `علاج ${tr.name}`,
+      subtitle: isEn
+        ? `Discover the best destination for ${tr.name}`
+        : `اكتشف أفضل وجهة لعلاج ${tr.name}`,
+      category: L.treatment,
+      href: `/destination/${tr.dest}`,
+      icon: tr.icon,
+      keywords: [tr.name],
     });
   });
 
@@ -180,17 +230,20 @@ function fuzzyMatch(query: string, item: SearchItem): number {
 
 export default function SearchCommand() {
   const router = useRouter();
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [selectedIdx, setSelectedIdx] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const index = useMemo(() => buildIndex(), []);
+  const index = useMemo(() => buildIndex(locale), [locale]);
+  const destinationCategoryLabel = isEn ? "Destination" : "وجهة";
 
   const results = useMemo(() => {
     if (!query.trim()) {
       // Return default popular items
-      return index.filter((i) => i.category === "وجهة").slice(0, 5);
+      return index.filter((i) => i.category === destinationCategoryLabel).slice(0, 5);
     }
     return index
       .map((item) => ({ item, score: fuzzyMatch(query, item) }))
@@ -198,7 +251,7 @@ export default function SearchCommand() {
       .sort((a, b) => b.score - a.score)
       .slice(0, 10)
       .map((x) => x.item);
-  }, [query, index]);
+  }, [query, index, destinationCategoryLabel]);
 
   // Keyboard shortcut
   useEffect(() => {
@@ -286,7 +339,7 @@ export default function SearchCommand() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -20, scale: 0.96 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            dir="rtl"
+            dir={isEn ? "ltr" : "rtl"}
             className="fixed top-[10vh] left-1/2 -translate-x-1/2 w-[92%] max-w-xl z-[111]"
           >
             <div className="bg-white dark:bg-[#0d1b2a] rounded-2xl shadow-2xl border border-[#d0dde4] dark:border-[#1e3a5f] overflow-hidden">
@@ -311,7 +364,11 @@ export default function SearchCommand() {
                   type="text"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="ابحث عن وجهة، علاج، مقالة..."
+                  placeholder={
+                    isEn
+                      ? "Search destinations, therapies, articles..."
+                      : "ابحث عن وجهة، علاج، مقالة..."
+                  }
                   className="flex-1 bg-transparent outline-none text-[#12394d] dark:text-white placeholder:text-[#7b7c7d] text-sm"
                 />
                 <kbd className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-mono font-semibold text-[#7b7c7d] bg-[#f5f8fa] dark:bg-[#162033] border border-[#d0dde4] dark:border-[#1e3a5f] rounded">
@@ -324,14 +381,16 @@ export default function SearchCommand() {
                 {results.length === 0 ? (
                   <div className="p-8 text-center">
                     <p className="text-[#7b7c7d] text-sm">
-                      لا توجد نتائج لـ &ldquo;{query}&rdquo;
+                      {isEn
+                        ? <>No results for &ldquo;{query}&rdquo;</>
+                        : <>لا توجد نتائج لـ &ldquo;{query}&rdquo;</>}
                     </p>
                   </div>
                 ) : (
                   <div className="py-2">
                     {!query && (
                       <p className="px-5 py-2 text-[10px] text-[#7b7c7d] font-semibold uppercase tracking-wider">
-                        وجهات شائعة
+                        {isEn ? "Popular destinations" : "وجهات شائعة"}
                       </p>
                     )}
                     {results.map((item, idx) => (
@@ -339,7 +398,7 @@ export default function SearchCommand() {
                         key={item.id}
                         onClick={() => handleSelect(item)}
                         onMouseEnter={() => setSelectedIdx(idx)}
-                        className={`w-full flex items-center gap-3 px-5 py-3 text-right transition-colors ${
+                        className={`w-full flex items-center gap-3 px-5 py-3 ${isEn ? "text-left" : "text-right"} transition-colors ${
                           selectedIdx === idx
                             ? "bg-[#e4edf2] dark:bg-[#162033]"
                             : "hover:bg-[#f5f8fa] dark:hover:bg-[#162033]/50"
@@ -391,17 +450,17 @@ export default function SearchCommand() {
                     <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#162033] border border-[#d0dde4] dark:border-[#1e3a5f] rounded">
                       ↑↓
                     </kbd>
-                    تنقل
+                    {isEn ? "Navigate" : "تنقل"}
                   </span>
                   <span className="flex items-center gap-1">
                     <kbd className="px-1.5 py-0.5 bg-white dark:bg-[#162033] border border-[#d0dde4] dark:border-[#1e3a5f] rounded">
                       ↵
                     </kbd>
-                    اختيار
+                    {isEn ? "Select" : "اختيار"}
                   </span>
                 </div>
                 <p className="text-[10px] text-[#7b7c7d]">
-                  مدعوم بـ واحة 🌿
+                  {isEn ? "Powered by Waha 🌿" : "مدعوم بـ واحة 🌿"}
                 </p>
               </div>
             </div>

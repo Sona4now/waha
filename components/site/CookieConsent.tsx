@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const STORAGE_KEY = "waaha_cookie_consent";
 const HIDDEN_PATHS = ["/", "/gate", "/therapy-room", "/map"];
@@ -59,6 +60,7 @@ export function getConsent(): ConsentChoice {
 
 export default function CookieConsent() {
   const pathname = usePathname();
+  const { locale } = useTranslations();
   const [visible, setVisible] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
   const [analytics, setAnalytics] = useState(true);
@@ -98,9 +100,9 @@ export default function CookieConsent() {
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: "spring", stiffness: 280, damping: 26 }}
           className="fixed bottom-20 md:bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[95] no-print"
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
           role="dialog"
-          aria-label="موافقة استخدام الكوكيز"
+          aria-label={locale === "en" ? "Cookie consent" : "موافقة استخدام الكوكيز"}
         >
           <div className="bg-[#12394d] dark:bg-[#162033] text-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.5)] border border-white/10 p-5">
             <div className="flex items-start gap-3 mb-4">
@@ -109,16 +111,17 @@ export default function CookieConsent() {
               </span>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-base mb-1.5">
-                  نستخدم بيانات بسيطة
+                  {locale === "en" ? "We use basic data" : "نستخدم بيانات بسيطة"}
                 </h3>
                 <p className="text-xs text-white/70 leading-relaxed">
-                  موقعنا بيستخدم تحليلات Vercel و localStorage لتحسين تجربتك.
-                  مفيش trackers إعلانية.{" "}
+                  {locale === "en"
+                    ? "Our site uses Vercel Analytics and localStorage to improve your experience. No ad trackers."
+                    : "موقعنا بيستخدم تحليلات Vercel و localStorage لتحسين تجربتك. مفيش trackers إعلانية."}{" "}
                   <Link
                     href="/privacy"
                     className="text-[#91b149] underline hover:text-[#a3c45a]"
                   >
-                    اقرأ السياسة
+                    {locale === "en" ? "Read the policy" : "اقرأ السياسة"}
                   </Link>
                 </p>
               </div>
@@ -134,21 +137,36 @@ export default function CookieConsent() {
                 >
                   <div className="space-y-3 mb-4 pt-3 border-t border-white/10">
                     <ConsentRow
-                      label="ضرورية"
-                      hint="تسجيل الدخول، المقارنة، الـ theme — مش ممكن تتعطل"
+                      label={locale === "en" ? "Essential" : "ضرورية"}
+                      hint={
+                        locale === "en"
+                          ? "Sign-in, comparison, theme — can't be turned off"
+                          : "تسجيل الدخول، المقارنة، الـ theme — مش ممكن تتعطل"
+                      }
+                      alwaysLabel={locale === "en" ? "(always)" : "(دائماً)"}
                       checked
                       disabled
                       onChange={() => {}}
                     />
                     <ConsentRow
-                      label="تحليلات"
-                      hint="Vercel Analytics — أعداد فقط، بدون بيانات شخصية"
+                      label={locale === "en" ? "Analytics" : "تحليلات"}
+                      hint={
+                        locale === "en"
+                          ? "Vercel Analytics — counts only, no personal data"
+                          : "Vercel Analytics — أعداد فقط، بدون بيانات شخصية"
+                      }
+                      alwaysLabel={locale === "en" ? "(always)" : "(دائماً)"}
                       checked={analytics}
                       onChange={(v) => setAnalytics(v)}
                     />
                     <ConsentRow
-                      label="مميزات شخصية"
-                      hint="حفظ تفضيلاتك، تقدم القراءة، فورم الحجز"
+                      label={locale === "en" ? "Personal features" : "مميزات شخصية"}
+                      hint={
+                        locale === "en"
+                          ? "Save your preferences, reading progress, booking form"
+                          : "حفظ تفضيلاتك، تقدم القراءة، فورم الحجز"
+                      }
+                      alwaysLabel={locale === "en" ? "(always)" : "(دائماً)"}
                       checked={features}
                       onChange={(v) => setFeatures(v)}
                     />
@@ -167,14 +185,20 @@ export default function CookieConsent() {
                 }
                 className="w-full py-2.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-sm rounded-full transition-colors"
               >
-                {showCustomize ? "احفظ تفضيلاتي" : "تمام، استمرّ"}
+                {showCustomize
+                  ? locale === "en"
+                    ? "Save my preferences"
+                    : "احفظ تفضيلاتي"
+                  : locale === "en"
+                    ? "OK, continue"
+                    : "تمام، استمرّ"}
               </button>
               {!showCustomize ? (
                 <button
                   onClick={() => setShowCustomize(true)}
                   className="text-[11px] text-white/60 hover:text-white underline-offset-2 hover:underline"
                 >
-                  اضبط التفضيلات
+                  {locale === "en" ? "Customize preferences" : "اضبط التفضيلات"}
                 </button>
               ) : (
                 <button
@@ -183,7 +207,9 @@ export default function CookieConsent() {
                   }
                   className="text-[11px] text-white/60 hover:text-white underline-offset-2 hover:underline"
                 >
-                  ارفض كل ما هو غير ضروري
+                  {locale === "en"
+                    ? "Reject all non-essential"
+                    : "ارفض كل ما هو غير ضروري"}
                 </button>
               )}
             </div>
@@ -200,12 +226,14 @@ function ConsentRow({
   checked,
   disabled,
   onChange,
+  alwaysLabel,
 }: {
   label: string;
   hint: string;
   checked: boolean;
   disabled?: boolean;
   onChange: (v: boolean) => void;
+  alwaysLabel?: string;
 }) {
   return (
     <label className="flex items-start gap-3 cursor-pointer">
@@ -233,7 +261,7 @@ function ConsentRow({
         <div className="text-xs font-bold text-white">
           {label}
           {disabled && (
-            <span className="ml-1 text-[10px] text-white/40">(دائماً)</span>
+            <span className="ml-1 text-[10px] text-white/40">{alwaysLabel ?? "(always)"}</span>
           )}
         </div>
         <div className="text-[10px] text-white/50 leading-relaxed">

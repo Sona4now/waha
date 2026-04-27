@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 // Organize 23 members into a tree:
 // Root (1) → 4 leads → 4-5 members each
@@ -36,6 +37,7 @@ const TREE = {
 };
 
 export default function InteractiveTreeView() {
+  const { locale } = useTranslations();
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
@@ -46,7 +48,7 @@ export default function InteractiveTreeView() {
             · Team Tree ·
           </div>
           <h2 className="font-display text-3xl md:text-4xl font-black text-white">
-            شجرة الفريق
+            {locale === "en" ? "Team tree" : "شجرة الفريق"}
           </h2>
         </div>
 

@@ -6,20 +6,30 @@ import Link from "next/link";
 import type { Session } from "@/lib/meditation/sessions";
 import type { Stats } from "@/hooks/meditation/useSessionHistory";
 import type { Journey } from "@/lib/meditation/journeys";
+import { useTranslations } from "@/components/site/LocaleProvider";
 import Confetti from "./Confetti";
 
 /**
- * Short, specific Arabic encouragements. Picked randomly per-session so
+ * Short, specific encouragements. Picked randomly per-session so
  * returning users don't see the same line. Kept small (6 items) on purpose —
  * a larger set dilutes the specificity.
  */
-const MOTIVATIONAL_QUOTES = [
+const MOTIVATIONAL_QUOTES_AR = [
   "اللي عملته ده أصعب من إنك تقعد ساعة في الجيم.",
   "جسمك دلوقتي بيعمل reset. اديله لحظة.",
   "كل مرة بتتأمل، بتبني عضلة في الصبر.",
   "الهدوء مش هروب — ده قوة.",
   "التنفس الواعي هو أقدم دواء في التاريخ.",
   "3 دقايق بس كفاية إنك ترجع لنفسك.",
+];
+
+const MOTIVATIONAL_QUOTES_EN = [
+  "What you just did is harder than spending an hour at the gym.",
+  "Your body is doing a reset right now. Give it a moment.",
+  "Every time you meditate, you build a muscle of patience.",
+  "Calm isn't escape — it's strength.",
+  "Mindful breathing is the oldest medicine in history.",
+  "Three minutes is enough to come back to yourself.",
 ];
 
 interface Props {
@@ -43,12 +53,16 @@ interface Props {
   onViewHistory?: () => void;
 }
 
-function achievementFor(elapsed: number, fullyCompleted: boolean) {
-  if (fullyCompleted) return { emoji: "🏆", text: "أتممت الجلسة كاملة" };
-  if (elapsed >= 600) return { emoji: "🥇", text: "أكتر من 10 دقائق — ممتاز" };
-  if (elapsed >= 300) return { emoji: "🥈", text: "5 دقائق — بداية قوية" };
-  if (elapsed >= 120) return { emoji: "🥉", text: "دقيقتين — خطوة أولى" };
-  return { emoji: "🌱", text: "كل لحظة بتحسبلك" };
+function achievementFor(elapsed: number, fullyCompleted: boolean, isEn: boolean) {
+  if (fullyCompleted)
+    return { emoji: "🏆", text: isEn ? "Completed the full session" : "أتممت الجلسة كاملة" };
+  if (elapsed >= 600)
+    return { emoji: "🥇", text: isEn ? "More than 10 minutes — excellent" : "أكتر من 10 دقائق — ممتاز" };
+  if (elapsed >= 300)
+    return { emoji: "🥈", text: isEn ? "5 minutes — strong start" : "5 دقائق — بداية قوية" };
+  if (elapsed >= 120)
+    return { emoji: "🥉", text: isEn ? "Two minutes — first step" : "دقيقتين — خطوة أولى" };
+  return { emoji: "🌱", text: isEn ? "Every moment counts" : "كل لحظة بتحسبلك" };
 }
 
 /**
@@ -56,7 +70,7 @@ function achievementFor(elapsed: number, fullyCompleted: boolean) {
  * Positive delta (+1, +2...) = got better. Negative = got worse.
  * Zero = "stayed same" still counts as a win for stability.
  */
-function MoodDelta({ before, after }: { before: number; after: number }) {
+function MoodDelta({ before, after, isEn }: { before: number; after: number; isEn: boolean }) {
   const delta = after - before;
   const MOOD_EMOJIS = ["😞", "😟", "😐", "🙂", "😊"];
   const beforeEmoji = MOOD_EMOJIS[before - 1] ?? "😐";
@@ -64,14 +78,24 @@ function MoodDelta({ before, after }: { before: number; after: number }) {
 
   const message =
     delta > 1
-      ? `تحسّن كبير! قفزت ${delta} درجات`
+      ? isEn
+        ? `Big improvement! You jumped ${delta} levels`
+        : `تحسّن كبير! قفزت ${delta} درجات`
       : delta === 1
-        ? "حاسس أحسن شوية ← مفيش حاجة صغيرة"
+        ? isEn
+          ? "Feeling a bit better ← no small thing"
+          : "حاسس أحسن شوية ← مفيش حاجة صغيرة"
         : delta === 0
-          ? "حافظت على هدوءك — ده إنجاز برضه"
+          ? isEn
+            ? "You held your calm — that's an achievement too"
+            : "حافظت على هدوءك — ده إنجاز برضه"
           : delta === -1
-            ? "أحياناً التأمل بيكشف مشاعر كانت مدفونة"
-            : "لو لسه متعب، امنح نفسك وقت تاني";
+            ? isEn
+              ? "Sometimes meditation surfaces feelings that were buried"
+              : "أحياناً التأمل بيكشف مشاعر كانت مدفونة"
+            : isEn
+              ? "If you're still tired, give yourself another moment"
+              : "لو لسه متعب، امنح نفسك وقت تاني";
 
   const tint =
     delta > 0
@@ -106,7 +130,9 @@ export default function SessionSummary({
   onLibrary,
   onViewHistory,
 }: Props) {
-  const a = achievementFor(elapsed, fullyCompleted);
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
+  const a = achievementFor(elapsed, fullyCompleted, isEn);
   const mins = Math.floor(elapsed / 60);
   const secs = elapsed % 60;
   const hasMoodData =
@@ -116,11 +142,11 @@ export default function SessionSummary({
 
   // Pick a stable motivational quote for this mount (not on every render).
   const quote = useMemo(
-    () =>
-      MOTIVATIONAL_QUOTES[
-        Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length)
-      ],
-    [],
+    () => {
+      const list = isEn ? MOTIVATIONAL_QUOTES_EN : MOTIVATIONAL_QUOTES_AR;
+      return list[Math.floor(Math.random() * list.length)];
+    },
+    [isEn],
   );
 
   // Fire confetti when the user actually finished. Not for short-tap sessions
@@ -130,11 +156,18 @@ export default function SessionSummary({
   // Web Share API fallback → copy-to-clipboard
   const handleShare = useCallback(async () => {
     const text = journey
-      ? `خلّصت اليوم ${journeyDay} من ${journey.name} — ${mins} دقيقة تأمل. 🌿`
-      : `خلّصت جلسة ${session.name} — ${mins} دقيقة تأمل، ${breathCycles} دورة تنفس. 🌿`;
+      ? isEn
+        ? `Finished day ${journeyDay} of ${journey.name} — ${mins} minutes of meditation. 🌿`
+        : `خلّصت اليوم ${journeyDay} من ${journey.name} — ${mins} دقيقة تأمل. 🌿`
+      : isEn
+        ? `Finished session ${session.name} — ${mins} minutes of meditation, ${breathCycles} breath cycles. 🌿`
+        : `خلّصت جلسة ${session.name} — ${mins} دقيقة تأمل، ${breathCycles} دورة تنفس. 🌿`;
     try {
       if (navigator.share) {
-        await navigator.share({ text, title: "واحة · غرفة التأمل" });
+        await navigator.share({
+          text,
+          title: isEn ? "Waha · Meditation Room" : "واحة · غرفة التأمل",
+        });
       } else {
         await navigator.clipboard.writeText(
           `${text}\nhttps://wahaeg.com/therapy-room`,
@@ -143,16 +176,16 @@ export default function SessionSummary({
     } catch {
       /* user canceled */
     }
-  }, [journey, journeyDay, mins, breathCycles, session.name]);
+  }, [journey, journeyDay, mins, breathCycles, session.name, isEn]);
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="fixed inset-0 bg-[#070d15]/95 backdrop-blur-xl flex items-center justify-center z-[60] px-4 overflow-y-auto py-8"
-      dir="rtl"
+      dir={isEn ? "ltr" : "rtl"}
       role="dialog"
-      aria-label="ملخص الجلسة"
+      aria-label={isEn ? "Session summary" : "ملخص الجلسة"}
     >
       <Confetti active={showConfetti} />
       <motion.div
@@ -170,16 +203,28 @@ export default function SessionSummary({
           {journeyDone ? "🎉" : a.emoji}
         </motion.div>
         <h2 className="text-2xl font-display font-black text-white mb-1">
-          {journeyDone ? `خلّصت ${journey?.name}!` : fullyCompleted ? "أحسنت!" : "شكراً لك"}
+          {journeyDone
+            ? isEn
+              ? `Finished ${journey?.name}!`
+              : `خلّصت ${journey?.name}!`
+            : fullyCompleted
+              ? isEn
+                ? "Great work!"
+                : "أحسنت!"
+              : isEn
+                ? "Thank you"
+                : "شكراً لك"}
         </h2>
         <p className="text-[#91b149] text-sm font-bold mb-5">
           {journey && journeyDay !== undefined
-            ? `اليوم ${journeyDay} من ${journey.days.length}`
+            ? isEn
+              ? `Day ${journeyDay} of ${journey.days.length}`
+              : `اليوم ${journeyDay} من ${journey.days.length}`
             : a.text}
         </p>
 
         {/* Mood delta — only if captured */}
-        {hasMoodData && <MoodDelta before={moodBefore!} after={moodAfter!} />}
+        {hasMoodData && <MoodDelta before={moodBefore!} after={moodAfter!} isEn={isEn} />}
 
         {/* Motivational quote — reinforces that the user did something real */}
         <p className="text-white/60 text-xs leading-relaxed mb-5 px-2">
@@ -191,25 +236,26 @@ export default function SessionSummary({
             <div className="text-lg font-bold text-white font-mono">
               {mins}:{String(secs).padStart(2, "0")}
             </div>
-            <div className="text-[9px] text-white/40 mt-0.5">المدة</div>
+            <div className="text-[9px] text-white/40 mt-0.5">{isEn ? "Duration" : "المدة"}</div>
           </div>
           <div className="bg-white/5 rounded-xl p-2.5">
             <div className="text-lg font-bold text-white font-mono">
               {breathCycles}
             </div>
-            <div className="text-[9px] text-white/40 mt-0.5">دورة تنفس</div>
+            <div className="text-[9px] text-white/40 mt-0.5">{isEn ? "Breath cycles" : "دورة تنفس"}</div>
           </div>
           <div className="bg-white/5 rounded-xl p-2.5">
             <div className="text-lg font-bold text-white font-mono">
               {stats.streak}🔥
             </div>
-            <div className="text-[9px] text-white/40 mt-0.5">يوم متواصل</div>
+            <div className="text-[9px] text-white/40 mt-0.5">{isEn ? "Day streak" : "يوم متواصل"}</div>
           </div>
         </div>
 
         <div className="text-[11px] text-white/30 mb-5 leading-relaxed">
-          {session.name} · إجمالي {stats.totalMinutes} دقيقة عبر{" "}
-          {stats.totalSessions} جلسة
+          {isEn
+            ? `${session.name} · ${stats.totalMinutes} total minutes across ${stats.totalSessions} sessions`
+            : `${session.name} · إجمالي ${stats.totalMinutes} دقيقة عبر ${stats.totalSessions} جلسة`}
         </div>
 
         <div className="flex flex-col gap-2">
@@ -218,7 +264,7 @@ export default function SessionSummary({
               onClick={onRestart}
               className="w-full py-3 bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white font-bold rounded-full text-sm hover:shadow-[0_8px_24px_rgba(145,177,73,0.4)] transition-shadow"
             >
-              كرر نفس الجلسة
+              {isEn ? "Repeat the session" : "كرر نفس الجلسة"}
             </button>
           )}
           <button
@@ -232,27 +278,33 @@ export default function SessionSummary({
               <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
               <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
             </svg>
-            <span>شارك اللحظة</span>
+            <span>{isEn ? "Share the moment" : "شارك اللحظة"}</span>
           </button>
           <button
             onClick={onLibrary}
             className="w-full py-2.5 text-white/70 hover:text-white text-xs font-bold transition-colors"
           >
-            {journey ? "عودة للرحلة" : "جلسة تانية"}
+            {journey
+              ? isEn
+                ? "Back to journey"
+                : "عودة للرحلة"
+              : isEn
+                ? "Another session"
+                : "جلسة تانية"}
           </button>
           {onViewHistory ? (
             <button
               onClick={onViewHistory}
               className="w-full py-2 text-white/40 hover:text-white/80 text-xs transition-colors"
             >
-              📊 شوف تاريخك
+              {isEn ? "📊 See your history" : "📊 شوف تاريخك"}
             </button>
           ) : (
             <Link
               href="/therapy-room/history"
               className="w-full py-2 text-white/40 hover:text-white/80 text-xs transition-colors no-underline"
             >
-              📊 شوف تاريخك
+              {isEn ? "📊 See your history" : "📊 شوف تاريخك"}
             </Link>
           )}
         </div>

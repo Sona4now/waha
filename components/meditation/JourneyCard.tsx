@@ -4,6 +4,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import type { Journey, JourneyProgress } from "@/lib/meditation/journeys";
 import { nextDayFor } from "@/lib/meditation/journeys";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   journey: Journey;
@@ -22,6 +23,7 @@ export default function JourneyCard({
   onOpen,
   index = 0,
 }: Props) {
+  const { locale } = useTranslations();
   const entry = progress[journey.id];
   const completedCount = entry?.completedDays.length ?? 0;
   const totalDays = journey.days.length;
@@ -38,8 +40,8 @@ export default function JourneyCard({
       whileTap={{ scale: 0.98 }}
       onClick={() => onOpen(journey)}
       className="relative group flex flex-col text-right bg-[#12394d]/70 backdrop-blur-md border border-white/10 rounded-3xl overflow-hidden w-full focus:outline-none focus:ring-2 focus:ring-[#91b149] focus:ring-offset-2 focus:ring-offset-[#0a151f]"
-      dir="rtl"
-      aria-label={`فتح رحلة ${journey.name}`}
+      dir={locale === "en" ? "ltr" : "rtl"}
+      aria-label={locale === "en" ? `Open journey ${journey.name}` : `فتح رحلة ${journey.name}`}
     >
       {/* Cover */}
       <div className="relative h-40 overflow-hidden">
@@ -100,12 +102,12 @@ export default function JourneyCard({
         <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[11px]">
           {completedCount === totalDays ? (
             <>
-              <span className="text-[#91b149] font-bold">✓ خلصت الرحلة</span>
-              <span className="text-white/40">ابدأ من جديد ←</span>
+              <span className="text-[#91b149] font-bold">{locale === "en" ? "✓ Journey complete" : "✓ خلصت الرحلة"}</span>
+              <span className="text-white/40">{locale === "en" ? "Start again ←" : "ابدأ من جديد ←"}</span>
             </>
           ) : (
             <>
-              <span className="text-white/50">يوم {nextDay}</span>
+              <span className="text-white/50">{locale === "en" ? `Day ${nextDay}` : `يوم ${nextDay}`}</span>
               <span className="text-white font-bold truncate max-w-[60%]">
                 {nextDayInfo?.teaser}
               </span>

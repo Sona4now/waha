@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams, useRouter } from "next/navigation";
 import SiteLayout from "@/components/site/SiteLayout";
-import { DESTINATIONS } from "@/data/siteData";
+import { DESTINATIONS, type DestinationFull } from "@/data/siteData";
 import {
   useRecommendation,
   NEED_TO_TREATMENTS,
@@ -15,6 +15,8 @@ import { THERAPEUTIC_SITES } from "@/lib/therapeuticSites";
 import StoryOverlay, { type Act } from "@/components/map/StoryOverlay";
 import MapToolbar from "@/components/map/MapToolbar";
 import { playChime } from "@/lib/meditation/chimes";
+import { useTranslations } from "@/components/site/LocaleProvider";
+import { localizeDestination } from "@/lib/localize";
 
 // Leaflet only runs in the browser.
 const StoryMap = dynamic(() => import("@/components/map/StoryMap"), {
@@ -23,7 +25,7 @@ const StoryMap = dynamic(() => import("@/components/map/StoryMap"), {
     <div className="w-full h-full bg-[#1a2332] flex items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <div className="w-10 h-10 border-[3px] border-[#91b149] border-t-transparent rounded-full animate-spin" />
-        <span className="text-white/60 text-sm">جاري تحضير الخريطة…</span>
+        <span className="text-white/60 text-sm">Loading map…</span>
       </div>
     </div>
   ),
@@ -31,6 +33,7 @@ const StoryMap = dynamic(() => import("@/components/map/StoryMap"), {
 
 export default function MapPage() {
   const { recommendation, loaded } = useRecommendation();
+  const { locale } = useTranslations();
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -70,10 +73,11 @@ export default function MapPage() {
 
   const recommendedDest = useMemo(() => {
     if (!recommendation) return null;
-    return (
-      DESTINATIONS.find((d) => d.id === recommendation.destinationId) ?? null
+    const raw = DESTINATIONS.find(
+      (d) => d.id === recommendation.destinationId,
     );
-  }, [recommendation]);
+    return raw ? localizeDestination(raw, locale) : null;
+  }, [recommendation, locale]);
 
   /**
    * Destinations that match the user's stored treatment need.
@@ -88,8 +92,10 @@ export default function MapPage() {
   }, [recommendation]);
 
   const alternateCompatible = useMemo(() => {
-    return compatibleDestinations.filter((d) => d.id !== recommendedDest?.id);
-  }, [compatibleDestinations, recommendedDest]);
+    return compatibleDestinations
+      .filter((d) => d.id !== recommendedDest?.id)
+      .map((d) => localizeDestination(d, locale));
+  }, [compatibleDestinations, recommendedDest, locale]);
 
   // What the camera and sub-site layer focus on right now.
   const highlighted = useMemo(() => {
@@ -132,13 +138,26 @@ export default function MapPage() {
 
   const handleShare = useCallback(async () => {
     const shareUrl = window.location.href;
+    const dest = manualHighlight
+      ? DESTINATIONS.find((d) => d.id === manualHighlight)
+      : null;
+    const localizedName = dest
+      ? localizeDestination(dest, locale).name
+      : "";
     try {
       if (navigator.share) {
         await navigator.share({
-          title: "خريطتي العلاجية — واحة",
-          text: manualHighlight
-            ? `اكتشف ${DESTINATIONS.find((d) => d.id === manualHighlight)?.name} على خريطة واحة`
-            : "اكتشف خريطة الوجهات الاستشفائية في مصر",
+          title:
+            locale === "en"
+              ? "My therapeutic map — Waha"
+              : "خريطتي العلاجية — واحة",
+          text: localizedName
+            ? locale === "en"
+              ? `Discover ${localizedName} on the Waha map`
+              : `اكتشف ${localizedName} على خريطة واحة`
+            : locale === "en"
+              ? "Discover the therapeutic destinations of Egypt on the map"
+              : "اكتشف خريطة الوجهات الاستشفائية في مصر",
           url: shareUrl,
         });
       } else {
@@ -147,7 +166,7 @@ export default function MapPage() {
     } catch {
       /* user canceled or clipboard denied — silent */
     }
-  }, [manualHighlight]);
+  }, [manualHighlight, locale]);
 
   // Play a soft chime when the user crosses into a new narrative act.
   const prevActRef = useRef<Act>(act);
@@ -177,25 +196,28 @@ export default function MapPage() {
   if (!recommendation || !recommendedDest) {
     return (
       <SiteLayout>
-        <NoRecommendationScreen />
+        <NoRecommendationScreen locale={locale} />
       </SiteLayout>
     );
   }
 
-  const highlightedDest = manualHighlight
+  const rawHighlighted = manualHighlight
     ? DESTINATIONS.find((d) => d.id === manualHighlight)
+    : null;
+  const highlightedDest = rawHighlighted
+    ? localizeDestination(rawHighlighted, locale)
     : null;
 
   return (
     <SiteLayout>
       <div
         className="map-shell relative w-full bg-[#0a151f] touch-manipulation"
-        dir="rtl"
+        dir={locale === "en" ? "ltr" : "rtl"}
       >
         {/* Map fills the screen as a canvas */}
         <div className="absolute inset-0">
           <StoryMap
-            destinations={DESTINATIONS}
+            destinations={DESTINATIONS.map((d) => localizeDestination(d, locale))}
             subSites={THERAPEUTIC_SITES}
             recommendation={recommendation}
             highlighted={highlighted}
@@ -226,12 +248,14 @@ export default function MapPage() {
           <Link
             href="/home"
             className="pointer-events-auto inline-flex items-center gap-1.5 bg-[#12394d]/90 backdrop-blur-md px-3 h-9 rounded-full text-white text-xs font-bold border border-white/15 hover:bg-[#12394d] no-underline transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.25)]"
-            aria-label="العودة للرئيسية"
+            aria-label={locale === "en" ? "Back to home" : "العودة للرئيسية"}
           >
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <polyline points="9 18 15 12 9 6" />
             </svg>
-            <span className="hidden xs:inline sm:inline">الرئيسية</span>
+            <span className="hidden xs:inline sm:inline">
+              {locale === "en" ? "Home" : "الرئيسية"}
+            </span>
           </Link>
 
           <div className="flex items-center gap-2">
@@ -239,8 +263,8 @@ export default function MapPage() {
             <button
               onClick={handleShare}
               className="pointer-events-auto bg-[#12394d]/90 backdrop-blur-md w-9 h-9 rounded-full text-white text-xs font-bold border border-white/15 hover:bg-[#12394d] transition-colors shadow-[0_4px_12px_rgba(0,0,0,0.25)] flex items-center justify-center"
-              aria-label="شارك الخريطة"
-              title="شارك"
+              aria-label={locale === "en" ? "Share map" : "شارك الخريطة"}
+              title={locale === "en" ? "Share" : "شارك"}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="18" cy="5" r="3" />
@@ -255,13 +279,15 @@ export default function MapPage() {
               <button
                 onClick={restartStory}
                 className="pointer-events-auto bg-[#91b149] hover:bg-[#a3c45a] px-3 h-9 rounded-full text-[#0a0f14] text-xs font-bold border border-white/10 transition-colors inline-flex items-center gap-1.5 shadow-[0_4px_12px_rgba(145,177,73,0.3)]"
-                aria-label="إعادة القصة"
+                aria-label={locale === "en" ? "Restart story" : "إعادة القصة"}
               >
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <polyline points="1 4 1 10 7 10" />
                   <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
                 </svg>
-                <span className="hidden xs:inline">إعادة</span>
+                <span className="hidden xs:inline">
+                  {locale === "en" ? "Restart" : "إعادة"}
+                </span>
               </button>
             )}
           </div>
@@ -285,6 +311,7 @@ export default function MapPage() {
             collapsed={sheetCollapsed}
             onToggle={() => setSheetCollapsed((v) => !v)}
             collapsedLabel={`${recommendedDest.envIcon} ${recommendedDest.name}`}
+            locale={locale}
           >
             <StoryOverlay
               act={act}
@@ -306,12 +333,16 @@ export default function MapPage() {
             collapsedLabel={
               highlightedDest
                 ? `${highlightedDest.envIcon} ${highlightedDest.name}`
-                : "وضع الاستكشاف الحر"
+                : locale === "en"
+                  ? "Free-explore mode"
+                  : "وضع الاستكشاف الحر"
             }
+            locale={locale}
           >
             <FreeExplorePanel
               highlightedDest={highlightedDest ?? null}
               subSites={focusedSubSites}
+              locale={locale}
             />
           </BottomSheet>
         )}
@@ -333,11 +364,13 @@ function BottomSheet({
   collapsed,
   onToggle,
   collapsedLabel,
+  locale,
   children,
 }: {
   collapsed: boolean;
   onToggle: () => void;
   collapsedLabel: string;
+  locale: "ar" | "en";
   children: React.ReactNode;
 }) {
   return (
@@ -348,7 +381,7 @@ function BottomSheet({
         right: 0,
         left: 0,
       }}
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <AnimatePresence initial={false} mode="wait">
         {collapsed ? (
@@ -362,10 +395,10 @@ function BottomSheet({
           >
             <button
               onClick={onToggle}
-              dir="rtl"
+              dir={locale === "en" ? "ltr" : "rtl"}
               className="pointer-events-auto inline-flex items-center gap-2 bg-[#12394d]/95 backdrop-blur-xl border border-white/15 rounded-full px-4 py-2.5 shadow-[0_10px_30px_-8px_rgba(0,0,0,0.5)] text-white text-sm font-bold hover:bg-[#12394d]"
               aria-expanded="false"
-              aria-label="فتح اللوحة"
+              aria-label={locale === "en" ? "Open panel" : "فتح اللوحة"}
             >
               <span>{collapsedLabel}</span>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -387,7 +420,7 @@ function BottomSheet({
               <button
                 onClick={onToggle}
                 className="md:hidden absolute -top-2 left-1/2 -translate-x-1/2 z-10 bg-[#12394d]/95 backdrop-blur-md w-12 h-5 rounded-full border border-white/15 flex items-center justify-center shadow-md hover:bg-[#12394d] transition-colors"
-                aria-label="تصغير اللوحة"
+                aria-label={locale === "en" ? "Collapse panel" : "تصغير اللوحة"}
               >
                 <div className="w-8 h-1 bg-white/40 rounded-full" />
               </button>
@@ -408,19 +441,21 @@ function BottomSheet({
 function FreeExplorePanel({
   highlightedDest,
   subSites,
+  locale,
 }: {
-  highlightedDest: (typeof DESTINATIONS)[number] | null;
+  highlightedDest: DestinationFull | null;
   subSites: typeof THERAPEUTIC_SITES;
+  locale: "ar" | "en";
 }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="bg-[#12394d]/95 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-[0_20px_60px_-12px_rgba(0,0,0,0.5)] max-h-[min(62vh,480px)] overflow-y-auto"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-        وضع الاستكشاف الحر
+        {locale === "en" ? "Free-explore mode" : "وضع الاستكشاف الحر"}
       </div>
       {highlightedDest ? (
         <>
@@ -434,7 +469,9 @@ function FreeExplorePanel({
           {subSites.length > 0 && (
             <div className="mb-3">
               <div className="text-[10px] font-bold text-white/50 mb-2">
-                {subSites.length} موقع علاجي داخل {highlightedDest.name}
+                {locale === "en"
+                  ? `${subSites.length} therapeutic sites inside ${highlightedDest.name}`
+                  : `${subSites.length} موقع علاجي داخل ${highlightedDest.name}`}
               </div>
               <div className="space-y-1.5">
                 {subSites.slice(0, 5).map((site) => (
@@ -463,12 +500,14 @@ function FreeExplorePanel({
             href={`/destination/${highlightedDest.id}`}
             className="block w-full py-2.5 bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white font-bold text-sm rounded-full no-underline text-center hover:shadow-[0_6px_18px_rgba(145,177,73,0.4)] transition-shadow"
           >
-            اكتشف المزيد ←
+            {locale === "en" ? "Discover more →" : "اكتشف المزيد ←"}
           </Link>
         </>
       ) : (
         <p className="text-white/60 text-xs leading-relaxed">
-          اضغط على أي pin لتعرف أكتر عن الوجهة — أو استخدم البحث والفلاتر فوق.
+          {locale === "en"
+            ? "Tap any pin to learn more about a destination — or use the search and filters above."
+            : "اضغط على أي pin لتعرف أكتر عن الوجهة — أو استخدم البحث والفلاتر فوق."}
         </p>
       )}
     </motion.div>
@@ -479,36 +518,41 @@ function FreeExplorePanel({
    Fallback shown when the user hasn't completed the intro yet
    ───────────────────────────────────────────────────────── */
 
-function NoRecommendationScreen() {
+function NoRecommendationScreen({ locale }: { locale: "ar" | "en" }) {
   return (
     <div
       className="min-h-[calc(100vh-72px)] bg-[#070d15] flex items-center justify-center px-4 py-16"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <div className="max-w-md text-center">
         <div className="text-[10px] uppercase tracking-[0.4em] text-[#91b149] font-bold mb-3">
-          خريطة الشفاء
+          {locale === "en" ? "Healing Map" : "خريطة الشفاء"}
         </div>
         <div className="text-6xl mb-6">🗺️</div>
         <h1 className="font-display text-3xl font-black text-white mb-3">
-          الخريطة بتحكي قصتك
+          {locale === "en"
+            ? "The map tells your story"
+            : "الخريطة بتحكي قصتك"}
         </h1>
         <p className="text-white/60 text-sm leading-relaxed mb-8">
-          عشان نوريك الخريطة بشكل مخصص، محتاجين نعرف إحساسك الأول. خد الرحلة
-          القصيرة (دقيقتين) وهنحكيلك القصة من جديد.
+          {locale === "en"
+            ? "To show you a personalised map, we need to learn how you feel first. Take the short journey (2 minutes) and we'll tell the story together."
+            : "عشان نوريك الخريطة بشكل مخصص، محتاجين نعرف إحساسك الأول. خد الرحلة القصيرة (دقيقتين) وهنحكيلك القصة من جديد."}
         </p>
         <div className="flex flex-col gap-3 max-w-xs mx-auto">
           <Link
             href="/"
             className="w-full py-3 bg-gradient-to-l from-[#91b149] to-[#6a8435] text-white font-bold rounded-full no-underline hover:shadow-[0_8px_24px_rgba(145,177,73,0.4)] transition-shadow"
           >
-            ابدأ الرحلة
+            {locale === "en" ? "Start the journey" : "ابدأ الرحلة"}
           </Link>
           <Link
             href="/destinations"
             className="w-full py-3 bg-white/10 hover:bg-white/15 text-white font-bold rounded-full no-underline border border-white/10 transition-colors"
           >
-            تصفح كل الوجهات يدوياً
+            {locale === "en"
+              ? "Browse all destinations manually"
+              : "تصفح كل الوجهات يدوياً"}
           </Link>
         </div>
       </div>

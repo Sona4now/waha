@@ -9,6 +9,7 @@ import {
   type SessionRecord,
 } from "@/hooks/meditation/useSessionHistory";
 import { readJourneyProgress, JOURNEYS } from "@/lib/meditation/journeys";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 /* ═══════════════════════════════════════════════════════════
    History page — /therapy-room/history
@@ -21,22 +22,44 @@ import { readJourneyProgress, JOURNEYS } from "@/lib/meditation/journeys";
    ═══════════════════════════════════════════════════════════ */
 
 // Format a date as "ي س" = day name + day number
-function dayLabel(ts: number, short = false): string {
+function dayLabel(
+  ts: number,
+  locale: "ar" | "en",
+  short = false,
+): string {
   const d = new Date(ts);
-  const names = short
+  const namesAr = short
     ? ["أحد", "اثن", "ثل", "أر", "خم", "جم", "سبت"]
     : ["الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+  const namesEn = short
+    ? ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+    : [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ];
+  const names = locale === "en" ? namesEn : namesAr;
   return `${names[d.getDay()]} ${d.getDate()}/${d.getMonth() + 1}`;
 }
 
-function formatDuration(sec: number): string {
-  if (sec < 60) return `${sec} ث`;
+function formatDuration(sec: number, locale: "ar" | "en"): string {
+  if (sec < 60) return locale === "en" ? `${sec}s` : `${sec} ث`;
   const m = Math.round(sec / 60);
-  return `${m} د`;
+  return locale === "en" ? `${m}m` : `${m} د`;
 }
 
 /** 30-day heatmap. Oldest on the right in RTL. */
-function Heatmap({ records }: { records: SessionRecord[] }) {
+function Heatmap({
+  records,
+  locale,
+}: {
+  records: SessionRecord[];
+  locale: "ar" | "en";
+}) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const DAY_MS = 86400000;
@@ -70,30 +93,39 @@ function Heatmap({ records }: { records: SessionRecord[] }) {
   return (
     <div>
       <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-        آخر 30 يوم
+        {locale === "en" ? "Last 30 days" : "آخر 30 يوم"}
       </div>
       <div className="grid grid-cols-10 gap-1">
         {cells.map((c) => (
           <div
             key={c.t}
             className={`aspect-square rounded-sm ${tone(c.intensity)}`}
-            title={`${dayLabel(c.t)} — ${formatDuration(c.secs) || "لا شيء"}`}
+            title={`${dayLabel(c.t, locale)} — ${
+              formatDuration(c.secs, locale) ||
+              (locale === "en" ? "Nothing" : "لا شيء")
+            }`}
           />
         ))}
       </div>
       <div className="flex items-center gap-2 mt-2 text-[10px] text-white/40">
-        <span>أقل</span>
+        <span>{locale === "en" ? "Less" : "أقل"}</span>
         <div className="w-3 h-3 rounded-sm bg-white/5" />
         <div className="w-3 h-3 rounded-sm bg-[#91b149]/30" />
         <div className="w-3 h-3 rounded-sm bg-[#91b149]/55" />
         <div className="w-3 h-3 rounded-sm bg-[#91b149]" />
-        <span>أكتر</span>
+        <span>{locale === "en" ? "More" : "أكتر"}</span>
       </div>
     </div>
   );
 }
 
-function MoodSummary({ records }: { records: SessionRecord[] }) {
+function MoodSummary({
+  records,
+  locale,
+}: {
+  records: SessionRecord[];
+  locale: "ar" | "en";
+}) {
   const withMoods = records.filter(
     (r) =>
       typeof r.moodBefore === "number" && typeof r.moodAfter === "number",
@@ -101,7 +133,9 @@ function MoodSummary({ records }: { records: SessionRecord[] }) {
   if (withMoods.length === 0) {
     return (
       <p className="text-xs text-white/40 leading-relaxed">
-        سجّل مزاجك قبل وبعد الجلسة عشان تشوف الفرق هنا.
+        {locale === "en"
+          ? "Log your mood before and after a session to see the difference here."
+          : "سجّل مزاجك قبل وبعد الجلسة عشان تشوف الفرق هنا."}
       </p>
     );
   }
@@ -123,7 +157,9 @@ function MoodSummary({ records }: { records: SessionRecord[] }) {
           {avgDelta.toFixed(1)}
         </div>
         <div className="text-[10px] text-white/50 leading-relaxed">
-          متوسط تحسّن المزاج بعد الجلسة
+          {locale === "en"
+            ? "Average mood improvement after a session"
+            : "متوسط تحسّن المزاج بعد الجلسة"}
         </div>
       </div>
       <div className="bg-white/5 rounded-2xl p-4">
@@ -131,7 +167,9 @@ function MoodSummary({ records }: { records: SessionRecord[] }) {
           {improvedPct}%
         </div>
         <div className="text-[10px] text-white/50 leading-relaxed">
-          من الجلسات حسّنت مزاجك
+          {locale === "en"
+            ? "of sessions improved your mood"
+            : "من الجلسات حسّنت مزاجك"}
         </div>
       </div>
     </div>
@@ -142,17 +180,21 @@ function SessionList({
   records,
   favorites,
   onToggleFavorite,
+  locale,
 }: {
   records: SessionRecord[];
   favorites: string[];
   onToggleFavorite: (id: string) => void;
+  locale: "ar" | "en";
 }) {
   const sorted = [...records].sort((a, b) => b.completedAt - a.completedAt);
   return (
     <div className="flex flex-col gap-2">
       {sorted.length === 0 && (
         <div className="text-center py-10 text-white/40 text-xs">
-          لسه مفيش جلسات — ابدأ أول واحدة
+          {locale === "en"
+            ? "No sessions yet — start your first one"
+            : "لسه مفيش جلسات — ابدأ أول واحدة"}
         </div>
       )}
       {sorted.slice(0, 50).map((r, idx) => {
@@ -180,11 +222,11 @@ function SessionList({
                 {s.name}
               </div>
               <div className="text-white/40 text-[11px] flex items-center gap-2 mt-0.5">
-                <span>{dayLabel(r.completedAt, true)}</span>
+                <span>{dayLabel(r.completedAt, locale, true)}</span>
                 <span>·</span>
                 <span>{timeStr}</span>
                 <span>·</span>
-                <span>{formatDuration(r.durationSec)}</span>
+                <span>{formatDuration(r.durationSec, locale)}</span>
                 {delta !== null && (
                   <>
                     <span>·</span>
@@ -197,7 +239,17 @@ function SessionList({
                             : "text-white/40"
                       }
                     >
-                      {delta > 0 ? `+${delta} مزاج` : delta < 0 ? `${delta} مزاج` : "مزاج ثابت"}
+                      {locale === "en"
+                        ? delta > 0
+                          ? `+${delta} mood`
+                          : delta < 0
+                            ? `${delta} mood`
+                            : "mood unchanged"
+                        : delta > 0
+                          ? `+${delta} مزاج`
+                          : delta < 0
+                            ? `${delta} مزاج`
+                            : "مزاج ثابت"}
                     </span>
                   </>
                 )}
@@ -210,7 +262,15 @@ function SessionList({
                   ? "text-[#91b149] bg-[#91b149]/15"
                   : "text-white/30 hover:text-white/70 hover:bg-white/5"
               }`}
-              aria-label={isFav ? "إزالة من المفضلة" : "أضف للمفضلة"}
+              aria-label={
+                isFav
+                  ? locale === "en"
+                    ? "Remove from favorites"
+                    : "إزالة من المفضلة"
+                  : locale === "en"
+                    ? "Add to favorites"
+                    : "أضف للمفضلة"
+              }
               aria-pressed={isFav}
             >
               {isFav ? "⭐" : "☆"}
@@ -222,7 +282,13 @@ function SessionList({
   );
 }
 
-function JourneyRings({ progress }: { progress: ReturnType<typeof readJourneyProgress> }) {
+function JourneyRings({
+  progress,
+  locale,
+}: {
+  progress: ReturnType<typeof readJourneyProgress>;
+  locale: "ar" | "en";
+}) {
   const active = JOURNEYS.filter((j) => {
     const p = progress[j.id];
     return p && p.completedDays.length > 0;
@@ -254,7 +320,9 @@ function JourneyRings({ progress }: { progress: ReturnType<typeof readJourneyPro
               />
             </div>
             <div className="text-[10px] text-white/50 mt-1.5 font-bold">
-              {done} / {total} يوم ({pct}%)
+              {locale === "en"
+                ? `${done} / ${total} days (${pct}%)`
+                : `${done} / ${total} يوم (${pct}%)`}
             </div>
           </Link>
         );
@@ -264,6 +332,8 @@ function JourneyRings({ progress }: { progress: ReturnType<typeof readJourneyPro
 }
 
 export default function TherapyHistoryPage() {
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
   const { records, settings, stats, toggleFavorite } = useSessionHistory();
   const [importError, setImportError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -320,7 +390,11 @@ export default function TherapyHistoryPage() {
       const text = await file.text();
       const parsed = JSON.parse(text);
       if (parsed.schema !== "waaha-meditation-v1") {
-        setImportError("الملف مش من واحة أو الصيغة قديمة");
+        setImportError(
+          isEn
+            ? "File isn't from Waaha or the format is outdated"
+            : "الملف مش من واحة أو الصيغة قديمة",
+        );
         return;
       }
       if (parsed.history) {
@@ -343,14 +417,16 @@ export default function TherapyHistoryPage() {
       }
       window.location.reload();
     } catch {
-      setImportError("الملف تالف أو مش JSON صحيح");
+      setImportError(
+        isEn ? "File is corrupt or not valid JSON" : "الملف تالف أو مش JSON صحيح",
+      );
     }
   };
 
   return (
     <div
       className="min-h-screen bg-[#070d15] text-white px-4 py-6 pb-24"
-      dir="rtl"
+      dir={isEn ? "ltr" : "rtl"}
     >
       {/* Top bar */}
       <div className="flex items-center justify-between mb-6">
@@ -361,9 +437,11 @@ export default function TherapyHistoryPage() {
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="9 18 15 12 9 6" />
           </svg>
-          <span>غرفة التأمل</span>
+          <span>{isEn ? "Therapy Room" : "غرفة التأمل"}</span>
         </Link>
-        <h1 className="font-display text-lg font-black">تاريخك</h1>
+        <h1 className="font-display text-lg font-black">
+          {isEn ? "Your history" : "تاريخك"}
+        </h1>
         <div className="w-20" />
       </div>
 
@@ -374,50 +452,62 @@ export default function TherapyHistoryPage() {
             <div className="text-2xl font-display font-black text-[#91b149]">
               {totalSessions}
             </div>
-            <div className="text-[10px] text-white/50 mt-1">جلسة</div>
+            <div className="text-[10px] text-white/50 mt-1">
+              {isEn ? "sessions" : "جلسة"}
+            </div>
           </div>
           <div className="bg-white/5 rounded-2xl p-3">
             <div className="text-2xl font-display font-black text-[#91b149]">
               {totalMinutes}
             </div>
-            <div className="text-[10px] text-white/50 mt-1">دقيقة</div>
+            <div className="text-[10px] text-white/50 mt-1">
+              {isEn ? "minutes" : "دقيقة"}
+            </div>
           </div>
           <div className="bg-white/5 rounded-2xl p-3">
             <div className="text-2xl font-display font-black text-[#91b149]">
               {stats.streak}
             </div>
-            <div className="text-[10px] text-white/50 mt-1">🔥 يوم متواصل</div>
+            <div className="text-[10px] text-white/50 mt-1">
+              {isEn ? "🔥 day streak" : "🔥 يوم متواصل"}
+            </div>
           </div>
         </div>
 
         {/* Heatmap */}
-        <Heatmap records={records} />
+        <Heatmap records={records} locale={locale} />
 
         {/* Mood summary */}
         <div>
           <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-            تحسّن المزاج
+            {isEn ? "Mood improvement" : "تحسّن المزاج"}
           </div>
-          <MoodSummary records={records} />
+          <MoodSummary records={records} locale={locale} />
         </div>
 
         {/* Personal bests */}
         {longest > 0 && (
           <div className="grid grid-cols-2 gap-2.5">
             <div className="bg-white/5 rounded-2xl p-3">
-              <div className="text-[10px] text-white/50 mb-1">أطول جلسة</div>
+              <div className="text-[10px] text-white/50 mb-1">
+                {isEn ? "Longest session" : "أطول جلسة"}
+              </div>
               <div className="text-lg font-black text-white font-mono">
-                {formatDuration(longest)}
+                {formatDuration(longest, locale)}
               </div>
             </div>
             {mostPlayed?.session && (
               <div className="bg-white/5 rounded-2xl p-3">
-                <div className="text-[10px] text-white/50 mb-1">الأكتر تكراراً</div>
+                <div className="text-[10px] text-white/50 mb-1">
+                  {isEn ? "Most played" : "الأكتر تكراراً"}
+                </div>
                 <div className="text-sm font-bold text-white truncate">
                   {mostPlayed.session.icon} {mostPlayed.session.name}
                 </div>
                 <div className="text-[10px] text-white/40 mt-0.5">
-                  {mostPlayed.count} مرة
+                  {isEn
+                    ? `${mostPlayed.count} times`
+                    : `${mostPlayed.count} مرة`}
                 </div>
               </div>
             )}
@@ -427,44 +517,46 @@ export default function TherapyHistoryPage() {
         {/* Journey rings */}
         <div>
           <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-            الرحلات
+            {isEn ? "Journeys" : "الرحلات"}
           </div>
-          <JourneyRings progress={journeyProgress} />
+          <JourneyRings progress={journeyProgress} locale={locale} />
         </div>
 
         {/* Session list */}
         <div>
           <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-            كل الجلسات
+            {isEn ? "All sessions" : "كل الجلسات"}
           </div>
           <SessionList
             records={records}
             favorites={settings.favorites}
             onToggleFavorite={toggleFavorite}
+            locale={locale}
           />
         </div>
 
         {/* Export / Import */}
         <div className="border-t border-white/10 pt-6">
           <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-            بياناتك
+            {isEn ? "Your data" : "بياناتك"}
           </div>
           <p className="text-xs text-white/50 mb-3 leading-relaxed">
-            كل التاريخ محفوظ على جهازك فقط — بدون سيرفر. نقله لجهاز تاني
-            بتحميل الملف واستيراده هناك.
+            {isEn
+              ? "Your full history is stored only on your device — no server. Move it to another device by exporting the file and importing it there."
+              : "كل التاريخ محفوظ على جهازك فقط — بدون سيرفر. نقله لجهاز تاني بتحميل الملف واستيراده هناك."}
           </p>
           <div className="flex gap-2">
             <button
               onClick={handleExport}
               className="flex-1 py-2.5 bg-white/10 hover:bg-white/15 text-white font-bold rounded-full text-xs border border-white/10 transition-colors"
             >
-              📥 صدّر البيانات
+              📥 {isEn ? "Export data" : "صدّر البيانات"}
             </button>
             <button
               onClick={() => fileInputRef.current?.click()}
               className="flex-1 py-2.5 bg-white/10 hover:bg-white/15 text-white font-bold rounded-full text-xs border border-white/10 transition-colors"
             >
-              📤 استورد
+              📤 {isEn ? "Import" : "استورد"}
             </button>
             <input
               ref={fileInputRef}

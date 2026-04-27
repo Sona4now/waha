@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const COLORS = [
   "from-[#91b149] to-[#6a8435]",
@@ -19,6 +20,7 @@ const ROTATIONS = [
 ];
 
 export default function PolaroidWallView() {
+  const { locale } = useTranslations();
   return (
     <div
       className="py-16 md:py-24 relative overflow-hidden"
@@ -39,7 +41,7 @@ export default function PolaroidWallView() {
             className="font-display text-3xl md:text-4xl font-black text-[#fff8e7]"
             style={{ textShadow: "2px 2px 6px rgba(0,0,0,0.5)" }}
           >
-            ذكرياتنا
+            {locale === "en" ? "Our memories" : "ذكرياتنا"}
           </h2>
         </div>
 

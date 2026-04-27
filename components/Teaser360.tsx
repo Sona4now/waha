@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { Destination } from "@/data/destinations";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   destination: Destination;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function Teaser360({ destination, onContinue }: Props) {
+  const { locale } = useTranslations();
   const containerRef = useRef<HTMLDivElement>(null);
   const [bgPos, setBgPos] = useState(50); // 0-100 percentage
   const [isDragging, setIsDragging] = useState(false);
@@ -137,7 +139,7 @@ export default function Teaser360({ destination, onContinue }: Props) {
             360°
           </motion.span>
           <span className="text-white/50 text-xs font-display">
-            جولة بانورامية
+            {locale === "en" ? "Panoramic tour" : "جولة بانورامية"}
           </span>
         </div>
       </motion.div>
@@ -153,7 +155,7 @@ export default function Teaser360({ destination, onContinue }: Props) {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
-          اسحب لاستكشاف
+          {locale === "en" ? "Drag to explore" : "اسحب لاستكشاف"}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: "scaleX(-1)" }}>
             <path d="M5 12h14M12 5l7 7-7 7" />
           </svg>
@@ -168,7 +170,7 @@ export default function Teaser360({ destination, onContinue }: Props) {
           transition={{ delay: 0.7, duration: 0.8 }}
           className="font-display text-2xl sm:text-3xl md:text-5xl font-bold text-white"
         >
-          {destination.name} من كل زاوية
+          {locale === "en" ? `${destination.name} from every angle` : `${destination.name} من كل زاوية`}
         </motion.p>
 
         <motion.p
@@ -177,7 +179,7 @@ export default function Teaser360({ destination, onContinue }: Props) {
           transition={{ delay: 1.2, duration: 0.8 }}
           className="text-white/40 text-sm max-w-sm font-display"
         >
-          اسحب يميناً ويساراً لاستكشاف المكان
+          {locale === "en" ? "Drag left and right to explore the place" : "اسحب يميناً ويساراً لاستكشاف المكان"}
         </motion.p>
 
         <motion.button
@@ -187,7 +189,7 @@ export default function Teaser360({ destination, onContinue }: Props) {
           onClick={onContinue}
           className="mt-4 py-4 px-10 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-sm rounded-full transition-all duration-300 hover:scale-[1.03] active:scale-95 pointer-events-auto"
         >
-          متابعة الرحلة
+          {locale === "en" ? "Continue the journey" : "متابعة الرحلة"}
         </motion.button>
       </div>
     </motion.div>

@@ -25,6 +25,8 @@ import RelatedArticles from "@/components/destination/RelatedArticles";
 import JsonLd from "@/components/site/JsonLd";
 import { getDestById } from "@/data/siteData";
 import { SITE_URL } from "@/lib/siteMeta";
+import { useTranslations } from "@/components/site/LocaleProvider";
+import { localizeDestination } from "@/lib/localize";
 import {
   destinationSchema,
   breadcrumbSchema,
@@ -36,18 +38,54 @@ import {
   getDestinationRating,
 } from "@/data/testimonials";
 
-const BASE_TABS = [
-  { key: "overview", label: "نبذة" },
-  { key: "benefits", label: "الفوائد العلاجية" },
-  { key: "timing", label: "أفضل وقت" },
-  { key: "why", label: "لماذا هنا؟" },
-];
+type TabDef = { key: string; label: string };
 
-const SINAI_TAB = { key: "sites", label: "المواقع الاستشفائية" };
-const SAFAGA_TAB = { key: "elements", label: "العناصر العلاجية" };
-const SIWA_TAB = { key: "siwa-sites", label: "مواقع الاستشفاء" };
-const FAYOUM_TAB = { key: "fayoum-sites", label: "المواقع الطبيعية" };
-const BAHARIYA_TAB = { key: "bahariya-sites", label: "مواقع الاستشفاء" };
+function getBaseTabs(locale: "ar" | "en"): TabDef[] {
+  return [
+    { key: "overview", label: locale === "en" ? "Overview" : "نبذة" },
+    {
+      key: "benefits",
+      label: locale === "en" ? "Therapeutic Benefits" : "الفوائد العلاجية",
+    },
+    { key: "timing", label: locale === "en" ? "Best Time" : "أفضل وقت" },
+    { key: "why", label: locale === "en" ? "Why here?" : "لماذا هنا؟" },
+  ];
+}
+
+function getSpecialTab(
+  destId: string,
+  locale: "ar" | "en",
+): TabDef | null {
+  switch (destId) {
+    case "sinai":
+      return {
+        key: "sites",
+        label: locale === "en" ? "Therapeutic sites" : "المواقع الاستشفائية",
+      };
+    case "safaga":
+      return {
+        key: "elements",
+        label: locale === "en" ? "Therapeutic elements" : "العناصر العلاجية",
+      };
+    case "siwa":
+      return {
+        key: "siwa-sites",
+        label: locale === "en" ? "Healing sites" : "مواقع الاستشفاء",
+      };
+    case "fayoum":
+      return {
+        key: "fayoum-sites",
+        label: locale === "en" ? "Natural sites" : "المواقع الطبيعية",
+      };
+    case "bahariya":
+      return {
+        key: "bahariya-sites",
+        label: locale === "en" ? "Healing sites" : "مواقع الاستشفاء",
+      };
+    default:
+      return null;
+  }
+}
 
 /* ─── Sinai Therapeutic Sites Data ─── */
 interface TherapeuticSite {
@@ -833,9 +871,11 @@ const BAHARIYA_SITES: TherapeuticSite[] = [
 ];
 
 export default function DestinationDetailPage() {
+  const { locale } = useTranslations();
   const params = useParams();
   const id = params?.id as string;
-  const dest = getDestById(id);
+  const rawDest = getDestById(id);
+  const dest = rawDest ? localizeDestination(rawDest, locale) : null;
   const [activeTab, setActiveTab] = useState("overview");
 
   // Track this destination as recently viewed so /destinations can surface
@@ -855,7 +895,9 @@ export default function DestinationDetailPage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: dest?.name || "وجهة علاجية",
+          title:
+            dest?.name ||
+            (locale === "en" ? "Therapeutic destination" : "وجهة علاجية"),
           text: dest?.description || "",
           url,
         });
@@ -864,7 +906,10 @@ export default function DestinationDetailPage() {
       }
     } else {
       await navigator.clipboard.writeText(url);
-      showToast("تم نسخ الرابط!", "success");
+      showToast(
+        locale === "en" ? "Link copied!" : "تم نسخ الرابط!",
+        "success",
+      );
     }
   };
 
@@ -872,7 +917,7 @@ export default function DestinationDetailPage() {
     return (
       <SiteLayout>
         <div
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
           className="min-h-screen flex items-center justify-center"
         >
           <div className="text-center">
@@ -880,14 +925,14 @@ export default function DestinationDetailPage() {
               className="text-3xl font-bold mb-4"
               style={{ color: "#12394d", fontFamily: "var(--font-display)" }}
             >
-              الوجهة غير موجودة
+              {locale === "en" ? "Destination not found" : "الوجهة غير موجودة"}
             </h1>
             <Link
               href="/"
               className="inline-block px-6 py-3 rounded-full text-white"
               style={{ backgroundColor: "#1d5770" }}
             >
-              العودة للرئيسية
+              {locale === "en" ? "Back to home" : "العودة للرئيسية"}
             </Link>
           </div>
         </div>
@@ -895,18 +940,9 @@ export default function DestinationDetailPage() {
     );
   }
 
-  const TABS =
-    id === "sinai"
-      ? [...BASE_TABS, SINAI_TAB]
-      : id === "safaga"
-        ? [...BASE_TABS, SAFAGA_TAB]
-        : id === "siwa"
-          ? [...BASE_TABS, SIWA_TAB]
-          : id === "fayoum"
-            ? [...BASE_TABS, FAYOUM_TAB]
-            : id === "bahariya"
-              ? [...BASE_TABS, BAHARIYA_TAB]
-              : BASE_TABS;
+  const baseTabs = getBaseTabs(locale);
+  const specialTab = getSpecialTab(id, locale);
+  const TABS = specialTab ? [...baseTabs, specialTab] : baseTabs;
   const [activeSiteId, setActiveSiteId] = useState(SINAI_SITES[0].id);
   const activeSinaiSite = SINAI_SITES.find((s) => s.id === activeSiteId)!;
   const [activeSiwaId, setActiveSiwaId] = useState(SIWA_SITES[0].id);
@@ -941,8 +977,14 @@ export default function DestinationDetailPage() {
             }),
           ),
           breadcrumbSchema([
-            { name: "الرئيسية", url: `${SITE_URL}/home` },
-            { name: "الوجهات", url: `${SITE_URL}/destinations` },
+            {
+              name: locale === "en" ? "Home" : "الرئيسية",
+              url: `${SITE_URL}/home`,
+            },
+            {
+              name: locale === "en" ? "Destinations" : "الوجهات",
+              url: `${SITE_URL}/destinations`,
+            },
             { name: dest.name, url: `${SITE_URL}/destination/${dest.id}` },
           ]),
           faqSchema(getFAQForDestination(dest.id)),
@@ -954,12 +996,16 @@ export default function DestinationDetailPage() {
       {/* Floating bottom action bar */}
       <StickyBottomBar destName={dest.name} destId={dest.id} />
 
-      <div dir="rtl">
+      <div dir={locale === "en" ? "ltr" : "rtl"}>
         {/* Hero Section */}
         <section className="relative w-full h-[55vh] min-h-[380px] overflow-hidden">
           <Image
             src={dest.image}
-            alt={`${dest.name} — السياحة الاستشفائية في مصر — ${dest.description}`}
+            alt={
+              locale === "en"
+                ? `${dest.name} — Therapeutic tourism in Egypt — ${dest.description}`
+                : `${dest.name} — السياحة الاستشفائية في مصر — ${dest.description}`
+            }
             fill
             sizes="100vw"
             className="object-cover scale-105 animate-[kenBurns_16s_ease-out_forwards]"
@@ -1027,7 +1073,7 @@ export default function DestinationDetailPage() {
                       d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"
                     />
                   </svg>
-                  مشاركة
+                  {locale === "en" ? "Share" : "مشاركة"}
                 </button>
               </div>
 
@@ -1065,7 +1111,9 @@ export default function DestinationDetailPage() {
                         fontFamily: "var(--font-display)",
                       }}
                     >
-                      نبذة عن {dest.name}
+                      {locale === "en"
+                        ? `About ${dest.name}`
+                        : `نبذة عن ${dest.name}`}
                     </h2>
                     <p
                       className="text-lg leading-relaxed"
@@ -1085,7 +1133,9 @@ export default function DestinationDetailPage() {
                         fontFamily: "var(--font-display)",
                       }}
                     >
-                      الفوائد العلاجية
+                      {locale === "en"
+                        ? "Therapeutic Benefits"
+                        : "الفوائد العلاجية"}
                     </h2>
                     <ul className="space-y-4">
                       {dest.benefits?.map((benefit: { icon: string; text: string }, i: number) => (
@@ -1129,7 +1179,9 @@ export default function DestinationDetailPage() {
                         fontFamily: "var(--font-display)",
                       }}
                     >
-                      أفضل وقت للزيارة
+                      {locale === "en"
+                        ? "Best time to visit"
+                        : "أفضل وقت للزيارة"}
                     </h2>
                     <div className="grid gap-6 md:grid-cols-2">
                       <div className="p-5 rounded-xl bg-green-50 border border-green-200">
@@ -1148,7 +1200,7 @@ export default function DestinationDetailPage() {
                               clipRule="evenodd"
                             />
                           </svg>
-                          الأشهر المثالية
+                          {locale === "en" ? "Ideal months" : "الأشهر المثالية"}
                         </h3>
                         <div className="flex flex-wrap gap-2">
                           {dest.bestMonths?.map(
@@ -1177,7 +1229,7 @@ export default function DestinationDetailPage() {
                               clipRule="evenodd"
                             />
                           </svg>
-                          أشهر مقبولة
+                          {locale === "en" ? "Acceptable months" : "أشهر مقبولة"}
                         </h3>
                         <div className="flex flex-wrap gap-2">
                           {dest.okMonths?.map(
@@ -1205,7 +1257,9 @@ export default function DestinationDetailPage() {
                         fontFamily: "var(--font-display)",
                       }}
                     >
-                      لماذا {dest.name}؟
+                      {locale === "en"
+                        ? `Why ${dest.name}?`
+                        : `لماذا ${dest.name}؟`}
                     </h2>
                     <div className="space-y-4">
                       {dest.reasons?.map((reason: string, i: number) => (
@@ -1238,7 +1292,7 @@ export default function DestinationDetailPage() {
                       className="text-2xl font-bold mb-6"
                       style={{ color: "#12394d", fontFamily: "var(--font-display)" }}
                     >
-                      المواقع الاستشفائية في سيناء
+                      {locale === "en" ? "Therapeutic sites in Sinai" : "المواقع الاستشفائية في سيناء"}
                     </h2>
 
                     {/* Site Selector Pills */}
@@ -1324,7 +1378,7 @@ export default function DestinationDetailPage() {
                       {activeSinaiSite.warnings && activeSinaiSite.warnings.length > 0 && (
                         <div className="mt-5 bg-red-50 border border-red-200 rounded-xl p-4">
                           <h4 className="font-bold text-red-700 font-display text-sm flex items-center gap-2 mb-2">
-                            ⚠️ تحذيرات مهمة
+                            {locale === "en" ? "⚠️ Important warnings" : "⚠️ تحذيرات مهمة"}
                           </h4>
                           <ul className="space-y-1.5">
                             {activeSinaiSite.warnings.map((w, i) => (
@@ -1347,10 +1401,12 @@ export default function DestinationDetailPage() {
                       className="text-2xl font-bold mb-2"
                       style={{ color: "#12394d", fontFamily: "var(--font-display)" }}
                     >
-                      العناصر العلاجية في سفاجا
+                      {locale === "en" ? "Therapeutic elements in Safaga" : "العناصر العلاجية في سفاجا"}
                     </h2>
                     <p className="text-sm text-[#7b7c7d] mb-8">
-                      تفاعل طبيعي فريد بين الموقع والشمس والبحر والرمال يخلق منظومة علاجية متكاملة
+                      {locale === "en"
+                        ? "A unique natural interaction between location, sun, sea, and sand creates a complete therapeutic system"
+                        : "تفاعل طبيعي فريد بين الموقع والشمس والبحر والرمال يخلق منظومة علاجية متكاملة"}
                     </p>
 
                     {/* 4 Elements Grid */}
@@ -1387,7 +1443,7 @@ export default function DestinationDetailPage() {
                       className="text-xl font-bold mb-5 flex items-center gap-2"
                       style={{ color: "#12394d", fontFamily: "var(--font-display)" }}
                     >
-                      🏥 الأمراض والعلاج بالتفصيل
+                      {locale === "en" ? "🏥 Conditions and treatment in detail" : "🏥 الأمراض والعلاج بالتفصيل"}
                     </h3>
                     <div className="space-y-4 mb-10">
                       {SAFAGA_DISEASES.map((disease) => (
@@ -1401,13 +1457,13 @@ export default function DestinationDetailPage() {
                               {disease.name}
                             </h4>
                             <span className="mr-auto px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
-                              نسبة التحسن: {disease.improvement}
+                              {locale === "en" ? "Improvement rate:" : "نسبة التحسن:"} {disease.improvement}
                             </span>
                           </div>
                           <p className="text-sm text-[#7b7c7d] mb-3">{disease.description}</p>
                           <div className="bg-[#f5f8fa] rounded-lg p-3 mb-3">
                             <p className="text-sm text-[#12394d]">
-                              <span className="font-bold text-[#1d5770]">نظام العلاج:</span> {disease.treatment}
+                              <span className="font-bold text-[#1d5770]">{locale === "en" ? "Treatment plan:" : "نظام العلاج:"}</span> {disease.treatment}
                             </p>
                           </div>
                           <div className="bg-red-50 rounded-lg p-3">
@@ -1424,7 +1480,7 @@ export default function DestinationDetailPage() {
                       className="text-xl font-bold mb-5 flex items-center gap-2"
                       style={{ color: "#12394d", fontFamily: "var(--font-display)" }}
                     >
-                      🏨 أشهر أماكن الاستشفاء
+                      {locale === "en" ? "🏨 Most popular healing centers" : "🏨 أشهر أماكن الاستشفاء"}
                     </h3>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-10">
                       {SAFAGA_CENTERS.map((center) => (
@@ -1443,24 +1499,28 @@ export default function DestinationDetailPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-5 border border-amber-200">
                         <h4 className="font-bold font-display text-base text-amber-700 mb-3 flex items-center gap-2">
-                          📅 أنسب وقت للعلاج
+                          {locale === "en" ? "📅 Best time for treatment" : "📅 أنسب وقت للعلاج"}
                         </h4>
-                        <p className="text-2xl font-bold text-[#12394d] mb-2">شهر 5 لشهر 9</p>
+                        <p className="text-2xl font-bold text-[#12394d] mb-2">
+                          {locale === "en" ? "May to September" : "شهر 5 لشهر 9"}
+                        </p>
                         <div className="space-y-1 text-sm text-[#7b7c7d]">
-                          <p>• الشمس مستقرة</p>
-                          <p>• الجو جاف</p>
-                          <p>• نسبة الرطوبة قليلة</p>
+                          <p>{locale === "en" ? "• Stable sunshine" : "• الشمس مستقرة"}</p>
+                          <p>{locale === "en" ? "• Dry weather" : "• الجو جاف"}</p>
+                          <p>{locale === "en" ? "• Low humidity" : "• نسبة الرطوبة قليلة"}</p>
                         </div>
                       </div>
                       <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-5 border border-teal-200">
                         <h4 className="font-bold font-display text-base text-teal-700 mb-3 flex items-center gap-2">
-                          🧘 الاستشفاء النفسي
+                          {locale === "en" ? "🧘 Mental wellness" : "🧘 الاستشفاء النفسي"}
                         </h4>
-                        <p className="text-sm text-[#7b7c7d] mb-2">الهدوء هناك بيساعد على:</p>
+                        <p className="text-sm text-[#7b7c7d] mb-2">
+                          {locale === "en" ? "The calm there helps with:" : "الهدوء هناك بيساعد على:"}
+                        </p>
                         <div className="space-y-1 text-sm text-[#12394d]">
-                          <p>• التأمل</p>
-                          <p>• تمارين التنفس</p>
-                          <p>• التخلص من التوتر (Mental Detox)</p>
+                          <p>{locale === "en" ? "• Meditation" : "• التأمل"}</p>
+                          <p>{locale === "en" ? "• Breathing exercises" : "• تمارين التنفس"}</p>
+                          <p>{locale === "en" ? "• Stress relief (Mental Detox)" : "• التخلص من التوتر (Mental Detox)"}</p>
                         </div>
                       </div>
                     </div>
@@ -1471,10 +1531,12 @@ export default function DestinationDetailPage() {
                 {activeTab === "siwa-sites" && (
                   <div>
                     <h2 className="text-2xl font-bold mb-2" style={{ color: "#12394d", fontFamily: "var(--font-display)" }}>
-                      مواقع الاستشفاء في سيوة
+                      {locale === "en" ? "Healing sites in Siwa" : "مواقع الاستشفاء في سيوة"}
                     </h2>
                     <p className="text-sm text-[#7b7c7d] mb-6">
-                      واحة سيوة — 18 متر تحت مستوى البحر — تجمع بين الموارد المائية والتكوينات الجيولوجية والتراث الثقافي
+                      {locale === "en"
+                        ? "Siwa Oasis — 18 meters below sea level — combines water resources, geological formations, and cultural heritage"
+                        : "واحة سيوة — 18 متر تحت مستوى البحر — تجمع بين الموارد المائية والتكوينات الجيولوجية والتراث الثقافي"}
                     </p>
 
                     {/* Quick Stats */}
@@ -1550,10 +1612,12 @@ export default function DestinationDetailPage() {
                 {activeTab === "fayoum-sites" && (
                   <div>
                     <h2 className="text-2xl font-bold mb-2" style={{ color: "#12394d", fontFamily: "var(--font-display)" }}>
-                      المواقع الطبيعية في الفيوم
+                      {locale === "en" ? "Natural sites in Fayoum" : "المواقع الطبيعية في الفيوم"}
                     </h2>
                     <p className="text-sm text-[#7b7c7d] mb-6">
-                      ميزة جغرافية استراتيجية — قريبة من القاهرة مع تنوع بيئي فريد يجمع بين العلاج والسياحة البيئية
+                      {locale === "en"
+                        ? "A strategic geographic advantage — close to Cairo with unique ecological diversity that combines treatment and ecotourism"
+                        : "ميزة جغرافية استراتيجية — قريبة من القاهرة مع تنوع بيئي فريد يجمع بين العلاج والسياحة البيئية"}
                     </p>
 
                     {/* Site Selector */}
@@ -1618,10 +1682,12 @@ export default function DestinationDetailPage() {
                 {activeTab === "bahariya-sites" && (
                   <div>
                     <h2 className="text-2xl font-bold mb-2" style={{ color: "#12394d", fontFamily: "var(--font-display)" }}>
-                      مواقع الاستشفاء في الواحات البحرية
+                      {locale === "en" ? "Healing sites in Bahariya Oasis" : "مواقع الاستشفاء في الواحات البحرية"}
                     </h2>
                     <p className="text-sm text-[#7b7c7d] mb-6">
-                      صحراء بيضاء وسوداء، ينابيع حارة، كهوف، جبال كريستال، ونظام غذائي علاجي
+                      {locale === "en"
+                        ? "White and black desert, hot springs, caves, crystal mountains, and a therapeutic diet"
+                        : "صحراء بيضاء وسوداء، ينابيع حارة، كهوف، جبال كريستال، ونظام غذائي علاجي"}
                     </p>
 
                     {/* Site Selector */}
@@ -1697,13 +1763,13 @@ export default function DestinationDetailPage() {
                   className="text-xl font-bold mb-5 border-b border-white/20 pb-3"
                   style={{ fontFamily: "var(--font-display)" }}
                 >
-                  معلومات سريعة
+                  {locale === "en" ? "Quick info" : "معلومات سريعة"}
                 </h3>
 
                 <div className="space-y-4">
                   <div>
                     <span className="text-white/60 text-sm block mb-1">
-                      البيئة
+                      {locale === "en" ? "Environment" : "البيئة"}
                     </span>
                     <span
                       className="inline-block px-3 py-1 rounded-full text-sm font-medium"
@@ -1715,7 +1781,7 @@ export default function DestinationDetailPage() {
 
                   <div>
                     <span className="text-white/60 text-sm block mb-1">
-                      العلاجات المتاحة
+                      {locale === "en" ? "Available treatments" : "العلاجات المتاحة"}
                     </span>
                     <div className="flex flex-wrap gap-1.5">
                       {dest.treatments?.map(
@@ -1734,7 +1800,7 @@ export default function DestinationDetailPage() {
                   {dest.trustSignal && (
                     <div className="mt-4 p-3 rounded-lg bg-white/10">
                       <span className="text-white/60 text-sm block mb-1">
-                        مصدر موثوق
+                        {locale === "en" ? "Trusted source" : "مصدر موثوق"}
                       </span>
                       <p className="text-sm leading-relaxed">
                         {dest.trustSignal}
@@ -1748,7 +1814,7 @@ export default function DestinationDetailPage() {
                   className="block w-full mt-6 py-3 text-center rounded-full font-semibold transition-colors"
                   style={{ backgroundColor: "#91b149" }}
                 >
-                  اسأل المساعد الذكي
+                  {locale === "en" ? "Ask the AI assistant" : "اسأل المساعد الذكي"}
                 </Link>
               </div>
             </aside>
@@ -1762,7 +1828,7 @@ export default function DestinationDetailPage() {
         >
           <div className="max-w-5xl mx-auto px-4">
             <DayTimeline
-              steps={getDayForDestination(dest.id)}
+              steps={getDayForDestination(dest.id, locale)}
               destinationName={dest.name}
             />
           </div>
@@ -1775,7 +1841,7 @@ export default function DestinationDetailPage() {
             <div id="gallery">
               <Gallery
                 images={getGalleryForDestination(dest.id)}
-                title={`معرض صور ${dest.name}`}
+                title={locale === "en" ? `${dest.name} photo gallery` : `معرض صور ${dest.name}`}
               />
             </div>
           </div>
@@ -1810,7 +1876,7 @@ export default function DestinationDetailPage() {
             <FAQ
               destId={dest.id}
               items={getFAQForDestination(dest.id)}
-              title={`أسئلة شائعة عن ${dest.name}`}
+              title={locale === "en" ? `Frequently asked questions about ${dest.name}` : `أسئلة شائعة عن ${dest.name}`}
             />
             <FeedbackWidget pageId={`dest-${dest.id}`} pageTitle={dest.name} />
           </div>

@@ -3,12 +3,14 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 import Particles from "./Particles";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   onDone: () => void;
 }
 
 export default function ProcessingScreen({ onDone }: Props) {
+  const { locale } = useTranslations();
   useEffect(() => {
     const t = setTimeout(onDone, 2500);
     return () => clearTimeout(t);
@@ -55,7 +57,7 @@ export default function ProcessingScreen({ onDone }: Props) {
         transition={{ delay: 0.3, duration: 0.7 }}
         className="font-display text-2xl md:text-3xl text-white/75 font-light text-center"
       >
-        نرسم لك رحلتك...
+        {locale === "en" ? "Mapping your journey..." : "نرسم لك رحلتك..."}
       </motion.p>
 
       {/* Dots */}

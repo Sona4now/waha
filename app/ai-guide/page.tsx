@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import SiteLayout from "@/components/site/SiteLayout";
 import PageHero from "@/components/site/PageHero";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 type Message = {
   id: string;
@@ -12,14 +13,13 @@ type Message = {
   content: string;
 };
 
-const GREETING: Message = {
-  id: "greeting",
-  role: "assistant",
-  content:
-    "أهلاً بك في واحة 🌿\n\nأنا مساعدك الذكي للسياحة الاستشفائية في مصر. احكيلي عن حالتك الصحية أو اللي بتدور عليه، وأنا هساعدك تكتشف الوجهة المثالية ليك.",
-};
+const GREETING_AR =
+  "أهلاً بك في واحة 🌿\n\nأنا مساعدك الذكي للسياحة الاستشفائية في مصر. احكيلي عن حالتك الصحية أو اللي بتدور عليه، وأنا هساعدك تكتشف الوجهة المثالية ليك.";
 
-const SUGGESTED_PROMPTS = [
+const GREETING_EN =
+  "Welcome to Waaha 🌿\n\nI'm your AI guide for therapeutic tourism in Egypt. Tell me about your health condition or what you're looking for, and I'll help you discover your perfect destination.";
+
+const SUGGESTED_PROMPTS_AR = [
   { icon: "🦴", text: "عندي آلام في المفاصل، إيه أفضل مكان؟" },
   { icon: "🩺", text: "بدي علاج طبيعي للصدفية" },
   { icon: "🧘", text: "مكان هادي للاسترخاء وتخفيف التوتر" },
@@ -28,8 +28,26 @@ const SUGGESTED_PROMPTS = [
   { icon: "📅", text: "امتى أفضل وقت لزيارة سيناء؟" },
 ];
 
+const SUGGESTED_PROMPTS_EN = [
+  { icon: "🦴", text: "I have joint pain — which destination is best?" },
+  { icon: "🩺", text: "I want natural treatment for psoriasis" },
+  { icon: "🧘", text: "A quiet place to relax and relieve stress" },
+  { icon: "🫁", text: "I have breathing issues and chest allergies" },
+  { icon: "🏖️", text: "Compare Safaga and Siwa for me" },
+  { icon: "📅", text: "When is the best time to visit Sinai?" },
+];
+
 export default function AIGuidePage() {
-  const [messages, setMessages] = useState<Message[]>([GREETING]);
+  const { t, locale } = useTranslations();
+  const greeting: Message = {
+    id: "greeting",
+    role: "assistant",
+    content: locale === "en" ? GREETING_EN : GREETING_AR,
+  };
+  const suggestedPrompts =
+    locale === "en" ? SUGGESTED_PROMPTS_EN : SUGGESTED_PROMPTS_AR;
+
+  const [messages, setMessages] = useState<Message[]>([greeting]);
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,7 +100,10 @@ export default function AIGuidePage() {
         throw new Error(errorData.error || `HTTP ${res.status}`);
       }
 
-      if (!res.body) throw new Error("لا يوجد response body");
+      if (!res.body)
+        throw new Error(
+          locale === "en" ? "No response body" : "لا يوجد response body",
+        );
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -126,7 +147,11 @@ export default function AIGuidePage() {
         // User cancelled
       } else {
         const errMsg =
-          err instanceof Error ? err.message : "حدث خطأ غير متوقع";
+          err instanceof Error
+            ? err.message
+            : locale === "en"
+              ? "An unexpected error occurred"
+              : "حدث خطأ غير متوقع";
         setError(errMsg);
         setMessages((prev) => prev.filter((m) => m.id !== assistantId));
       }
@@ -146,18 +171,22 @@ export default function AIGuidePage() {
   }
 
   function handleReset() {
-    setMessages([GREETING]);
+    setMessages([greeting]);
     setError(null);
   }
 
   return (
     <SiteLayout>
       <PageHero
-        title="المساعد الذكي"
-        subtitle="اكتشف وجهتك الاستشفائية المثالية بالذكاء الاصطناعي"
+        title={locale === "en" ? "AI Guide" : "المساعد الذكي"}
+        subtitle={
+          locale === "en"
+            ? "Discover your ideal therapeutic destination with AI"
+            : "اكتشف وجهتك الاستشفائية المثالية بالذكاء الاصطناعي"
+        }
         breadcrumb={[
-          { label: "الرئيسية", href: "/home" },
-          { label: "المساعد الذكي" },
+          { label: t("nav.home"), href: "/home" },
+          { label: locale === "en" ? "AI Guide" : "المساعد الذكي" },
         ]}
       />
 
@@ -175,10 +204,12 @@ export default function AIGuidePage() {
               </div>
               <div>
                 <h3 className="text-white font-bold font-display text-base">
-                  مساعد واحة
+                  {locale === "en" ? "Waaha Assistant" : "مساعد واحة"}
                 </h3>
                 <p className="text-white/50 text-xs">
-                  مدعوم بـ Claude — متاح الآن
+                  {locale === "en"
+                    ? "Powered by Claude — available now"
+                    : "مدعوم بـ Claude — متاح الآن"}
                 </p>
               </div>
             </div>
@@ -200,7 +231,7 @@ export default function AIGuidePage() {
                   <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
                   <path d="M3 3v5h5" />
                 </svg>
-                محادثة جديدة
+                {locale === "en" ? "New chat" : "محادثة جديدة"}
               </button>
             )}
           </div>
@@ -286,10 +317,12 @@ export default function AIGuidePage() {
                 className="pt-4"
               >
                 <p className="text-xs text-[#7b7c7d] dark:text-white/50 mb-3 text-center">
-                  أو جرّب أحد الأسئلة دي:
+                  {locale === "en"
+                    ? "Or try one of these questions:"
+                    : "أو جرّب أحد الأسئلة دي:"}
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {SUGGESTED_PROMPTS.map((p) => (
+                  {suggestedPrompts.map((p) => (
                     <button
                       key={p.text}
                       onClick={() => sendMessage(p.text)}
@@ -333,7 +366,13 @@ export default function AIGuidePage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={
-                  isStreaming ? "جاري التفكير..." : "اكتب سؤالك هنا..."
+                  isStreaming
+                    ? locale === "en"
+                      ? "Thinking..."
+                      : "جاري التفكير..."
+                    : locale === "en"
+                      ? "Type your question here..."
+                      : "اكتب سؤالك هنا..."
                 }
                 disabled={isStreaming}
                 className="flex-1 px-4 py-3 bg-[#f5f8fa] dark:bg-[#0d1b2a] border border-[#d0dde4] dark:border-[#1e3a5f] rounded-full text-sm text-[#12394d] dark:text-white placeholder:text-[#7b7c7d] dark:placeholder:text-white/40 focus:outline-none focus:border-[#1d5770] focus:bg-white dark:focus:bg-[#162033] transition-all disabled:opacity-60"
@@ -344,7 +383,7 @@ export default function AIGuidePage() {
                   type="button"
                   onClick={handleStop}
                   className="flex-shrink-0 w-11 h-11 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center transition-colors"
-                  title="إيقاف"
+                  title={locale === "en" ? "Stop" : "إيقاف"}
                 >
                   <svg
                     width="14"
@@ -360,7 +399,7 @@ export default function AIGuidePage() {
                   type="submit"
                   disabled={!input.trim()}
                   className="flex-shrink-0 w-11 h-11 rounded-full bg-[#1d5770] hover:bg-[#174860] disabled:bg-[#d0dde4] disabled:cursor-not-allowed text-white flex items-center justify-center transition-colors"
-                  title="إرسال"
+                  title={locale === "en" ? "Send" : "إرسال"}
                 >
                   <svg
                     width="16"
@@ -380,7 +419,9 @@ export default function AIGuidePage() {
               )}
             </div>
             <p className="text-[10px] text-[#7b7c7d] dark:text-white/40 text-center mt-2">
-              المساعد الذكي قد يخطئ أحياناً. استشر طبيبك قبل أي علاج طبيعي.
+              {locale === "en"
+                ? "The AI assistant may sometimes make mistakes. Consult your doctor before any natural treatment."
+                : "المساعد الذكي قد يخطئ أحياناً. استشر طبيبك قبل أي علاج طبيعي."}
             </p>
           </form>
         </div>
@@ -388,26 +429,47 @@ export default function AIGuidePage() {
         {/* How it works */}
         <div className="mt-10">
           <h2 className="text-xl font-bold text-center mb-6 font-display text-[#12394d] dark:text-white">
-            كيف يعمل المساعد الذكي؟
+            {locale === "en"
+              ? "How does the AI guide work?"
+              : "كيف يعمل المساعد الذكي؟"}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {[
-              {
-                icon: "1",
-                title: "صِف حالتك",
-                desc: "اكتب حالتك الصحية أو نوع التجربة التي تبحث عنها",
-              },
-              {
-                icon: "2",
-                title: "تحليل ذكي",
-                desc: "يحلل الذكاء الاصطناعي احتياجاتك ويبحث في قاعدة البيانات",
-              },
-              {
-                icon: "3",
-                title: "توصية مخصصة",
-                desc: "احصل على اقتراح وجهة مع الأسباب العلمية والتحذيرات",
-              },
-            ].map((step) => (
+            {(locale === "en"
+              ? [
+                  {
+                    icon: "1",
+                    title: "Describe your condition",
+                    desc: "Tell us about your health condition or the kind of experience you're after",
+                  },
+                  {
+                    icon: "2",
+                    title: "Smart analysis",
+                    desc: "Our AI analyses your needs and searches the destination database",
+                  },
+                  {
+                    icon: "3",
+                    title: "Tailored recommendation",
+                    desc: "Get a destination suggestion with the science behind it and safety notes",
+                  },
+                ]
+              : [
+                  {
+                    icon: "1",
+                    title: "صِف حالتك",
+                    desc: "اكتب حالتك الصحية أو نوع التجربة التي تبحث عنها",
+                  },
+                  {
+                    icon: "2",
+                    title: "تحليل ذكي",
+                    desc: "يحلل الذكاء الاصطناعي احتياجاتك ويبحث في قاعدة البيانات",
+                  },
+                  {
+                    icon: "3",
+                    title: "توصية مخصصة",
+                    desc: "احصل على اقتراح وجهة مع الأسباب العلمية والتحذيرات",
+                  },
+                ]
+            ).map((step) => (
               <div
                 key={step.icon}
                 className="bg-white dark:bg-[#162033] rounded-xl p-5 border border-[#d0dde4] dark:border-[#1e3a5f] text-center"
@@ -431,7 +493,9 @@ export default function AIGuidePage() {
             href="/destinations"
             className="inline-flex items-center gap-1.5 text-[#1d5770] hover:text-[#174860] text-sm font-semibold transition-colors"
           >
-            تصفح جميع الوجهات يدوياً
+            {locale === "en"
+              ? "Browse all destinations manually"
+              : "تصفح جميع الوجهات يدوياً"}
             <svg
               width="14"
               height="14"

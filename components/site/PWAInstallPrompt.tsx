@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const STORAGE_KEY = "waaha_pwa_dismissed_until";
 const HIDDEN_PATHS = ["/", "/gate", "/therapy-room"];
@@ -35,6 +36,7 @@ interface BeforeInstallPromptEvent extends Event {
  * (so we don't shove it in their face on first paint).
  */
 export default function PWAInstallPrompt() {
+  const { locale } = useTranslations();
   const pathname = usePathname();
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
@@ -100,7 +102,7 @@ export default function PWAInstallPrompt() {
           exit={{ opacity: 0, y: 16 }}
           transition={{ type: "spring", stiffness: 280, damping: 26 }}
           className="fixed bottom-20 md:bottom-4 left-4 right-4 md:left-auto md:right-4 md:max-w-sm z-[88] no-print"
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
           role="dialog"
         >
           <div className="bg-gradient-to-br from-[#12394d] to-[#1d5770] dark:from-[#0a151f] dark:to-[#162033] text-white rounded-2xl shadow-[0_20px_60px_-12px_rgba(0,0,0,0.5)] border border-white/10 p-5">
@@ -108,16 +110,20 @@ export default function PWAInstallPrompt() {
               <span className="text-3xl flex-shrink-0">📱</span>
               <div className="flex-1">
                 <h3 className="font-display font-bold text-base mb-1">
-                  ضيف واحة على شاشتك الرئيسية
+                  {locale === "en"
+                    ? "Add WAHA to your home screen"
+                    : "ضيف واحة على شاشتك الرئيسية"}
                 </h3>
                 <p className="text-xs text-white/70 leading-relaxed">
-                  افتح التطبيق في ثانية واحدة، شغّال حتى لو الإنترنت ضعيف.
+                  {locale === "en"
+                    ? "Open the app in one second — works even on poor connections."
+                    : "افتح التطبيق في ثانية واحدة، شغّال حتى لو الإنترنت ضعيف."}
                 </p>
               </div>
               <button
                 onClick={handleDismiss}
                 className="flex-shrink-0 w-7 h-7 rounded-full hover:bg-white/15 text-white/60 hover:text-white flex items-center justify-center text-sm transition-colors"
-                aria-label="إغلاق"
+                aria-label={locale === "en" ? "Close" : "إغلاق"}
               >
                 ✕
               </button>
@@ -126,7 +132,7 @@ export default function PWAInstallPrompt() {
               onClick={handleInstall}
               className="w-full py-2.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-sm rounded-full transition-colors"
             >
-              أضف للشاشة الرئيسية
+              {locale === "en" ? "Add to home screen" : "أضف للشاشة الرئيسية"}
             </button>
           </div>
         </motion.div>

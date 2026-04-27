@@ -1,36 +1,49 @@
 "use client";
 
 import type { Stats } from "@/hooks/meditation/useSessionHistory";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   stats: Stats;
   meditatedToday: boolean;
 }
 
-const DAY_LABELS = ["ح", "ن", "ث", "ر", "خ", "ج", "س"]; // RTL: Sunday .. Saturday
+const DAY_LABELS_AR = ["ح", "ن", "ث", "ر", "خ", "ج", "س"]; // Sunday .. Saturday
+const DAY_LABELS_EN = ["S", "M", "T", "W", "T", "F", "S"]; // Sunday .. Saturday
 
 /**
  * Compact streak + weekly overview. Rendered on the library screen.
  */
 export default function StreakBadge({ stats, meditatedToday }: Props) {
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
+  const DAY_LABELS = isEn ? DAY_LABELS_EN : DAY_LABELS_AR;
   const { streak, totalMinutes, totalSessions, last7Days } = stats;
 
   return (
     <div
       className="bg-gradient-to-br from-[#162033]/90 to-[#0a151f]/90 border border-[#1e3a5f] rounded-2xl p-5 backdrop-blur"
-      dir="rtl"
+      dir={isEn ? "ltr" : "rtl"}
     >
       <div className="flex items-center justify-between mb-4">
         <div>
           <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-1">
-            سلسلة التأمل
+            {isEn ? "Meditation streak" : "سلسلة التأمل"}
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-4xl font-black font-display text-white">
               {streak}
             </span>
             <span className="text-sm text-white/60">
-              {streak === 1 ? "يوم" : streak === 2 ? "يومين" : "أيام"}
+              {isEn
+                ? streak === 1
+                  ? "day"
+                  : "days"
+                : streak === 1
+                  ? "يوم"
+                  : streak === 2
+                    ? "يومين"
+                    : "أيام"}
             </span>
             {streak > 0 && <span className="text-xl">🔥</span>}
           </div>
@@ -40,13 +53,13 @@ export default function StreakBadge({ stats, meditatedToday }: Props) {
             <span className="text-white font-mono font-bold">
               {totalMinutes}
             </span>{" "}
-            دقيقة
+            {isEn ? "minutes" : "دقيقة"}
           </div>
           <div>
             <span className="text-white font-mono font-bold">
               {totalSessions}
             </span>{" "}
-            جلسة
+            {isEn ? "sessions" : "جلسة"}
           </div>
         </div>
       </div>
@@ -55,7 +68,7 @@ export default function StreakBadge({ stats, meditatedToday }: Props) {
       <div
         className="flex items-center justify-between gap-1.5"
         role="list"
-        aria-label="آخر 7 أيام"
+        aria-label={isEn ? "Last 7 days" : "آخر 7 أيام"}
       >
         {last7Days.map((done, i) => {
           const isToday = i === last7Days.length - 1;
@@ -74,7 +87,13 @@ export default function StreakBadge({ stats, meditatedToday }: Props) {
                       : "bg-white/5 border-white/10 text-white/20"
                 }`}
                 aria-label={
-                  done ? "تأمل في هذا اليوم" : "لم يتم التأمل في هذا اليوم"
+                  done
+                    ? isEn
+                      ? "Meditated this day"
+                      : "تأمل في هذا اليوم"
+                    : isEn
+                      ? "Did not meditate this day"
+                      : "لم يتم التأمل في هذا اليوم"
                 }
               >
                 {done ? "✓" : isToday ? "·" : ""}
@@ -89,7 +108,9 @@ export default function StreakBadge({ stats, meditatedToday }: Props) {
 
       {!meditatedToday && (
         <div className="mt-3 pt-3 border-t border-white/10 text-[11px] text-[#91b149] text-center">
-          لسه مأمنتش النهاردة — جلسة دقيقتين كفاية
+          {isEn
+            ? "Haven't meditated today — two minutes is enough"
+            : "لسه مأمنتش النهاردة — جلسة دقيقتين كفاية"}
         </div>
       )}
     </div>

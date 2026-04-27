@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const GRADIENTS = [
   "from-[#91b149] to-[#6a8435]",
@@ -13,6 +14,7 @@ const GRADIENTS = [
 ];
 
 export default function HallOfFameView() {
+  const { locale } = useTranslations();
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
@@ -26,10 +28,12 @@ export default function HallOfFameView() {
             <span className="w-8 h-px bg-[#91b149]" />
           </div>
           <h2 className="font-display text-4xl md:text-5xl font-black text-[#12394d] dark:text-white mb-2">
-            قاعة المشاهير
+            {locale === "en" ? "Hall of Fame" : "قاعة المشاهير"}
           </h2>
           <p className="text-[#7b7c7d] text-sm">
-            الأعضاء الذين صنعوا واحة — 23 بطلاً
+            {locale === "en"
+              ? "The members who built WAHA — 23 heroes"
+              : "الأعضاء الذين صنعوا واحة — 23 بطلاً"}
           </p>
         </div>
 

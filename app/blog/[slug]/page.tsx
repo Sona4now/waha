@@ -69,7 +69,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const post = getBlogPost(slug);
-  if (!post) return { title: `المقال غير موجود — ${SITE_NAME}` };
+  if (!post)
+    return {
+      title: `المقال غير موجود — ${SITE_NAME}`,
+      description: "Article not found / المقال غير موجود",
+    };
   return {
     title: `${post.title} — ${SITE_NAME}`,
     description: post.excerpt,
@@ -85,13 +89,18 @@ export async function generateMetadata({
   };
 }
 
-function fmtDate(iso: string): string {
+function fmtDate(iso: string, locale: "ar" | "en"): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  const months = [
+  const monthsAr = [
     "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
     "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
   ];
+  const monthsEn = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+  const months = locale === "en" ? monthsEn : monthsAr;
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
@@ -143,8 +152,14 @@ export default async function BlogPostPage({
             url: `${SITE_URL}/blog/${post.id}`,
           }),
           breadcrumbSchema([
-            { name: "الرئيسية", url: `${SITE_URL}/home` },
-            { name: "المدونة", url: `${SITE_URL}/blog` },
+            {
+              name: locale === "en" ? "Home" : "الرئيسية",
+              url: `${SITE_URL}/home`,
+            },
+            {
+              name: locale === "en" ? "Blog" : "المدونة",
+              url: `${SITE_URL}/blog`,
+            },
             { name: post.title, url: `${SITE_URL}/blog/${post.id}` },
           ]),
         ]}
@@ -154,7 +169,11 @@ export default async function BlogPostPage({
       <header className="relative w-full h-[46vh] min-h-[340px] overflow-hidden">
         <Image
           src={post.image}
-          alt={`${post.title} — مدونة السياحة الاستشفائية في مصر`}
+          alt={
+            locale === "en"
+              ? `${post.title} — Therapeutic tourism blog in Egypt`
+              : `${post.title} — مدونة السياحة الاستشفائية في مصر`
+          }
           fill
           priority
           sizes="100vw"
@@ -163,7 +182,7 @@ export default async function BlogPostPage({
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/45 to-black/10" />
         <div
           className="absolute inset-x-0 bottom-0 p-6 md:p-12 max-w-4xl mx-auto"
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
         >
           <div className="flex items-center gap-3 mb-3 text-[11px]">
             <Link
@@ -188,7 +207,7 @@ export default async function BlogPostPage({
             {post.excerpt}
           </p>
           <div className="mt-4 text-xs text-white/50">
-            {t("blogPost.publishedOn")} {fmtDate(post.date)}
+            {t("blogPost.publishedOn")} {fmtDate(post.date, locale)}
           </div>
         </div>
       </header>
@@ -196,7 +215,7 @@ export default async function BlogPostPage({
       {/* ── Body ── */}
       <article
         className="bg-white dark:bg-[#0d1b2a] py-14"
-        dir="rtl"
+        dir={locale === "en" ? "ltr" : "rtl"}
       >
         <div className="max-w-3xl mx-auto px-6 space-y-8">
           {post.content && post.content.length > 0 ? (
@@ -276,7 +295,7 @@ export default async function BlogPostPage({
       {related.length > 0 && (
         <section
           className="bg-[#f5f8fa] dark:bg-[#0a151f] py-14"
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
         >
           <div className="max-w-5xl mx-auto px-6">
             <h2 className="font-display text-2xl font-bold text-[#12394d] dark:text-white mb-8 text-center">
@@ -292,7 +311,11 @@ export default async function BlogPostPage({
                   <div className="relative h-44 overflow-hidden">
                     <Image
                       src={r.image}
-                      alt={`${r.title} — السياحة الاستشفائية في مصر`}
+                      alt={
+                        locale === "en"
+                          ? `${r.title} — Therapeutic tourism in Egypt`
+                          : `${r.title} — السياحة الاستشفائية في مصر`
+                      }
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-105"

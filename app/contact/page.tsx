@@ -56,10 +56,14 @@ export default function ContactPage() {
 
     // Build mailto link as fallback (no backend)
     const subject = encodeURIComponent(
-      `[واحة] ${formData.subject} — من ${formData.name}`,
+      locale === "en"
+        ? `[Waaha] ${formData.subject} — from ${formData.name}`
+        : `[واحة] ${formData.subject} — من ${formData.name}`,
     );
     const body = encodeURIComponent(
-      `الاسم: ${formData.name}\nالإيميل: ${formData.email}\n\n${formData.message}`,
+      locale === "en"
+        ? `Name: ${formData.name}\nEmail: ${formData.email}\n\n${formData.message}`
+        : `الاسم: ${formData.name}\nالإيميل: ${formData.email}\n\n${formData.message}`,
     );
     window.open(
       `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`,

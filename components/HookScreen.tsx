@@ -3,17 +3,25 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import Particles from "./Particles";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   onDone: () => void;
 }
 
-const lines = [
+const LINES_AR = [
   "مش كل علاج بيبدأ من دواء",
   "أحياناً... يبدأ من مكان",
 ];
 
+const LINES_EN = [
+  "Not every cure starts with medicine",
+  "Sometimes… it starts with a place",
+];
+
 export default function HookScreen({ onDone }: Props) {
+  const { locale } = useTranslations();
+  const lines = locale === "en" ? LINES_EN : LINES_AR;
   const [lineIndex, setLineIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 

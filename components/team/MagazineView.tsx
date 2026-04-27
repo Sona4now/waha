@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 export default function MagazineView() {
+  const { locale } = useTranslations();
   return (
     <div className="bg-[#0a151f] text-white py-16 md:py-24">
       <div className="max-w-[1280px] mx-auto px-6">
@@ -19,22 +21,45 @@ export default function MagazineView() {
               Issue № 2026 · WAHA
             </div>
             <h2 className="font-display text-5xl md:text-7xl lg:text-8xl font-black leading-[0.9] mb-8">
-              الفريق
-              <br />
-              <span className="text-[#91b149]">وراء</span>
-              <br />
-              الواحة
+              {locale === "en" ? (
+                <>
+                  The team
+                  <br />
+                  <span className="text-[#91b149]">behind</span>
+                  <br />
+                  the oasis
+                </>
+              ) : (
+                <>
+                  الفريق
+                  <br />
+                  <span className="text-[#91b149]">وراء</span>
+                  <br />
+                  الواحة
+                </>
+              )}
             </h2>
             <p className="text-white/60 text-base leading-relaxed max-w-sm border-r-2 border-[#91b149] pr-4">
-              23 عقلاً اجتمعوا على فكرة واحدة — توثيق الموارد العلاجية الطبيعية
-              في مصر، وتقديمها للعالم في إطار بيئي مسؤول.
+              {locale === "en"
+                ? "23 minds meeting around one idea — documenting Egypt's natural healing resources and presenting them to the world within an environmentally responsible framework."
+                : "23 عقلاً اجتمعوا على فكرة واحدة — توثيق الموارد العلاجية الطبيعية في مصر، وتقديمها للعالم في إطار بيئي مسؤول."}
             </p>
             <div className="mt-12 flex items-center gap-4">
               <div className="text-4xl font-black text-[#91b149]">23</div>
               <div className="text-[11px] uppercase tracking-[0.2em] text-white/40 leading-tight">
-                أعضاء
-                <br />
-                في الفريق
+                {locale === "en" ? (
+                  <>
+                    Members
+                    <br />
+                    in the team
+                  </>
+                ) : (
+                  <>
+                    أعضاء
+                    <br />
+                    في الفريق
+                  </>
+                )}
               </div>
             </div>
           </motion.div>

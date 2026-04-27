@@ -2,15 +2,24 @@
 
 import { useCallback } from "react";
 import { motion } from "framer-motion";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 export type Mood = 1 | 2 | 3 | 4 | 5;
 
-const MOODS: { value: Mood; emoji: string; label: string }[] = [
+const MOODS_AR: { value: Mood; emoji: string; label: string }[] = [
   { value: 1, emoji: "😞", label: "متعب" },
   { value: 2, emoji: "😟", label: "متوتر" },
   { value: 3, emoji: "😐", label: "عادي" },
   { value: 4, emoji: "🙂", label: "كويس" },
   { value: 5, emoji: "😊", label: "ممتاز" },
+];
+
+const MOODS_EN: { value: Mood; emoji: string; label: string }[] = [
+  { value: 1, emoji: "😞", label: "Exhausted" },
+  { value: 2, emoji: "😟", label: "Stressed" },
+  { value: 3, emoji: "😐", label: "Okay" },
+  { value: 4, emoji: "🙂", label: "Good" },
+  { value: 5, emoji: "😊", label: "Great" },
 ];
 
 interface Props {
@@ -41,6 +50,8 @@ export default function MoodCheckIn({
   onSkip,
   sessionName,
 }: Props) {
+  const { locale } = useTranslations();
+  const MOODS = locale === "en" ? MOODS_EN : MOODS_AR;
   // Small haptic tap on selection — this is the moment the user commits
   // to an emotion, a subtle confirmation vibration reinforces the choice.
   const select = useCallback(
@@ -55,11 +66,21 @@ export default function MoodCheckIn({
     [onSelect],
   );
   const title =
-    phase === "before" ? "إزاي حاسس دلوقتي؟" : "دلوقتي إزاي حاسس؟";
+    phase === "before"
+      ? locale === "en"
+        ? "How are you feeling right now?"
+        : "إزاي حاسس دلوقتي؟"
+      : locale === "en"
+        ? "How are you feeling now?"
+        : "دلوقتي إزاي حاسس؟";
   const subtitle =
     phase === "before"
-      ? `قبل ما نبدأ ${sessionName} — لحظة صدق مع نفسك`
-      : "الفرق بين قبل وبعد هيساعدك تشوف إن التأمل بيعمل فرق حقيقي";
+      ? locale === "en"
+        ? `Before we begin ${sessionName} — a moment of honesty with yourself`
+        : `قبل ما نبدأ ${sessionName} — لحظة صدق مع نفسك`
+      : locale === "en"
+        ? "The difference between before and after will help you see that meditation makes a real difference"
+        : "الفرق بين قبل وبعد هيساعدك تشوف إن التأمل بيعمل فرق حقيقي";
 
   return (
     <motion.div
@@ -68,7 +89,7 @@ export default function MoodCheckIn({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
       className="fixed inset-0 z-50 bg-gradient-to-b from-[#0a1a2a] via-[#0d2238] to-[#070d15] flex flex-col items-center justify-center px-6"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <motion.div
         initial={{ y: 20, opacity: 0 }}
@@ -77,7 +98,13 @@ export default function MoodCheckIn({
         className="max-w-md w-full text-center"
       >
         <p className="text-[10px] uppercase tracking-[0.4em] text-[#91b149] font-bold mb-3">
-          {phase === "before" ? "قبل الجلسة" : "بعد الجلسة"}
+          {phase === "before"
+            ? locale === "en"
+              ? "Before session"
+              : "قبل الجلسة"
+            : locale === "en"
+              ? "After session"
+              : "بعد الجلسة"}
         </p>
         <h1 className="font-display text-2xl md:text-3xl font-black text-white mb-2 leading-tight">
           {title}
@@ -87,7 +114,7 @@ export default function MoodCheckIn({
         </p>
 
         {/* Mood row — 5 emoji buttons */}
-        <div className="flex items-center justify-between gap-2 md:gap-3 mb-8" role="radiogroup" aria-label="مقياس المزاج">
+        <div className="flex items-center justify-between gap-2 md:gap-3 mb-8" role="radiogroup" aria-label={locale === "en" ? "Mood scale" : "مقياس المزاج"}>
           {MOODS.map((m, i) => {
             const isPrev = previousMood === m.value;
             return (
@@ -120,7 +147,9 @@ export default function MoodCheckIn({
         {/* Contextual hint for "before" */}
         {phase === "before" && previousMood === undefined && (
           <p className="text-white/40 text-[11px] leading-relaxed mb-6">
-            اختار الإحساس الأقرب · مش لازم يكون مثالي
+            {locale === "en"
+              ? "Pick the closest feeling · it doesn't need to be perfect"
+              : "اختار الإحساس الأقرب · مش لازم يكون مثالي"}
           </p>
         )}
 
@@ -128,7 +157,13 @@ export default function MoodCheckIn({
           onClick={onSkip}
           className="text-white/45 hover:text-white/75 text-xs font-bold transition-colors"
         >
-          {phase === "before" ? "تخطّي" : "تخطّي واذهب للملخص"}
+          {phase === "before"
+            ? locale === "en"
+              ? "Skip"
+              : "تخطّي"
+            : locale === "en"
+              ? "Skip and go to summary"
+              : "تخطّي واذهب للملخص"}
         </button>
       </motion.div>
     </motion.div>

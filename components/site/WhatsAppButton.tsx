@@ -23,6 +23,16 @@ const DESTINATION_NAMES: Record<string, string> = {
   "shagie-farms": "مزارع شجيع",
 };
 
+const DESTINATION_NAMES_EN: Record<string, string> = {
+  safaga: "Safaga",
+  siwa: "Siwa",
+  sinai: "Sinai",
+  fayoum: "Fayoum",
+  bahariya: "Bahariya",
+  "wadi-degla": "Wadi Degla",
+  "shagie-farms": "Shagie Farms",
+};
+
 function buildContextualMessage(path: string): string {
   // /destination/safaga → "صفحة سفاجا"
   const destMatch = path.match(/^\/destination\/([\w-]+)/);
@@ -56,6 +66,33 @@ function buildContextualMessage(path: string): string {
   }
   // Generic
   return "أهلاً، عايز أعرف أكتر عن السياحة الاستشفائية في مصر.";
+}
+
+function buildContextualMessageEn(path: string): string {
+  const destMatch = path.match(/^\/destination\/([\w-]+)/);
+  if (destMatch) {
+    const name = DESTINATION_NAMES_EN[destMatch[1]] || destMatch[1];
+    return `Hi, I'm on the ${name} page and would like to learn about packages and book a trip.`;
+  }
+  if (path.startsWith("/blog/")) {
+    return "Hi, I just read one of your blog posts and would like to ask about wellness tourism in Egypt.";
+  }
+  if (path.startsWith("/tours")) {
+    return "Hi, I checked the 360° virtual tours on your site and would like to book a real visit.";
+  }
+  if (path.startsWith("/destinations")) {
+    return "Hi, I'm browsing the destinations and would like advice on which is best for my case.";
+  }
+  if (path.startsWith("/symptoms")) {
+    return "Hi, I just took the symptom checker and want to talk through the recommendation.";
+  }
+  if (path.startsWith("/compare")) {
+    return "Hi, I'm comparing destinations on your site and would value your input.";
+  }
+  if (path.startsWith("/calendar")) {
+    return "Hi, I'm looking at the calendar and want to book a trip for the upcoming season.";
+  }
+  return "Hi, I'd like to know more about wellness tourism in Egypt.";
 }
 
 /**
@@ -108,7 +145,7 @@ export default function WhatsAppButton() {
     // other end knows which language to start in.
     const message =
       locale === "en"
-        ? `Hi, I'm browsing ${path} and would like to learn more about wellness tourism in Egypt.`
+        ? buildContextualMessageEn(path)
         : buildContextualMessage(path);
     return `https://wa.me/${CONTACT_PHONE_INTL}?text=${encodeURIComponent(
       message,
@@ -122,7 +159,7 @@ export default function WhatsAppButton() {
       // bottom-20 on mobile keeps it above the BottomNav. md+ pulls it down.
       // The chat widget FAB sits at bottom-left so we anchor right.
       className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-[90] no-print"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <AnimatePresence>
         {showHint && (

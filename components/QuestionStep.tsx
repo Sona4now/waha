@@ -2,7 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
-import { Question } from "@/data/questions";
+import { Question, localizeQuestion } from "@/data/questions";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   question: Question;
@@ -30,11 +31,13 @@ const bgImages: Record<string, string> = {
 };
 
 export default function QuestionStep({
-  question,
+  question: rawQuestion,
   stepIndex,
   totalSteps,
   onAnswer,
 }: Props) {
+  const { locale } = useTranslations();
+  const question = localizeQuestion(rawQuestion, locale);
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -122,7 +125,7 @@ export default function QuestionStep({
               ? "grid-cols-2"
               : "grid-cols-1 sm:grid-cols-3"
           }`}
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
         >
           {question.options.map((opt, i) => {
             const isSelected = selected === opt.id;

@@ -3,8 +3,11 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 export default function GatePage() {
+  const { locale } = useTranslations();
+  const isEn = locale === "en";
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,10 +31,14 @@ export default function GatePage() {
         router.push("/");
         router.refresh();
       } else {
-        setError(data.error || "كلمة المرور غير صحيحة");
+        setError(
+          data.error || (isEn ? "Incorrect password" : "كلمة المرور غير صحيحة"),
+        );
       }
     } catch {
-      setError("حدث خطأ، حاول مرة أخرى");
+      setError(
+        isEn ? "An error occurred, please try again" : "حدث خطأ، حاول مرة أخرى",
+      );
     } finally {
       setLoading(false);
     }
@@ -40,7 +47,7 @@ export default function GatePage() {
   return (
     <div
       className="fixed inset-0 flex items-center justify-center bg-[#070d15]"
-      dir="rtl"
+      dir={isEn ? "ltr" : "rtl"}
     >
       {/* Background */}
       <div
@@ -58,7 +65,7 @@ export default function GatePage() {
           {/* Logo */}
           <Image
             src="/logo.png"
-            alt="واحة — شعار المنصة"
+            alt={isEn ? "Waaha — platform logo" : "واحة — شعار المنصة"}
             width={80}
             height={80}
             className="rounded-full bg-white/90 p-1"
@@ -69,10 +76,10 @@ export default function GatePage() {
               className="text-2xl font-bold text-white mb-1"
               style={{ fontFamily: "Reem Kufi, Cairo, sans-serif" }}
             >
-              واحة
+              {isEn ? "Waaha" : "واحة"}
             </h1>
             <p className="text-white/40 text-sm">
-              الموقع محمي بكلمة مرور
+              {isEn ? "Site is password-protected" : "الموقع محمي بكلمة مرور"}
             </p>
           </div>
 
@@ -83,7 +90,7 @@ export default function GatePage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="أدخل كلمة المرور"
+                placeholder={isEn ? "Enter password" : "أدخل كلمة المرور"}
                 className="w-full px-5 py-4 bg-white/[0.06] border border-white/15 rounded-xl text-white text-center placeholder:text-white/25 focus:outline-none focus:border-[#91b149]/50 focus:bg-white/[0.08] transition-all duration-300"
                 autoFocus
               />
@@ -98,7 +105,13 @@ export default function GatePage() {
               disabled={loading || !password}
               className="w-full py-4 bg-[#91b149] hover:bg-[#a3c45a] disabled:opacity-40 disabled:hover:bg-[#91b149] text-[#0a0f14] font-bold text-sm rounded-xl transition-all duration-300"
             >
-              {loading ? "جاري التحقق..." : "دخول"}
+              {loading
+                ? isEn
+                  ? "Verifying…"
+                  : "جاري التحقق..."
+                : isEn
+                  ? "Enter"
+                  : "دخول"}
             </button>
           </form>
         </div>

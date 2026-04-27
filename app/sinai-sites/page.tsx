@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
 import Link from "next/link";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 /* ─── Data from PDF ─── */
 
@@ -25,7 +26,7 @@ interface Site {
   quickFacts: { label: string; value: string; icon: string }[];
 }
 
-const SITES: Site[] = [
+const SITES_AR: Site[] = [
   {
     id: "wadi-asal",
     name: "وادي عسل",
@@ -251,6 +252,232 @@ const SITES: Site[] = [
   },
 ];
 
+const SITES_EN: Site[] = [
+  {
+    id: "wadi-asal",
+    name: "Wadi Asal",
+    subtitle: "Sulphur Lake — Ras Sudr",
+    icon: "♨️",
+    color: "#0e7490",
+    heroImage:
+      "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80",
+    location: "South of Ras Sudr, South Sinai",
+    coords: "10 km south of Ras Sudr",
+    sections: [
+      {
+        title: "Geographic Setting",
+        icon: "🗺️",
+        content: [
+          "Located south of Ras Sudr in South Sinai, about 10 kilometres from the city, in a coastal desert region near the Gulf of Suez.",
+          "The site sits in a low-lying area created by the geological faults that opened the Gulf of Suez, which let hot water rise from deep underground.",
+          "The surroundings are exposed desert. A windbreak of trees has been planted around the spring to calm the air and create a healing-friendly atmosphere.",
+        ],
+      },
+      {
+        title: "Sulphur Waters",
+        icon: "💧",
+        content: [
+          "The water comes from a very deep underground reservoir and reaches around 200°C at the source.",
+          "It has carved its own natural channel about 100 metres long and pools in a depression that acts as a natural swimming pool — 150 m² in area and around 2 metres deep.",
+          "The temperature is highest at the source and cools as it reaches the lake, which makes bathing possible.",
+        ],
+      },
+      {
+        title: "Therapeutic Value",
+        icon: "🏥",
+        content: [
+          "The heat helps relax muscles, ease tension, improve circulation, and is good for joint pain and rheumatism.",
+          "Sulphur is absorbed through the skin and helps treat psoriasis and eczema.",
+          "Inhaling the steam benefits the respiratory system, especially for asthma and sinus issues.",
+          "Used for relief from rheumatism, gout, joint pain, skin conditions, and respiratory problems.",
+        ],
+      },
+      {
+        title: "Environmental Status",
+        icon: "🌿",
+        content: [
+          "Wadi Asal is highly sensitive. The daily flow is around 20 cubic metres — a limited resource.",
+          "The site falls under South Sinai Governorate, with ongoing efforts to improve infrastructure and cleanliness so it can become a properly managed eco-healing destination.",
+        ],
+      },
+    ],
+    warnings: [
+      "The high temperature can be dangerous for pregnant women",
+      "Not suitable for people with high blood pressure",
+      "Not suitable for kidney failure patients",
+    ],
+    quickFacts: [
+      { label: "Source temp.", value: "200°C", icon: "🌡️" },
+      { label: "Pool size", value: "150 m²", icon: "🏊" },
+      { label: "Depth", value: "2 m", icon: "📏" },
+      { label: "Daily flow", value: "20 m³", icon: "💧" },
+    ],
+  },
+  {
+    id: "serabit",
+    name: "Serabit El-Khadem",
+    subtitle: "Mountain Plateau — South Sinai",
+    icon: "⛰️",
+    color: "#92400e",
+    heroImage:
+      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80",
+    location: "Heart of the South Sinai mountains, north of El-Tor",
+    coords: "40 km east of Abu Zenima",
+    sections: [
+      {
+        title: "Geographic Setting",
+        icon: "🗺️",
+        content: [
+          "Sits in the heart of the South Sinai mountains, at an altitude of 1,100 to 1,200 metres above sea level.",
+          "The climate is alpine: cold in winter, mild in summer, with a sharp swing between day and night.",
+          "The plateau is made of sandstone, quartz, and old volcanic rock. The area is rich in turquoise and copper ore.",
+        ],
+      },
+      {
+        title: "Healing Environment",
+        icon: "🧘",
+        content: [
+          "An indirect kind of healing — visitors benefit from the isolation, the silence, and the mountain environment.",
+          "Sand therapy is offered in the surrounding valleys in summer, since the sand holds the sun's heat and eases rheumatic pain.",
+          "Some eco-camps have built salt rooms from rock salt to support breathing therapy.",
+          "Bedouin tradition holds that quartz and turquoise carry an energy that brings calm and a sense of wellbeing.",
+        ],
+      },
+      {
+        title: "Historical Value",
+        icon: "🏛️",
+        content: [
+          "A major turquoise mining centre dating back to the Fourth Dynasty of ancient Egypt.",
+          "The temple is dedicated to the goddess Hathor, \"Lady of Turquoise\" — a design that mixes carved grottos with inscribed structures.",
+          "Site of the Proto-Sinaitic inscriptions — the earliest known attempt at an alphabetic writing system, considered the ancestor of every alphabet.",
+        ],
+      },
+      {
+        title: "Environmental Status",
+        icon: "🌿",
+        content: [
+          "Highly sensitive area, part of the protected reserves of South Sinai.",
+          "Under antiquities protection, with on-the-ground protection that depends on cooperation with the Bedouin tribes.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "Altitude", value: "1,200 m", icon: "🏔️" },
+      { label: "Rock", value: "Quartz + turquoise", icon: "💎" },
+      { label: "Era", value: "Fourth Dynasty", icon: "🏛️" },
+      { label: "Key find", value: "Oldest alphabet", icon: "✍️" },
+    ],
+  },
+  {
+    id: "hammam-musa",
+    name: "Hammam Musa",
+    subtitle: "Northern South Sinai Governorate",
+    icon: "♨️",
+    color: "#065f46",
+    heroImage:
+      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=1920&q=80",
+    location: "El-Tor city, on the Gulf of Suez coast",
+    coords: "Between mountain, oasis, and gulf",
+    sections: [
+      {
+        title: "Geographic Setting",
+        icon: "🗺️",
+        content: [
+          "Hammam Musa lies in El-Tor city, in northern South Sinai on the Gulf of Suez coast.",
+          "It is a set of natural sulphur springs that emerge from beneath the mountain and feed into pools.",
+          "It's a major draw for therapeutic tourism in the region.",
+        ],
+      },
+      {
+        title: "Therapeutic Properties",
+        icon: "🏥",
+        content: [
+          "Warm sulphur springs (37°C) flow year-round, rich in sulphur, sodium, magnesium, and calcium.",
+          "Used for skin conditions (psoriasis, eczema), rheumatism, improving circulation, and relaxation.",
+          "The area is rich in algae beneficial for skin and hair.",
+          "The water rises from five main springs that feed into bathing pools.",
+        ],
+      },
+      {
+        title: "Historical Value",
+        icon: "📜",
+        content: [
+          "The site is linked to the prophet Moses (peace be upon him) — tradition says he passed by here during the Exodus from Egypt with the Children of Israel.",
+          "Stories tell that his people were stricken with skin diseases, and God led them to these springs to heal — they bathed there and were cured.",
+        ],
+      },
+      {
+        title: "Environmental Setting",
+        icon: "🌴",
+        content: [
+          "The area is surrounded by palm trees that provide shade and a beautiful setting.",
+          "The palms are date palms native to the desert, making the site an ideal place for treatment and relaxation.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "Water temp.", value: "37°C", icon: "🌡️" },
+      { label: "Springs", value: "5 springs", icon: "💧" },
+      { label: "Minerals", value: "Sulphur + sodium", icon: "⚗️" },
+      { label: "Flow", value: "Year-round", icon: "♾️" },
+    ],
+  },
+  {
+    id: "uyun-musa",
+    name: "Uyun Musa (Springs of Moses)",
+    subtitle: "Gulf of Suez Coast",
+    icon: "🌊",
+    color: "#1d5770",
+    heroImage:
+      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1920&q=80",
+    location: "Gulf of Suez coast, South Sinai",
+    coords: "35 km from the Ahmed Hamdi Tunnel",
+    sections: [
+      {
+        title: "Geographic Setting",
+        icon: "🗺️",
+        content: [
+          "An important touristic and archaeological site on the Gulf of Suez coast, 35 km from the Ahmed Hamdi Tunnel.",
+          "Close to Suez city, and considered the first tourist stop travellers see on their way to Sharm El-Sheikh.",
+        ],
+      },
+      {
+        title: "Historical Value",
+        icon: "📜",
+        content: [
+          "After their escape from Pharaoh, Moses and the Children of Israel travelled through the Sinai desert and suffered from severe thirst.",
+          "Moses struck a rock with his staff and twelve springs gushed out — one for each tribe of the Children of Israel.",
+          "The Torah mentions 12 springs and 70 palms — the 70 palms are still here today.",
+          "Historians' writings describe the road from Suez to Uyun Musa as extremely arid land.",
+        ],
+      },
+      {
+        title: "State Restoration Efforts",
+        icon: "🏗️",
+        content: [
+          "After the springs dried up under the sand, 7 of them were cleared, the water analysed and purified.",
+          "Reopened on 10 February 2018 with the Supreme Council of Antiquities restoring access to the fresh water.",
+          "Water analysis confirmed the water is fresh, supporting that these are indeed the springs of the prophet Moses.",
+        ],
+      },
+      {
+        title: "Uyun Musa Today",
+        icon: "🌴",
+        content: [
+          "A natural area of springs, now a major religious and tourist destination.",
+          "Made up of springs, grottos, and palm trees — some of the original springs survive, with their distinctive fresh water.",
+        ],
+      },
+    ],
+    quickFacts: [
+      { label: "Springs", value: "12 springs", icon: "💧" },
+      { label: "Palms", value: "70 palms", icon: "🌴" },
+      { label: "Reopened", value: "2018", icon: "📅" },
+      { label: "Distance", value: "35 km", icon: "🛣️" },
+    ],
+  },
+];
+
 /* ─── Components ─── */
 
 function SiteCard({
@@ -352,6 +579,8 @@ function SectionBlock({
 /* ─── Main Page ─── */
 
 export default function SinaiSitesPage() {
+  const { locale } = useTranslations();
+  const SITES = locale === "en" ? SITES_EN : SITES_AR;
   const [activeSiteId, setActiveSiteId] = useState(SITES[0].id);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -387,7 +616,7 @@ export default function SinaiSitesPage() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
-              العودة لصفحة سيناء
+              {locale === "en" ? "Back to Sinai page" : "العودة لصفحة سيناء"}
             </Link>
             <AnimatePresence mode="wait">
               <motion.div
@@ -418,7 +647,9 @@ export default function SinaiSitesPage() {
           {/* Sidebar — Site Selector */}
           <div>
             <h2 className="text-sm font-bold text-[#7b7c7d] dark:text-white/60 mb-3 px-1">
-              المواقع الاستشفائية في سيناء
+              {locale === "en"
+                ? "Therapeutic sites in Sinai"
+                : "المواقع الاستشفائية في سيناء"}
             </h2>
             <div className="flex flex-row lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
               {SITES.map((site) => (
@@ -471,7 +702,10 @@ export default function SinaiSitesPage() {
                     className="mt-6 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800/50 rounded-2xl p-6"
                   >
                     <h3 className="font-bold text-red-700 dark:text-red-400 font-display flex items-center gap-2 mb-3">
-                      <span>⚠️</span> تحذيرات مهمة
+                      <span>⚠️</span>{" "}
+                      {locale === "en"
+                        ? "Important warnings"
+                        : "تحذيرات مهمة"}
                     </h3>
                     <ul className="space-y-2">
                       {activeSite.warnings.map((w, i) => (
@@ -490,13 +724,13 @@ export default function SinaiSitesPage() {
                     href="/destination/sinai"
                     className="px-6 py-3 bg-[#1d5770] hover:bg-[#174860] text-white font-bold text-sm rounded-full transition-all duration-300 no-underline"
                   >
-                    اكتشف سيناء
+                    {locale === "en" ? "Discover Sinai" : "اكتشف سيناء"}
                   </Link>
                   <Link
                     href="/map"
                     className="px-6 py-3 border border-[#d0dde4] dark:border-[#1e3a5f] hover:border-[#1d5770] text-[#12394d] dark:text-white font-bold text-sm rounded-full transition-all duration-300 no-underline"
                   >
-                    عرض على الخريطة
+                    {locale === "en" ? "View on map" : "عرض على الخريطة"}
                   </Link>
                 </div>
               </motion.div>

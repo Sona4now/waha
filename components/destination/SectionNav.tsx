@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Section {
   id: string;
@@ -9,13 +10,22 @@ interface Section {
   icon: string;
 }
 
-const SECTIONS: Section[] = [
+const SECTIONS_AR: Section[] = [
   { id: "overview", label: "نبذة", icon: "📖" },
   { id: "benefits", label: "الفوائد", icon: "💊" },
   { id: "timing", label: "الوقت", icon: "🌡️" },
   { id: "day", label: "الرحلة", icon: "🗓️" },
   { id: "gallery", label: "الصور", icon: "🖼️" },
   { id: "faq", label: "أسئلة", icon: "❓" },
+];
+
+const SECTIONS_EN: Section[] = [
+  { id: "overview", label: "Overview", icon: "📖" },
+  { id: "benefits", label: "Benefits", icon: "💊" },
+  { id: "timing", label: "Timing", icon: "🌡️" },
+  { id: "day", label: "Itinerary", icon: "🗓️" },
+  { id: "gallery", label: "Gallery", icon: "🖼️" },
+  { id: "faq", label: "FAQ", icon: "❓" },
 ];
 
 interface Props {
@@ -27,17 +37,19 @@ interface Props {
  * Horizontal sticky section nav — appears after user scrolls past hero.
  * Lets user jump between sections and always know where they are.
  */
-export default function SectionNav({ sections = SECTIONS }: Props) {
+export default function SectionNav({ sections }: Props) {
+  const { locale } = useTranslations();
+  const resolvedSections = sections ?? (locale === "en" ? SECTIONS_EN : SECTIONS_AR);
   const [visible, setVisible] = useState(false);
-  const [activeId, setActiveId] = useState(sections[0].id);
+  const [activeId, setActiveId] = useState(resolvedSections[0].id);
 
   useEffect(() => {
     const onScroll = () => {
       setVisible(window.scrollY > 500);
 
       // Find which section is currently in view
-      let current = sections[0].id;
-      for (const s of sections) {
+      let current = resolvedSections[0].id;
+      for (const s of resolvedSections) {
         const el = document.getElementById(s.id);
         if (!el) continue;
         const rect = el.getBoundingClientRect();
@@ -48,7 +60,7 @@ export default function SectionNav({ sections = SECTIONS }: Props) {
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
-  }, [sections]);
+  }, [resolvedSections]);
 
   const handleClick = (id: string) => {
     const el = document.getElementById(id);
@@ -66,11 +78,11 @@ export default function SectionNav({ sections = SECTIONS }: Props) {
           exit={{ y: -60, opacity: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 28 }}
           className="fixed top-[72px] left-0 right-0 z-40 bg-white/95 dark:bg-[#0d1b2a]/95 backdrop-blur-xl border-b border-[#d0dde4] dark:border-[#1e3a5f] no-print"
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
         >
           <div className="max-w-6xl mx-auto px-4 overflow-x-auto scrollbar-hide">
             <div className="flex items-center gap-1 py-2.5">
-              {sections.map((s) => {
+              {resolvedSections.map((s) => {
                 const isActive = activeId === s.id;
                 return (
                   <button

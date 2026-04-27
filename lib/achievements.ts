@@ -4,6 +4,9 @@ export interface Achievement {
   id: string;
   title: string;
   description: string;
+  /** Optional English overlay; falls back to Arabic when missing. */
+  titleEn?: string;
+  descriptionEn?: string;
   icon: string;
   condition: (state: UserState) => boolean;
 }
@@ -25,6 +28,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "explorer",
     title: "المستكشف",
     description: "زرت 3 وجهات مختلفة",
+    titleEn: "Explorer",
+    descriptionEn: "Visited 3 different destinations",
     icon: "🗺️",
     condition: (s) => s.destinationsVisited.length >= 3,
   },
@@ -32,6 +37,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "world-traveler",
     title: "رحّالة محترف",
     description: "زرت كل الـ 7 وجهات",
+    titleEn: "Master Traveler",
+    descriptionEn: "Visited all 7 destinations",
     icon: "🌍",
     condition: (s) => s.destinationsVisited.length >= 7,
   },
@@ -39,6 +46,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "reader",
     title: "القارئ",
     description: "قرأت 5 مقالات من المدونة",
+    titleEn: "Reader",
+    descriptionEn: "Read 5 articles from the blog",
     icon: "📚",
     condition: (s) => s.articlesRead >= 5,
   },
@@ -46,6 +55,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "cinematic",
     title: "السينمائي",
     description: "خلصت التجربة السينمائية الكاملة",
+    titleEn: "Cinematic",
+    descriptionEn: "Completed the full cinematic experience",
     icon: "🎬",
     condition: (s) => s.cinematicCompleted,
   },
@@ -53,6 +64,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "health-conscious",
     title: "الواعي صحياً",
     description: "جربت فاحص الأعراض",
+    titleEn: "Health Conscious",
+    descriptionEn: "Tried the symptom checker",
     icon: "🩺",
     condition: (s) => s.symptomCheckerUsed,
   },
@@ -60,6 +73,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "curious",
     title: "الفضولي",
     description: "سألت المساعد الذكي",
+    titleEn: "Curious",
+    descriptionEn: "Asked the AI assistant",
     icon: "🤖",
     condition: (s) => s.aiChatUsed,
   },
@@ -67,6 +82,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "collector",
     title: "الجامع",
     description: "أضفت 3 وجهات للمفضلة",
+    titleEn: "Collector",
+    descriptionEn: "Added 3 destinations to favorites",
     icon: "❤️",
     condition: (s) => s.favoritesCount >= 3,
   },
@@ -74,6 +91,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "analyst",
     title: "المحلل",
     description: "قارنت بين وجهتين",
+    titleEn: "Analyst",
+    descriptionEn: "Compared two destinations",
     icon: "⚖️",
     condition: (s) => s.comparisonsMade >= 1,
   },
@@ -81,6 +100,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "loyal",
     title: "زائر مُخلص",
     description: "رجعت للموقع 5 مرات",
+    titleEn: "Loyal Visitor",
+    descriptionEn: "Returned to the site 5 times",
     icon: "💚",
     condition: (s) => s.visitCount >= 5,
   },
@@ -88,6 +109,8 @@ export const ACHIEVEMENTS: Achievement[] = [
     id: "virtual-explorer",
     title: "مستكشف افتراضي",
     description: "شاهدت 3 جولات 360°",
+    titleEn: "Virtual Explorer",
+    descriptionEn: "Watched 3 360° tours",
     icon: "🎥",
     condition: (s) => s.toursWatched >= 3,
   },

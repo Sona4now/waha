@@ -10,6 +10,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import type { DestinationFull } from "@/data/siteData";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 // Fix Leaflet default icon issue
 delete (L.Icon.Default.prototype as unknown as Record<string, unknown>)
@@ -73,6 +74,7 @@ export default function EgyptMap({
   activeDestination,
   onSelectDestination,
 }: Props) {
+  const { locale } = useTranslations();
   const flyTarget = activeDestination
     ? destinations.find((d) => d.id === activeDestination)
     : null;
@@ -212,7 +214,7 @@ export default function EgyptMap({
                     transition: "background 0.3s",
                   }}
                 >
-                  اكتشف المزيد
+                  {locale === "en" ? "Discover more" : "اكتشف المزيد"}
                 </a>
               </div>
             </Popup>

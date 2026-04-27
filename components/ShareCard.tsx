@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 import { Destination } from "@/data/destinations";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   destination: Destination;
@@ -30,6 +31,7 @@ const STYLE_LABELS: Record<string, string> = {
 };
 
 export default function ShareCard({ destination, answers, onClose }: Props) {
+  const { locale } = useTranslations();
   const cardRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
 
@@ -88,14 +90,14 @@ export default function ShareCard({ destination, answers, onClose }: Props) {
             {/* Logo */}
             <img
               src="/logo.png"
-              alt="واحة"
+              alt={locale === "en" ? "Waha" : "واحة"}
               className="w-14 h-14 rounded-full bg-white/90 p-0.5"
             />
 
             {/* Title */}
             <div>
               <p className="text-[#91b149]/70 text-xs tracking-widest mb-2">
-                وجهتك الاستشفائية
+                {locale === "en" ? "Your healing destination" : "وجهتك الاستشفائية"}
               </p>
               <h2 className="font-display text-3xl font-bold text-white">
                 {destination.name}
@@ -111,7 +113,7 @@ export default function ShareCard({ destination, answers, onClose }: Props) {
             </p>
 
             {/* Tags */}
-            <div className="flex flex-wrap gap-2 justify-center" dir="rtl">
+            <div className="flex flex-wrap gap-2 justify-center" dir={locale === "en" ? "ltr" : "rtl"}>
               {answers.need && (
                 <span className="px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-white/50 text-xs">
                   {NEED_LABELS[answers.need]}
@@ -124,7 +126,7 @@ export default function ShareCard({ destination, answers, onClose }: Props) {
               )}
               {answers.journeyStyle && (
                 <span className="px-3 py-1 rounded-full bg-white/[0.06] border border-white/10 text-white/50 text-xs">
-                  رحلة {STYLE_LABELS[answers.journeyStyle]}
+                  {locale === "en" ? `${STYLE_LABELS[answers.journeyStyle]} journey` : `رحلة ${STYLE_LABELS[answers.journeyStyle]}`}
                 </span>
               )}
             </div>
@@ -134,7 +136,7 @@ export default function ShareCard({ destination, answers, onClose }: Props) {
 
             {/* Brand */}
             <p className="text-white/15 text-[0.6rem] tracking-[0.3em] uppercase">
-              واحة · السياحة الاستشفائية
+              {locale === "en" ? "Waha · Healing Tourism" : "واحة · السياحة الاستشفائية"}
             </p>
           </div>
         </div>
@@ -146,7 +148,7 @@ export default function ShareCard({ destination, answers, onClose }: Props) {
             className="flex-1 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-sm rounded-full transition-all duration-300 flex items-center justify-center gap-2"
           >
             {copied ? (
-              "تم النسخ ✓"
+              locale === "en" ? "Copied ✓" : "تم النسخ ✓"
             ) : (
               <>
                 <svg
@@ -165,7 +167,7 @@ export default function ShareCard({ destination, answers, onClose }: Props) {
                   <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
                   <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
                 </svg>
-                مشاركة النتيجة
+                {locale === "en" ? "Share result" : "مشاركة النتيجة"}
               </>
             )}
           </button>
@@ -173,7 +175,7 @@ export default function ShareCard({ destination, answers, onClose }: Props) {
             onClick={onClose}
             className="py-3.5 px-6 border border-white/20 hover:border-white/40 text-white/60 hover:text-white/80 text-sm rounded-full transition-all duration-300"
           >
-            إغلاق
+            {locale === "en" ? "Close" : "إغلاق"}
           </button>
         </div>
       </motion.div>

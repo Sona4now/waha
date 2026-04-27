@@ -47,6 +47,16 @@ const KNOWN_DESTINATIONS: Record<string, string> = {
   "wadi-degla": "وادي دجلة",
   "shagie-farms": "مزارع شجيع",
 };
+
+const KNOWN_DESTINATIONS_EN: Record<string, string> = {
+  safaga: "Safaga",
+  siwa: "Siwa",
+  sinai: "Sinai",
+  fayoum: "Fayoum",
+  bahariya: "Bahariya",
+  "wadi-degla": "Wadi Degla",
+  "shagie-farms": "Shagie Farms",
+};
 const KNOWN_TIERS = new Set(["basic", "standard", "premium"]);
 
 interface BookCta {
@@ -74,10 +84,16 @@ function parseBook(content: string): [string, BookCta | null] {
   ];
 }
 
-const TIER_LABEL: Record<BookCta["tier"], string> = {
+const TIER_LABEL_AR: Record<BookCta["tier"], string> = {
   basic: "الأساسية",
   standard: "الموصى بها ⭐",
   premium: "المتكاملة",
+};
+
+const TIER_LABEL_EN: Record<BookCta["tier"], string> = {
+  basic: "Basic",
+  standard: "Recommended ⭐",
+  premium: "Premium",
 };
 
 const GREETING_AR: Message = {
@@ -274,7 +290,7 @@ export default function ChatWidget() {
         throw new Error(errorData.error || `HTTP ${res.status}`);
       }
 
-      if (!res.body) throw new Error("لا يوجد response body");
+      if (!res.body) throw new Error(locale === "en" ? "No response body" : "لا يوجد response body");
 
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
@@ -325,7 +341,11 @@ export default function ChatWidget() {
         // user cancelled
       } else {
         const errMsg =
-          err instanceof Error ? err.message : "حدث خطأ غير متوقع";
+          err instanceof Error
+            ? err.message
+            : locale === "en"
+              ? "An unexpected error occurred"
+              : "حدث خطأ غير متوقع";
         setError(errMsg);
         setMessages((prev) => prev.filter((m) => m.id !== assistantId));
       }
@@ -485,7 +505,7 @@ export default function ChatWidget() {
               whileHover={{ opacity: 1, y: 0 }}
               className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 whitespace-nowrap bg-[#0d2a39] text-white text-xs px-3 py-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none shadow-lg"
             >
-              اسأل المساعد الذكي 💬
+              {locale === "en" ? "Ask the AI assistant 💬" : "اسأل المساعد الذكي 💬"}
               <span className="absolute top-full left-1/2 -translate-x-1/2 -mt-1 w-2 h-2 bg-[#0d2a39] rotate-45" />
             </motion.span>
           </motion.div>
@@ -510,7 +530,7 @@ export default function ChatWidget() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 20, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              dir="rtl"
+              dir={locale === "en" ? "ltr" : "rtl"}
               // Mobile: full-screen using h-dvh (Tailwind v4) so iOS Safari's
               // address-bar shrinking doesn't push the input off-screen.
               // Desktop: fixed 600px panel anchored bottom-left.
@@ -725,15 +745,19 @@ export default function ChatWidget() {
                                 className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-l from-[#91b149] to-[#6a8435] hover:from-[#a3c45a] hover:to-[#7a9442] text-[#0a0f14] no-underline px-3.5 py-2.5 shadow-[0_4px_14px_-4px_rgba(145,177,73,0.5)] hover:shadow-[0_6px_20px_-4px_rgba(145,177,73,0.7)] transition-all"
                               >
                                 <span className="text-base">✦</span>
-                                <div className="text-right flex-1">
+                                <div className={`flex-1 ${locale === "en" ? "text-left" : "text-right"}`}>
                                   <div className="text-[10px] font-bold opacity-80">
-                                    احجز الباقة {TIER_LABEL[book.tier]}
+                                    {locale === "en"
+                                      ? `Book the ${TIER_LABEL_EN[book.tier]} package`
+                                      : `احجز الباقة ${TIER_LABEL_AR[book.tier]}`}
                                   </div>
                                   <div className="text-xs font-bold">
-                                    {book.destinationName}
+                                    {locale === "en"
+                                      ? KNOWN_DESTINATIONS_EN[book.destinationId] ?? book.destinationName
+                                      : book.destinationName}
                                   </div>
                                 </div>
-                                <span className="text-base">←</span>
+                                <span className="text-base">{locale === "en" ? "→" : "←"}</span>
                               </motion.a>
                             )}
 

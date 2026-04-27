@@ -14,7 +14,7 @@ import {
 import { useTranslations } from "@/components/site/LocaleProvider";
 
 export default function AchievementsPage() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [unlocked, setUnlocked] = useState<string[]>([]);
   const [state, setState] = useState<UserState | null>(null);
 
@@ -34,12 +34,15 @@ export default function AchievementsPage() {
         title={t("achievementsPage.title")}
         subtitle={t("achievementsPage.subtitle")}
         breadcrumb={[
-          { label: "الرئيسية", href: "/home" },
-          { label: "الإنجازات" },
+          { label: t("nav.home"), href: "/home" },
+          { label: t("nav.achievements") },
         ]}
       />
 
-      <section className="py-16 bg-white dark:bg-[#0d1b2a]">
+      <section
+        className="py-16 bg-white dark:bg-[#0d1b2a]"
+        dir={locale === "en" ? "ltr" : "rtl"}
+      >
         <div className="max-w-5xl mx-auto px-6">
           {/* Progress Summary */}
           <Reveal>
@@ -50,7 +53,7 @@ export default function AchievementsPage() {
               <div className="relative text-center">
                 <div className="text-6xl mb-3">🏆</div>
                 <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-                  تقدمك
+                  {locale === "en" ? "Your progress" : "تقدمك"}
                 </div>
                 <div className="flex items-baseline justify-center gap-2 mb-4">
                   <span className="text-6xl md:text-7xl font-black">
@@ -60,7 +63,9 @@ export default function AchievementsPage() {
                     / {ACHIEVEMENTS.length}
                   </span>
                 </div>
-                <p className="text-white/70 mb-6">إنجاز مفتوح</p>
+                <p className="text-white/70 mb-6">
+                  {locale === "en" ? "achievements unlocked" : "إنجاز مفتوح"}
+                </p>
 
                 {/* Progress bar */}
                 <div className="max-w-md mx-auto">
@@ -76,18 +81,24 @@ export default function AchievementsPage() {
                     />
                   </div>
                   <div className="mt-2 text-sm text-white/60">
-                    {progress}% مكتمل
+                    {locale === "en"
+                      ? `${progress}% complete`
+                      : `${progress}% مكتمل`}
                   </div>
                 </div>
 
                 {state && state.visitCount > 0 && (
                   <div className="mt-6 flex flex-wrap justify-center gap-2 text-xs">
                     <span className="px-3 py-1 rounded-full bg-white/10">
-                      زيارات: {state.visitCount}
+                      {locale === "en"
+                        ? `Visits: ${state.visitCount}`
+                        : `زيارات: ${state.visitCount}`}
                     </span>
                     {state.destinationsVisited.length > 0 && (
                       <span className="px-3 py-1 rounded-full bg-white/10">
-                        وجهات: {state.destinationsVisited.length}/5
+                        {locale === "en"
+                          ? `Destinations: ${state.destinationsVisited.length}/5`
+                          : `وجهات: ${state.destinationsVisited.length}/5`}
                       </span>
                     )}
                   </div>
@@ -161,10 +172,14 @@ export default function AchievementsPage() {
                       {achievement.icon}
                     </div>
                     <h3 className="font-bold font-display text-lg text-[#12394d] dark:text-white mb-1">
-                      {achievement.title}
+                      {locale === "en"
+                        ? achievement.titleEn ?? achievement.title
+                        : achievement.title}
                     </h3>
                     <p className="text-sm text-[#7b7c7d] dark:text-white/60 leading-relaxed">
-                      {achievement.description}
+                      {locale === "en"
+                        ? achievement.descriptionEn ?? achievement.description
+                        : achievement.description}
                     </p>
                   </motion.div>
                 </Reveal>
@@ -177,7 +192,9 @@ export default function AchievementsPage() {
             <Reveal delay={0.5}>
               <div className="mt-8 text-center p-6 bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-2xl">
                 <p className="text-sm text-amber-700 dark:text-amber-400">
-                  💡 ابدأ استكشاف الموقع لفتح إنجازاتك الأولى
+                  {locale === "en"
+                    ? "💡 Start exploring the site to unlock your first achievements"
+                    : "💡 ابدأ استكشاف الموقع لفتح إنجازاتك الأولى"}
                 </p>
               </div>
             </Reveal>

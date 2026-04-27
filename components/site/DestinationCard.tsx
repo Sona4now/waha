@@ -81,7 +81,11 @@ export default function DestinationCard({
         >
           <Image
             src={dest.image}
-            alt={`${dest.name} — وجهة استشفائية`}
+            alt={
+              locale === "en"
+                ? `${dest.name} — wellness destination`
+                : `${dest.name} — وجهة استشفائية`
+            }
             fill
             sizes="(max-width: 768px) 128px, (max-width: 1024px) 50vw, 33vw"
             className="object-cover md:group-hover:scale-110 transition-transform duration-700 ease-out"
@@ -99,15 +103,15 @@ export default function DestinationCard({
             aria-hidden="true"
           >
             <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white/90 text-[#12394d] font-bold text-sm shadow-xl backdrop-blur-md transform translate-y-2 group-hover:translate-y-0 transition-transform duration-400">
-              اكتشف المزيد
-              <span className="text-base leading-none">←</span>
+              {locale === "en" ? "Explore" : "اكتشف المزيد"}
+              <span className="text-base leading-none">{locale === "en" ? "→" : "←"}</span>
             </span>
           </div>
 
           {/* Distance chip — desktop only (mobile shows it in the body) */}
           {dest.distanceKm !== undefined && (
             <span className="hidden md:inline-flex absolute top-3 left-3 items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full text-white bg-black/50 backdrop-blur-sm z-[1]">
-              📍 {dest.distanceKm} كم
+              📍 {dest.distanceKm} {locale === "en" ? "km" : "كم"}
             </span>
           )}
 
@@ -123,12 +127,12 @@ export default function DestinationCard({
               no badge so we don't discourage off-season planners. */}
           {seasonStatus === "best" && (
             <span className="inline-flex absolute bottom-3 right-3 md:left-3 md:right-auto items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full text-[#0a0f14] bg-[#91b149] shadow-md z-[1]">
-              ✨ مثالي دلوقتي
+              {locale === "en" ? "✨ Ideal now" : "✨ مثالي دلوقتي"}
             </span>
           )}
           {seasonStatus === "ok" && (
             <span className="hidden md:inline-flex absolute bottom-3 left-3 items-center gap-1 text-[10px] font-bold px-2.5 py-1 rounded-full text-white bg-[#d97706]/90 backdrop-blur-sm z-[1]">
-              🟡 موسم مقبول
+              {locale === "en" ? "🟡 Acceptable season" : "🟡 موسم مقبول"}
             </span>
           )}
 
@@ -158,7 +162,7 @@ export default function DestinationCard({
             )}
             {isRecommended && (
               <span className="text-[10px] font-bold text-[#91b149] md:hidden">
-                ✦ مناسب لك
+                {locale === "en" ? "✦ Suits you" : "✦ مناسب لك"}
               </span>
             )}
           </div>
@@ -183,7 +187,7 @@ export default function DestinationCard({
           {dest.costFrom && (
             <div className="mt-auto md:mt-0 md:mb-2 flex items-baseline gap-1.5">
               <span className="text-[10px] md:text-xs text-[#7b7c7d] dark:text-white/50">
-                من
+                {locale === "en" ? "from" : "من"}
               </span>
               <span className="text-lg md:text-xl font-black text-[#12394d] dark:text-white leading-none">
                 {dest.costFrom}
@@ -196,7 +200,7 @@ export default function DestinationCard({
             {dest.duration && <span>⏱️ {dest.duration}</span>}
             {dest.difficulty && <span>⭐ {dest.difficulty}</span>}
             {dest.distanceKm !== undefined && (
-              <span className="md:hidden">📍 {dest.distanceKm} كم</span>
+              <span className="md:hidden">📍 {dest.distanceKm} {locale === "en" ? "km" : "كم"}</span>
             )}
           </div>
 

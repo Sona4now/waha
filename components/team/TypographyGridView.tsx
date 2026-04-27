@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 // Varied size classes and colors for a magazine-style collage
 const SIZES = [
@@ -25,6 +26,7 @@ const COLORS = [
 const ALIGN = ["text-right", "text-left", "text-center"];
 
 export default function TypographyGridView() {
+  const { locale } = useTranslations();
   return (
     <div className="bg-[#070d15] py-16 md:py-24 overflow-hidden">
       <div className="max-w-[1280px] mx-auto px-6">
@@ -33,7 +35,7 @@ export default function TypographyGridView() {
             · Typography Grid ·
           </div>
           <h2 className="font-display text-3xl md:text-4xl font-black text-white">
-            الأسماء كتصميم
+            {locale === "en" ? "Names as design" : "الأسماء كتصميم"}
           </h2>
         </div>
 

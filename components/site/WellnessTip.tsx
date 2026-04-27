@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "./LocaleProvider";
 
 interface Tip {
   icon: string;
@@ -12,7 +13,7 @@ interface Tip {
   destId?: string;
 }
 
-const TIPS: Tip[] = [
+const TIPS_AR: Tip[] = [
   {
     icon: "🌿",
     text: "15 دقيقة مشي في الطبيعة بتخفض هرمون الكورتيزول بنسبة 20%",
@@ -73,21 +74,83 @@ const TIPS: Tip[] = [
   },
 ];
 
+const TIPS_EN: Tip[] = [
+  {
+    icon: "🌿",
+    text: "15 minutes walking in nature lowers cortisol by 20%",
+    source: "Stanford University study",
+  },
+  {
+    icon: "☀️",
+    text: "10-20 minutes of daily sun exposure produces vitamin D3",
+    source: "Academic study",
+    destId: "safaga",
+  },
+  {
+    icon: "🧂",
+    text: "Floating in salt water reduces joint pressure by 90%",
+    source: "Halotherapy",
+    destId: "siwa",
+  },
+  {
+    icon: "🏊",
+    text: "Swimming in salt water improves skin and eases psoriasis",
+    source: "Medical study",
+    destId: "safaga",
+  },
+  {
+    icon: "🧘",
+    text: "Time in the desert improves focus and reduces chronic stress",
+    source: "Environmental Psychology",
+    destId: "bahariya",
+  },
+  {
+    icon: "💧",
+    text: "Warm sulfur waters stimulate circulation",
+    source: "Balneotherapy",
+    destId: "sinai",
+  },
+  {
+    icon: "🌅",
+    text: "Watching the sunrise improves sleep rhythm and reduces depression",
+    source: "Chronobiology",
+  },
+  {
+    icon: "🌴",
+    text: "Desert herbs like wormwood help with relaxation",
+    source: "Traditional medicine",
+    destId: "siwa",
+  },
+  {
+    icon: "🔥",
+    text: "Hot sand burial relieves rheumatism by 70%",
+    source: "Field studies",
+    destId: "safaga",
+  },
+  {
+    icon: "🏜️",
+    text: "Dry desert air helps allergy and asthma patients",
+    source: "Climatotherapy",
+    destId: "fayoum",
+  },
+];
+
 const STORAGE_KEY = "waaha_tip_dismissed";
 const DELAY_MS = 20000;
 const AUTO_DISMISS_MS = 5000;
 const HIDDEN_PATHS = ["/", "/gate", "/therapy-room", "/map"];
 
-function getTipForToday(): Tip {
+function getTipForToday(tips: Tip[]): Tip {
   const dayOfYear = Math.floor(
     (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) /
       (1000 * 60 * 60 * 24),
   );
-  return TIPS[dayOfYear % TIPS.length];
+  return tips[dayOfYear % tips.length];
 }
 
 export default function WellnessTip() {
   const pathname = usePathname();
+  const { locale } = useTranslations();
   const [show, setShow] = useState(false);
   const [tip, setTip] = useState<Tip | null>(null);
 
@@ -98,11 +161,12 @@ export default function WellnessTip() {
     const dismissed = localStorage.getItem(STORAGE_KEY);
     if (dismissed === today) return;
 
-    setTip(getTipForToday());
+    const tips = locale === "en" ? TIPS_EN : TIPS_AR;
+    setTip(getTipForToday(tips));
 
     const showTimer = setTimeout(() => setShow(true), DELAY_MS);
     return () => clearTimeout(showTimer);
-  }, [pathname]);
+  }, [pathname, locale]);
 
   useEffect(() => {
     if (!show) return;
@@ -132,7 +196,7 @@ export default function WellnessTip() {
           style={{ top: "calc(env(safe-area-inset-top, 0px) + 88px)" }}
           role="status"
           aria-live="polite"
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
         >
           {/*
             Card layout (NOT a pill): the previous design tried to cram the
@@ -171,7 +235,7 @@ export default function WellnessTip() {
                     onClick={handleDismiss}
                     className="text-[11px] font-bold text-[#91b149] hover:text-white hover:bg-[#91b149]/15 rounded-full px-2.5 py-1 transition-colors no-underline"
                   >
-                    اكتشف ←
+                    {locale === "en" ? "Discover →" : "اكتشف ←"}
                   </Link>
                 )}
                 <span className="text-[10px] text-white/45 truncate">
@@ -183,7 +247,7 @@ export default function WellnessTip() {
             <button
               onClick={handleDismiss}
               className="flex-shrink-0 w-7 h-7 rounded-full hover:bg-white/15 text-white/60 hover:text-white flex items-center justify-center transition-colors text-sm leading-none -mt-0.5"
-              aria-label="إغلاق"
+              aria-label={locale === "en" ? "Close" : "إغلاق"}
             >
               ✕
             </button>

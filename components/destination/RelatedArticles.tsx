@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { BLOG_POSTS, type BlogPost } from "@/data/siteData";
+import { useTranslations } from "@/components/site/LocaleProvider";
+import type { Locale } from "@/lib/i18n";
 
 interface Props {
   destinationId: string;
@@ -48,13 +50,18 @@ function findArticlesAboutDestination(
   return scored.slice(0, 3).map((x) => x.post);
 }
 
-function fmtDate(iso: string): string {
+function fmtDate(iso: string, locale: Locale): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  const months = [
+  const monthsAr = [
     "يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو",
     "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
   ];
+  const monthsEn = [
+    "January", "February", "March", "April", "May", "June",
+    "July", "August", "September", "October", "November", "December",
+  ];
+  const months = locale === "en" ? monthsEn : monthsAr;
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
@@ -62,6 +69,7 @@ export default function RelatedArticles({
   destinationId,
   destinationName,
 }: Props) {
+  const { locale } = useTranslations();
   const articles = findArticlesAboutDestination(
     destinationId,
     destinationName,
@@ -70,14 +78,16 @@ export default function RelatedArticles({
   if (articles.length === 0) return null;
 
   return (
-    <section className="py-14 bg-white dark:bg-[#0d1b2a]" dir="rtl">
+    <section className="py-14 bg-white dark:bg-[#0d1b2a]" dir={locale === "en" ? "ltr" : "rtl"}>
       <div className="max-w-5xl mx-auto px-4">
         <div className="text-center mb-8">
           <span className="inline-block text-xs font-bold text-[#91b149] uppercase tracking-wider mb-2">
-            مقالات ذات صلة
+            {locale === "en" ? "Related articles" : "مقالات ذات صلة"}
           </span>
           <h2 className="font-display text-2xl md:text-3xl font-black text-[#12394d] dark:text-white">
-            اعرف أكتر عن السياحة الاستشفائية في {destinationName}
+            {locale === "en"
+              ? `Learn more about wellness tourism in ${destinationName}`
+              : `اعرف أكتر عن السياحة الاستشفائية في ${destinationName}`}
           </h2>
         </div>
 
@@ -97,7 +107,11 @@ export default function RelatedArticles({
                 <div className="relative h-40 overflow-hidden">
                   <Image
                     src={post.image}
-                    alt={`${post.title} — مقال عن السياحة الاستشفائية في ${destinationName}`}
+                    alt={
+                      locale === "en"
+                        ? `${post.title} — article about wellness tourism in ${destinationName}`
+                        : `${post.title} — مقال عن السياحة الاستشفائية في ${destinationName}`
+                    }
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -115,9 +129,9 @@ export default function RelatedArticles({
                     {post.excerpt}
                   </p>
                   <div className="flex items-center justify-between text-[11px] text-[#7b7c7d] dark:text-white/40">
-                    <span>{fmtDate(post.date)}</span>
+                    <span>{fmtDate(post.date, locale)}</span>
                     <span className="font-bold text-[#1d5770] dark:text-[#91b149]">
-                      اقرأ ←
+                      {locale === "en" ? "Read →" : "اقرأ ←"}
                     </span>
                   </div>
                 </div>

@@ -117,10 +117,10 @@ export default function FAQ({
             >
               <button
                 onClick={() => setOpenIdx(isOpen ? null : i)}
-                className="w-full flex items-center justify-between gap-4 px-4 py-3.5 text-right"
+                className={`w-full flex items-center justify-between gap-4 px-4 py-3.5 ${locale === "en" ? "text-left" : "text-right"}`}
                 aria-expanded={isOpen}
               >
-                <span className="font-bold text-sm text-[#12394d] dark:text-white leading-relaxed flex-1 text-right">
+                <span className={`font-bold text-sm text-[#12394d] dark:text-white leading-relaxed flex-1 ${locale === "en" ? "text-left" : "text-right"}`}>
                   {item.question}
                 </span>
                 <motion.div
@@ -182,7 +182,7 @@ export default function FAQ({
                                       : "text-[#7b7c7d] hover:bg-[#91b149]/10 hover:text-[#91b149]"
                                   }`}
                                   aria-pressed={v === "up"}
-                                  aria-label="مفيد"
+                                  aria-label={locale === "en" ? "Helpful" : "مفيد"}
                                 >
                                   👍 {locale === "en" ? "Helpful" : "مفيد"}
                                 </button>
@@ -194,9 +194,9 @@ export default function FAQ({
                                       : "text-[#7b7c7d] hover:bg-red-500/10 hover:text-red-500"
                                   }`}
                                   aria-pressed={v === "down"}
-                                  aria-label="مش مفيد"
+                                  aria-label={locale === "en" ? "Not helpful" : "مش مفيد"}
                                 >
-                                  👎 {locale === "en" ? "Not enough" : "مش كفاية"}
+                                  👎 {locale === "en" ? "Not helpful" : "مش مفيد"}
                                 </button>
                                 {v === "up" && (
                                   <span className="text-[10px] text-[#91b149]">

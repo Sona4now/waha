@@ -9,6 +9,7 @@ import type { Journey, JourneyProgress } from "@/lib/meditation/journeys";
 import type { Stats } from "@/hooks/meditation/useSessionHistory";
 import type { ResumeState } from "@/hooks/meditation/useSessionResume";
 import { getEnvironment } from "@/lib/meditation/environments";
+import { useTranslations } from "@/components/site/LocaleProvider";
 import JourneyCard from "./JourneyCard";
 
 interface Props {
@@ -50,6 +51,7 @@ export default function ImmersiveEntry({
   onOpenJourney,
   onOpenLibrary,
 }: Props) {
+  const { locale } = useTranslations();
   const env = getEnvironment(suggestedSession.env);
   const [orbBreath, setOrbBreath] = useState<"in" | "out">("in");
 
@@ -64,6 +66,13 @@ export default function ImmersiveEntry({
   // Time-aware greeting (morning / afternoon / evening)
   const greeting = (() => {
     const h = new Date().getHours();
+    if (locale === "en") {
+      if (h < 5) return "Good night";
+      if (h < 12) return "Good morning";
+      if (h < 17) return "Good afternoon";
+      if (h < 21) return "Good evening";
+      return "Good night";
+    }
     if (h < 5) return "ليلة طيبة";
     if (h < 12) return "صباح الخير";
     if (h < 17) return "نهارك سعيد";
@@ -78,7 +87,7 @@ export default function ImmersiveEntry({
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
       className="relative min-h-screen bg-[#070d15] overflow-hidden"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       {/* ── Hero: full-viewport immersive zone (uses dvh for mobile) ── */}
       <section
@@ -115,12 +124,12 @@ export default function ImmersiveEntry({
           href="/home"
           className="absolute top-4 right-4 z-30 text-white/80 hover:text-white text-xs bg-black/30 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/10 no-underline transition-colors inline-flex items-center gap-1.5"
           style={{ top: "max(16px, env(safe-area-inset-top))" }}
-          aria-label="الرجوع للرئيسية"
+          aria-label={locale === "en" ? "Back to home" : "الرجوع للرئيسية"}
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
             <polyline points="9 18 15 12 9 6" />
           </svg>
-          <span>الرئيسية</span>
+          <span>{locale === "en" ? "Home" : "الرئيسية"}</span>
         </Link>
 
         {/* Stats chip (top-left) */}
@@ -128,9 +137,9 @@ export default function ImmersiveEntry({
           <div
             className="absolute top-4 left-4 z-30 bg-black/30 backdrop-blur-md rounded-full px-3 py-1.5 border border-white/10 text-white text-xs font-bold inline-flex items-center gap-1.5"
             style={{ top: "max(16px, env(safe-area-inset-top))" }}
-            aria-label={`streak: ${stats.streak} أيام`}
+            aria-label={locale === "en" ? `streak: ${stats.streak} days` : `streak: ${stats.streak} أيام`}
           >
-            🔥 <span>{stats.streak} يوم</span>
+            🔥 <span>{stats.streak} {locale === "en" ? "day" : "يوم"}</span>
             {meditatedToday && <span className="text-[#91b149]">·</span>}
           </div>
         )}
@@ -143,13 +152,13 @@ export default function ImmersiveEntry({
             transition={{ duration: 0.9, delay: 0.15 }}
           >
             <p className="text-[11px] uppercase tracking-[0.5em] text-[#91b149] font-bold mb-6">
-              غرفة التأمل
+              {locale === "en" ? "Meditation Room" : "غرفة التأمل"}
             </p>
 
             {/* Time-aware greeting */}
             <p className="text-white/75 text-lg mb-1 font-display">{greeting}</p>
             <h1 className="font-display text-3xl md:text-5xl font-black mb-8 leading-tight">
-              خد شهيق.
+              {locale === "en" ? "Take a breath." : "خد شهيق."}
             </h1>
           </motion.div>
 
@@ -168,7 +177,7 @@ export default function ImmersiveEntry({
               type="button"
               onClick={onStart}
               className="relative w-full h-full rounded-full active:scale-[0.96] transition-transform duration-200 focus:outline-none focus:ring-4 focus:ring-[#91b149]/40"
-              aria-label={`ابدأ جلسة ${suggestedSession.name}`}
+              aria-label={locale === "en" ? `Start session ${suggestedSession.name}` : `ابدأ جلسة ${suggestedSession.name}`}
             >
               {/* Pulsing outer ring — breathes at 4s in / 4s out to invite breath sync */}
               <motion.div
@@ -189,9 +198,9 @@ export default function ImmersiveEntry({
                 <span className="text-3xl mb-1" aria-hidden="true">
                   {suggestedSession.icon}
                 </span>
-                <span className="text-xs font-bold">ابدأ</span>
+                <span className="text-xs font-bold">{locale === "en" ? "Start" : "ابدأ"}</span>
                 <span className="text-[10px] opacity-70 mt-0.5">
-                  {Math.round(suggestedSession.duration / 60)} دقيقة
+                  {Math.round(suggestedSession.duration / 60)} {locale === "en" ? "min" : "دقيقة"}
                 </span>
               </div>
             </button>
@@ -236,7 +245,9 @@ export default function ImmersiveEntry({
             >
               <span>▶</span>
               <span>
-                كمّل من {Math.round(resumable.elapsed / 60) || 1} دقيقة
+                {locale === "en"
+                  ? `Continue from ${Math.round(resumable.elapsed / 60) || 1} min`
+                  : `كمّل من ${Math.round(resumable.elapsed / 60) || 1} دقيقة`}
               </span>
             </motion.button>
           )}
@@ -252,7 +263,7 @@ export default function ImmersiveEntry({
               onClick={onOpenLibrary}
               className="text-white/70 hover:text-white text-xs font-bold bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full px-4 h-9 border border-white/15 transition-colors"
             >
-              كل الجلسات
+              {locale === "en" ? "All sessions" : "كل الجلسات"}
             </button>
             <button
               onClick={() => {
@@ -262,7 +273,7 @@ export default function ImmersiveEntry({
               }}
               className="text-white/70 hover:text-white text-xs font-bold bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full px-4 h-9 border border-white/15 transition-colors"
             >
-              رحلات ↓
+              {locale === "en" ? "Journeys ↓" : "رحلات ↓"}
             </button>
           </motion.div>
         </div>
@@ -275,7 +286,7 @@ export default function ImmersiveEntry({
           className="absolute bottom-6 left-1/2 -translate-x-1/2 text-white/50 text-[10px] font-bold tracking-wider pointer-events-none"
           aria-hidden="true"
         >
-          ⌄ اسحب لأسفل
+          {locale === "en" ? "⌄ Scroll down" : "⌄ اسحب لأسفل"}
         </motion.div>
       </section>
 
@@ -287,13 +298,15 @@ export default function ImmersiveEntry({
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
             <p className="text-[10px] uppercase tracking-[0.5em] text-[#91b149] font-bold mb-3">
-              رحلات
+              {locale === "en" ? "Journeys" : "رحلات"}
             </p>
             <h2 className="font-display text-2xl md:text-3xl font-black text-white mb-2">
-              رحلات متدرجة
+              {locale === "en" ? "Guided journeys" : "رحلات متدرجة"}
             </h2>
             <p className="text-white/55 text-sm max-w-md mx-auto">
-              برامج يومية تبني عادة التأمل خطوة خطوة
+              {locale === "en"
+                ? "Daily programs that build the meditation habit step by step"
+                : "برامج يومية تبني عادة التأمل خطوة خطوة"}
             </p>
           </div>
 
@@ -320,7 +333,7 @@ export default function ImmersiveEntry({
                 {stats.totalSessions}
               </div>
               <div className="text-[10px] uppercase tracking-widest text-white/50 mt-1">
-                جلسة
+                {locale === "en" ? "Sessions" : "جلسة"}
               </div>
             </div>
             <div>
@@ -328,7 +341,7 @@ export default function ImmersiveEntry({
                 {Math.round(stats.totalMinutes)}
               </div>
               <div className="text-[10px] uppercase tracking-widest text-white/50 mt-1">
-                دقيقة
+                {locale === "en" ? "Minutes" : "دقيقة"}
               </div>
             </div>
             <div>
@@ -336,7 +349,7 @@ export default function ImmersiveEntry({
                 {stats.streak}
               </div>
               <div className="text-[10px] uppercase tracking-widest text-white/50 mt-1">
-                يوم streak
+                {locale === "en" ? "Day streak" : "يوم streak"}
               </div>
             </div>
           </div>

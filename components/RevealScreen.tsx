@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Destination } from "@/data/destinations";
 import Particles from "./Particles";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   destination: Destination;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function RevealScreen({ destination, onExplore, on360, onShare }: Props) {
+  const { locale } = useTranslations();
   return (
     <motion.div
       className="fixed inset-0 flex flex-col items-center justify-center overflow-hidden"
@@ -43,7 +45,7 @@ export default function RevealScreen({ destination, onExplore, on360, onShare }:
           transition={{ delay: 0.6, duration: 0.8 }}
           className="text-[0.7rem] tracking-[0.4em] text-[#91b149]/70 uppercase"
         >
-          وجهتك المقترحة
+          {locale === "en" ? "Your suggested destination" : "وجهتك المقترحة"}
         </motion.p>
 
         {/* Name */}
@@ -56,7 +58,7 @@ export default function RevealScreen({ destination, onExplore, on360, onShare }:
             textShadow: `0 0 100px ${destination.color}88`,
           }}
         >
-          رحلتك تبدأ من {destination.name}
+          {locale === "en" ? `Your journey begins from ${destination.name}` : `رحلتك تبدأ من ${destination.name}`}
         </motion.h1>
 
         {/* Subtitle */}
@@ -93,13 +95,13 @@ export default function RevealScreen({ destination, onExplore, on360, onShare }:
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2.8, duration: 0.8 }}
           className="flex flex-col sm:flex-row gap-3 w-full max-w-sm"
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
         >
           <button
             onClick={onExplore}
             className="flex-1 py-4 px-6 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-sm rounded-full transition-all duration-300 hover:scale-[1.03] active:scale-95"
           >
-            استكشف الرحلة
+            {locale === "en" ? "Explore the journey" : "استكشف الرحلة"}
           </button>
           <button
             onClick={on360}
@@ -108,7 +110,7 @@ export default function RevealScreen({ destination, onExplore, on360, onShare }:
             <span className="text-xs font-bold tracking-wider text-[#91b149]">
               360°
             </span>
-            شاهد
+            {locale === "en" ? "Watch" : "شاهد"}
           </button>
         </motion.div>
 
@@ -124,7 +126,7 @@ export default function RevealScreen({ destination, onExplore, on360, onShare }:
             <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
           </svg>
-          شارك نتيجتك
+          {locale === "en" ? "Share your result" : "شارك نتيجتك"}
         </motion.button>
       </div>
     </motion.div>

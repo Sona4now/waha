@@ -142,7 +142,7 @@ export default function PricingPackages({
   return (
     <section
       className="py-12 md:py-16 bg-white dark:bg-[#0a151f]"
-      dir={locale === "ar" ? "rtl" : "ltr"}
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <div className="max-w-6xl mx-auto px-4">
         <div className="text-center mb-10">

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "@/components/site/LocaleProvider";
+
 export interface MixerState {
   ambient: number; // 0-100
   chimes: number;
@@ -32,6 +34,8 @@ export default function AmbientMixer({
   sleepTimer,
   onSleepTimerChange,
 }: Props) {
+  const { locale } = useTranslations();
+
   function patch(p: Partial<MixerState>) {
     onMixerChange({ ...mixer, ...p });
   }
@@ -42,15 +46,15 @@ export default function AmbientMixer({
     icon: string;
     value: number;
   }[] = [
-    { key: "ambient", label: "الطبيعة", icon: "🌊", value: mixer.ambient },
-    { key: "chimes", label: "النواقيس", icon: "🔔", value: mixer.chimes },
-    { key: "voice", label: "الصوت", icon: "🎙️", value: mixer.voice },
+    { key: "ambient", label: locale === "en" ? "Nature" : "الطبيعة", icon: "🌊", value: mixer.ambient },
+    { key: "chimes", label: locale === "en" ? "Chimes" : "النواقيس", icon: "🔔", value: mixer.chimes },
+    { key: "voice", label: locale === "en" ? "Voice" : "الصوت", icon: "🎙️", value: mixer.voice },
   ];
 
   return (
     <div
       className="flex flex-col gap-3 p-4 rounded-2xl bg-black/40 backdrop-blur-xl border border-white/10 shadow-[0_10px_30px_rgba(0,0,0,0.3)]"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <div className="text-white/60 text-[10px] uppercase tracking-[0.3em] mb-1">
         Mixer
@@ -70,7 +74,7 @@ export default function AmbientMixer({
             value={s.value}
             onChange={(e) => patch({ [s.key]: Number(e.target.value) })}
             aria-label={`${s.label} — ${s.value}%`}
-            aria-valuetext={`${s.value} بالمية`}
+            aria-valuetext={locale === "en" ? `${s.value} percent` : `${s.value} بالمية`}
             className="flex-1 h-1.5 appearance-none bg-white/10 rounded-full outline-none
               [&::-webkit-slider-thumb]:appearance-none
               [&::-webkit-slider-thumb]:w-6 [&::-webkit-slider-thumb]:h-6
@@ -98,7 +102,7 @@ export default function AmbientMixer({
         >
           <span className="flex items-center gap-2">
             <span className="text-base">🌙</span>
-            <span>وضع النوم</span>
+            <span>{locale === "en" ? "Sleep mode" : "وضع النوم"}</span>
           </span>
           <span
             className={`relative inline-block w-9 h-5 rounded-full transition-colors ${

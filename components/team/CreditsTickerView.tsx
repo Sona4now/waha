@@ -1,12 +1,14 @@
 "use client";
 
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 // Split into two rows that will move in opposite directions
 const ROW_A = TEAM_MEMBERS.slice(0, 12);
 const ROW_B = TEAM_MEMBERS.slice(12);
 
 export default function CreditsTickerView() {
+  const { locale } = useTranslations();
   return (
     <div className="relative bg-gradient-to-b from-[#050a14] via-[#0a1420] to-[#050a14] text-white min-h-[600px] flex flex-col justify-center overflow-hidden py-24">
       {/* Background grain */}
@@ -24,7 +26,7 @@ export default function CreditsTickerView() {
           · CREDITS ROLL ·
         </div>
         <h2 className="font-display text-4xl md:text-5xl font-black">
-          الفريق
+          {locale === "en" ? "The team" : "الفريق"}
         </h2>
       </div>
 

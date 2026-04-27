@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ENVIRONMENT_CHAPTERS } from "@/data/environmentChapters";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 /**
  * Sticky chapter navigation for the narrative /destinations page.
@@ -18,6 +19,7 @@ import { ENVIRONMENT_CHAPTERS } from "@/data/environmentChapters";
  * grid mode) to avoid pointing at non-existent anchors.
  */
 export default function ChapterNav() {
+  const { locale } = useTranslations();
   const [activeKey, setActiveKey] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
 
@@ -84,7 +86,7 @@ export default function ChapterNav() {
           // the chat FAB (also right). Vertical orientation matches the
           // reading direction of a long-scroll page.
           className="hidden lg:flex fixed left-6 top-1/2 -translate-y-1/2 z-30 flex-col gap-3 no-print"
-          aria-label="فصول الرحلة"
+          aria-label={locale === "en" ? "Journey chapters" : "فصول الرحلة"}
         >
           {ENVIRONMENT_CHAPTERS.map((c) => {
             const active = activeKey === c.key;
@@ -93,7 +95,11 @@ export default function ChapterNav() {
                 key={c.key}
                 onClick={() => jumpTo(c.key)}
                 className="group relative flex items-center gap-3 cursor-pointer"
-                aria-label={`اقفز للفصل ${c.number}: ${c.name}`}
+                aria-label={
+                  locale === "en"
+                    ? `Jump to chapter ${c.number}: ${c.name}`
+                    : `اقفز للفصل ${c.number}: ${c.name}`
+                }
                 aria-current={active ? "true" : undefined}
               >
                 {/* Dot — fills with chapter accent when active */}

@@ -35,6 +35,21 @@ const MONTHS_AR = [
   "ديسمبر",
 ];
 
+const MONTHS_EN = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
 type Intensity = 0 | 1 | 2; // 0 avoid / 1 ok / 2 best
 
 function intensityFor(
@@ -54,14 +69,20 @@ function toneClass(i: Intensity): string {
   return "bg-[#d0dde4]/40 dark:bg-white/5 hover:bg-[#d0dde4] dark:hover:bg-white/10 text-[#7b7c7d] dark:text-white/30";
 }
 
-function labelFor(i: Intensity): string {
+function labelFor(i: Intensity, locale: "ar" | "en"): string {
+  if (locale === "en") {
+    if (i === 2) return "Best";
+    if (i === 1) return "Acceptable";
+    return "Avoid";
+  }
   if (i === 2) return "الأفضل";
   if (i === 1) return "مناسب";
   return "يُفضّل تجنّبه";
 }
 
 export default function CalendarPage() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
+  const MONTHS = locale === "en" ? MONTHS_EN : MONTHS_AR;
   const now = new Date();
   const [selectedMonth, setSelectedMonth] = useState<number>(now.getMonth());
 
@@ -80,31 +101,34 @@ export default function CalendarPage() {
         title={t("calendarPage.title")}
         subtitle={t("calendarPage.subtitle")}
         breadcrumb={[
-          { label: "الرئيسية", href: "/home" },
-          { label: "التقويم" },
+          { label: t("nav.home"), href: "/home" },
+          { label: t("nav.calendar") },
         ]}
       />
 
       <section className="py-10 md:py-16 px-4 bg-[#f5f8fa] dark:bg-[#0a151f]">
-        <div className="max-w-6xl mx-auto" dir="rtl">
+        <div
+          className="max-w-6xl mx-auto"
+          dir={locale === "en" ? "ltr" : "rtl"}
+        >
           {/* Legend */}
           <div className="flex flex-wrap items-center gap-4 mb-6 text-xs">
             <div className="flex items-center gap-2">
               <span className="inline-block w-4 h-4 rounded-sm bg-[#91b149]" />
               <span className="text-[#12394d] dark:text-white/80 font-bold">
-                الأفضل
+                {labelFor(2, locale)}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <span className="inline-block w-4 h-4 rounded-sm bg-amber-400" />
               <span className="text-[#12394d] dark:text-white/80 font-bold">
-                مناسب
+                {labelFor(1, locale)}
               </span>
             </div>
             <div className="flex items-center gap-2">
               <span className="inline-block w-4 h-4 rounded-sm bg-[#d0dde4] dark:bg-white/10" />
               <span className="text-[#7b7c7d] dark:text-white/50">
-                يُفضّل تجنّبه
+                {labelFor(0, locale)}
               </span>
             </div>
           </div>
@@ -118,7 +142,7 @@ export default function CalendarPage() {
                     <th className="sticky right-0 bg-white dark:bg-[#162033] z-10 text-right text-[11px] font-bold text-[#7b7c7d] dark:text-white/60 p-3 w-40">
                       الوجهة
                     </th>
-                    {MONTHS_AR.map((m, i) => (
+                    {MONTHS.map((m, i) => (
                       <th
                         key={m}
                         onClick={() => setSelectedMonth(i)}
@@ -148,7 +172,7 @@ export default function CalendarPage() {
                           <span className="truncate">{d.name}</span>
                         </Link>
                       </td>
-                      {MONTHS_AR.map((_, i) => {
+                      {MONTHS.map((_, i) => {
                         const intensity = intensityFor(d, i);
                         return (
                           <td
@@ -161,8 +185,8 @@ export default function CalendarPage() {
                               className={`w-full aspect-square min-h-[32px] max-h-[48px] rounded-md transition-all ${toneClass(
                                 intensity,
                               )} ${i === selectedMonth ? "ring-2 ring-[#91b149]" : ""}`}
-                              aria-label={`${d.name} في ${MONTHS_AR[i]}: ${labelFor(intensity)}`}
-                              title={`${d.name} — ${MONTHS_AR[i]}: ${labelFor(intensity)}`}
+                              aria-label={`${d.name} ${locale === "en" ? "in" : "في"} ${MONTHS[i]}: ${labelFor(intensity, locale)}`}
+                              title={`${d.name} — ${MONTHS[i]}: ${labelFor(intensity, locale)}`}
                             />
                           </td>
                         );
@@ -178,14 +202,16 @@ export default function CalendarPage() {
           <div className="mt-10">
             <div className="flex items-center justify-between mb-5">
               <h2 className="font-display text-xl md:text-2xl font-bold text-[#12394d] dark:text-white">
-                أفضل الوجهات في {MONTHS_AR[selectedMonth]}
+                {locale === "en"
+                  ? `Best destinations in ${MONTHS[selectedMonth]}`
+                  : `أفضل الوجهات في ${MONTHS[selectedMonth]}`}
               </h2>
               <div className="flex items-center gap-1">
                 <button
                   onClick={() =>
                     setSelectedMonth((m) => (m === 0 ? 11 : m - 1))
                   }
-                  aria-label="الشهر السابق"
+                  aria-label={locale === "en" ? "Previous month" : "الشهر السابق"}
                   className="w-9 h-9 rounded-full bg-white dark:bg-[#162033] border border-[#d0dde4] dark:border-[#1e3a5f] text-[#12394d] dark:text-white flex items-center justify-center hover:bg-[#e4edf2] dark:hover:bg-[#1e3a5f] transition-colors"
                 >
                   ←
@@ -194,7 +220,7 @@ export default function CalendarPage() {
                   onClick={() =>
                     setSelectedMonth((m) => (m === 11 ? 0 : m + 1))
                   }
-                  aria-label="الشهر التالي"
+                  aria-label={locale === "en" ? "Next month" : "الشهر التالي"}
                   className="w-9 h-9 rounded-full bg-white dark:bg-[#162033] border border-[#d0dde4] dark:border-[#1e3a5f] text-[#12394d] dark:text-white flex items-center justify-center hover:bg-[#e4edf2] dark:hover:bg-[#1e3a5f] transition-colors"
                 >
                   →
@@ -204,7 +230,9 @@ export default function CalendarPage() {
 
             {destinationsForMonth.filter((x) => x.intensity > 0).length === 0 ? (
               <div className="text-sm text-[#7b7c7d] dark:text-white/50 text-center py-10 bg-white dark:bg-[#162033] rounded-2xl border border-dashed border-[#d0dde4] dark:border-[#1e3a5f]">
-                مفيش وجهة مُفضّلة في {MONTHS_AR[selectedMonth]} — جرّب شهر تاني.
+                {locale === "en"
+                  ? `No recommended destinations in ${MONTHS[selectedMonth]} — try a different month.`
+                  : `مفيش وجهة مُفضّلة في ${MONTHS[selectedMonth]} — جرّب شهر تاني.`}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -237,7 +265,7 @@ export default function CalendarPage() {
                                 : "bg-amber-400 text-amber-950"
                             }`}
                           >
-                            {labelFor(intensity)}
+                            {labelFor(intensity, locale)}
                           </span>
                           <div className="absolute bottom-3 right-4 left-4">
                             <h3 className="text-lg font-bold text-white font-display drop-shadow-md">
@@ -259,8 +287,9 @@ export default function CalendarPage() {
 
           {/* Disclaimer */}
           <p className="text-xs text-[#7b7c7d] dark:text-white/40 text-center mt-10 leading-relaxed">
-            💡 المواسم تقريبية وتعتمد على مناخ مصر وطبيعة العلاج.
-            راجع صفحة كل وجهة للتفاصيل الكاملة.
+            {locale === "en"
+              ? "💡 Seasons are approximate and depend on Egypt's climate and the type of therapy. See each destination's page for full details."
+              : "💡 المواسم تقريبية وتعتمد على مناخ مصر وطبيعة العلاج. راجع صفحة كل وجهة للتفاصيل الكاملة."}
           </p>
         </div>
       </section>

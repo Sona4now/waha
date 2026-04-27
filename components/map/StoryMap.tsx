@@ -6,6 +6,7 @@ import L from "leaflet";
 import type { DestinationFull } from "@/data/siteData";
 import type { TherapeuticSite } from "@/lib/therapeuticSites";
 import type { Recommendation } from "@/hooks/useRecommendation";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 /* ── Map styles — real tile providers, not abstract art ── */
 type MapStyle = "streets" | "satellite" | "terrain" | "dark";
@@ -241,6 +242,7 @@ export default function StoryMap({
   treatmentFilter,
   searchQuery,
 }: Props) {
+  const { locale } = useTranslations();
   const [mapStyle, setMapStyle] = useState<MapStyle>("streets");
   const [tileError, setTileError] = useState(false);
   const [tilesSeen, setTilesSeen] = useState(0);
@@ -373,7 +375,7 @@ export default function StoryMap({
       <MapInvalidator />
       <CameraController target={cameraTarget} zoom={cameraZoom} />
 
-      <StyleSwitcher current={mapStyle} onChange={setMapStyle} />
+      <StyleSwitcher current={mapStyle} onChange={setMapStyle} locale={locale} />
 
       {/* Destination pins */}
       {destinations.map((dest) => {
@@ -400,9 +402,13 @@ export default function StoryMap({
         const ariaLabel = [
           dest.name,
           dest.environment,
-          isRecommended ? "وجهتك المقترحة" : "",
-          dim ? "(غير مناسبة لبحثك)" : "",
-          dest.treatments?.length ? `تعالج: ${dest.treatments.join("، ")}` : "",
+          isRecommended ? (locale === "en" ? "Your suggested destination" : "وجهتك المقترحة") : "",
+          dim ? (locale === "en" ? "(not matching your search)" : "(غير مناسبة لبحثك)") : "",
+          dest.treatments?.length
+            ? locale === "en"
+              ? `Treats: ${dest.treatments.join(", ")}`
+              : `تعالج: ${dest.treatments.join("، ")}`
+            : "",
         ]
           .filter(Boolean)
           .join(" — ");
@@ -432,12 +438,18 @@ export default function StoryMap({
                 !!isRecommended,
               )}
               alt={ariaLabel}
-              title={dim && !matchesFilter ? "مش مناسبة للفلتر الحالي — اضغط للاستكشاف" : dest.name}
+              title={
+                dim && !matchesFilter
+                  ? locale === "en"
+                    ? "Not matching the current filter — click to explore"
+                    : "مش مناسبة للفلتر الحالي — اضغط للاستكشاف"
+                  : dest.name
+              }
               keyboard={true}
               eventHandlers={{ click: () => onSelectDestination(dest.id) }}
             >
               <Popup maxWidth={260} className="custom-popup">
-                <div dir="rtl" style={{ fontFamily: "Cairo, sans-serif" }}>
+                <div dir={locale === "en" ? "ltr" : "rtl"} style={{ fontFamily: "Cairo, sans-serif" }}>
                   <div
                     style={{
                       fontSize: 17,
@@ -479,7 +491,7 @@ export default function StoryMap({
                         marginBottom: 8,
                       }}
                     >
-                      ⭐ وجهتك المقترحة
+                      {locale === "en" ? "⭐ Your suggested destination" : "⭐ وجهتك المقترحة"}
                     </div>
                   )}
                   <a
@@ -496,7 +508,7 @@ export default function StoryMap({
                       textDecoration: "none",
                     }}
                   >
-                    اكتشف المزيد
+                    {locale === "en" ? "Discover more" : "اكتشف المزيد"}
                   </a>
                 </div>
               </Popup>
@@ -511,12 +523,12 @@ export default function StoryMap({
           key={site.id}
           position={[site.lat, site.lng]}
           icon={subSiteIcon(site.icon, site.name)}
-          alt={`${site.name} — ${site.subtitle} — ${site.treatments.join("، ")}`}
+          alt={`${site.name} — ${site.subtitle} — ${site.treatments.join(locale === "en" ? ", " : "، ")}`}
           title={site.name}
           keyboard={true}
         >
           <Popup maxWidth={240}>
-            <div dir="rtl" style={{ fontFamily: "Cairo, sans-serif" }}>
+            <div dir={locale === "en" ? "ltr" : "rtl"} style={{ fontFamily: "Cairo, sans-serif" }}>
               <div
                 style={{
                   fontSize: 14,
@@ -584,7 +596,7 @@ export default function StoryMap({
       )}
 
       {/* Zoom + locate controls */}
-      <MapZoomControl onLocate={handleLocateMe} locating={locating} />
+      <MapZoomControl onLocate={handleLocateMe} locating={locating} locale={locale} />
     </MapContainer>
 
       {/* Offline / tile-error banner — shown when tiles can't load.
@@ -593,12 +605,16 @@ export default function StoryMap({
       {showTileFailureBanner && (
         <div
           className="absolute left-1/2 -translate-x-1/2 z-[500] pointer-events-none"
-          dir="rtl"
+          dir={locale === "en" ? "ltr" : "rtl"}
           style={{ top: "calc(env(safe-area-inset-top) + 140px)" }}
         >
           <div className="pointer-events-auto bg-[#1d5770]/95 backdrop-blur-md text-white text-[11px] font-bold px-3 py-1.5 rounded-full border border-white/15 shadow-lg flex items-center gap-1.5 max-w-[88vw]">
             <span>📡</span>
-            <span className="truncate">وضع غير متصل — الخريطة شغالة بدون tiles</span>
+            <span className="truncate">
+              {locale === "en"
+                ? "Offline mode — map running without tiles"
+                : "وضع غير متصل — الخريطة شغالة بدون tiles"}
+            </span>
           </div>
         </div>
       )}
@@ -625,9 +641,11 @@ function UserLocationCamera({ target }: { target: [number, number] }) {
 function MapZoomControl({
   onLocate,
   locating,
+  locale,
 }: {
   onLocate: () => void;
   locating: boolean;
+  locale: string;
 }) {
   const map = useMap();
   const zoomIn = useCallback(() => map.zoomIn(), [map]);
@@ -663,14 +681,14 @@ function MapZoomControl({
         <div style={{ display: "flex", flexDirection: "column" }}>
           <button
             onClick={zoomIn}
-            aria-label="تكبير"
+            aria-label={locale === "en" ? "Zoom in" : "تكبير"}
             style={{ ...baseBtnStyle, borderRadius: "12px 12px 0 0" }}
           >
             +
           </button>
           <button
             onClick={zoomOut}
-            aria-label="تصغير"
+            aria-label={locale === "en" ? "Zoom out" : "تصغير"}
             style={{ ...baseBtnStyle, borderRadius: "0 0 12px 12px" }}
           >
             −
@@ -680,8 +698,16 @@ function MapZoomControl({
         {/* Locate-me button */}
         <button
           onClick={onLocate}
-          aria-label={locating ? "جاري تحديد موقعك" : "اعرف موقعي"}
-          title="اعرف موقعي"
+          aria-label={
+            locating
+              ? locale === "en"
+                ? "Locating you"
+                : "جاري تحديد موقعك"
+              : locale === "en"
+                ? "Locate me"
+                : "اعرف موقعي"
+          }
+          title={locale === "en" ? "Locate me" : "اعرف موقعي"}
           disabled={locating}
           style={{
             ...baseBtnStyle,
@@ -718,9 +744,11 @@ function MapZoomControl({
 function StyleSwitcher({
   current,
   onChange,
+  locale,
 }: {
   current: MapStyle;
   onChange: (s: MapStyle) => void;
+  locale: string;
 }) {
   const styles: MapStyle[] = ["streets", "satellite", "terrain"];
   // Collapse to icon-only under ~640px so it can't overflow the top bar.
@@ -751,9 +779,9 @@ function StyleSwitcher({
           gap: 2,
           boxShadow: "0 4px 12px rgba(0,0,0,0.25)",
         }}
-        dir="rtl"
+        dir={locale === "en" ? "ltr" : "rtl"}
         role="group"
-        aria-label="نمط الخريطة"
+        aria-label={locale === "en" ? "Map style" : "نمط الخريطة"}
       >
         {styles.map((s) => {
           const cfg = TILE_CONFIG[s];

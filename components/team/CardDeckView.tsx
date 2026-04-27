@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const GRADIENTS = [
   "from-[#91b149] to-[#6a8435]",
@@ -13,6 +14,7 @@ const GRADIENTS = [
 ];
 
 export default function CardDeckView() {
+  const { locale } = useTranslations();
   const [index, setIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -38,7 +40,7 @@ export default function CardDeckView() {
         · Card Deck ·
       </div>
       <h2 className="font-display text-3xl md:text-4xl font-black text-white mb-12">
-        وجوه الفريق
+        {locale === "en" ? "Team faces" : "وجوه الفريق"}
       </h2>
 
       <div className="relative w-[280px] md:w-[340px] h-[400px] md:h-[460px]">

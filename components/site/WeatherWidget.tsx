@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 // Seasonal weather data for each destination (no API needed)
 // Based on average climate data
@@ -19,7 +20,10 @@ interface Props {
   destName: string;
 }
 
-const WEATHER_DATA: Record<string, SeasonalData[]> = {
+// Arabic season keys are used internally as canonical season identifiers
+// across both AR and EN datasets so that getCurrentSeason() lookups
+// (which are based on month) keep working uniformly.
+const WEATHER_DATA_AR: Record<string, SeasonalData[]> = {
   safaga: [
     {
       season: "الشتاء",
@@ -288,7 +292,280 @@ const WEATHER_DATA: Record<string, SeasonalData[]> = {
   ],
 };
 
-function getCurrentSeason(): string {
+const WEATHER_DATA_EN: Record<string, SeasonalData[]> = {
+  safaga: [
+    {
+      season: "Winter",
+      months: "December — February",
+      temp: { min: 14, max: 22 },
+      humidity: 50,
+      rainDays: 1,
+      suitability: "excellent",
+      note: "The ideal therapy season — moderate sun and perfect weather",
+    },
+    {
+      season: "Spring",
+      months: "March — May",
+      temp: { min: 18, max: 28 },
+      humidity: 55,
+      rainDays: 0,
+      suitability: "excellent",
+      note: "Lovely weather — excellent for sun therapy",
+    },
+    {
+      season: "Summer",
+      months: "June — August",
+      temp: { min: 25, max: 35 },
+      humidity: 60,
+      rainDays: 0,
+      suitability: "good",
+      note: "Hot, but the sea cools things down",
+    },
+    {
+      season: "Autumn",
+      months: "September — November",
+      temp: { min: 20, max: 29 },
+      humidity: 55,
+      rainDays: 1,
+      suitability: "excellent",
+      note: "The most suitable time for healing travel",
+    },
+  ],
+  siwa: [
+    {
+      season: "Winter",
+      months: "December — February",
+      temp: { min: 6, max: 20 },
+      humidity: 45,
+      rainDays: 1,
+      suitability: "excellent",
+      note: "The best season — warm days and refreshingly cool nights",
+    },
+    {
+      season: "Spring",
+      months: "March — May",
+      temp: { min: 12, max: 28 },
+      humidity: 40,
+      rainDays: 0,
+      suitability: "excellent",
+      note: "Perfect weather for treatment and tourism",
+    },
+    {
+      season: "Summer",
+      months: "June — August",
+      temp: { min: 22, max: 38 },
+      humidity: 35,
+      rainDays: 0,
+      suitability: "fair",
+      note: "Very hot during the day — morning activities preferred",
+    },
+    {
+      season: "Autumn",
+      months: "September — November",
+      temp: { min: 15, max: 30 },
+      humidity: 40,
+      rainDays: 0,
+      suitability: "excellent",
+      note: "Best time to visit — wonderful weather",
+    },
+  ],
+  sinai: [
+    {
+      season: "Winter",
+      months: "December — February",
+      temp: { min: 5, max: 18 },
+      humidity: 50,
+      rainDays: 2,
+      suitability: "good",
+      note: "Cold in the mountains — warm on the coast",
+    },
+    {
+      season: "Spring",
+      months: "March — May",
+      temp: { min: 12, max: 25 },
+      humidity: 45,
+      rainDays: 1,
+      suitability: "excellent",
+      note: "The best season — perfectly mild weather",
+    },
+    {
+      season: "Summer",
+      months: "June — August",
+      temp: { min: 22, max: 35 },
+      humidity: 40,
+      rainDays: 0,
+      suitability: "good",
+      note: "Hot — but the mountain air is pure",
+    },
+    {
+      season: "Autumn",
+      months: "September — November",
+      temp: { min: 15, max: 28 },
+      humidity: 45,
+      rainDays: 1,
+      suitability: "excellent",
+      note: "Wonderful weather for hiking and climbing",
+    },
+  ],
+  fayoum: [
+    {
+      season: "Winter",
+      months: "December — February",
+      temp: { min: 8, max: 20 },
+      humidity: 60,
+      rainDays: 2,
+      suitability: "good",
+      note: "Pleasant weather — suitable for day trips",
+    },
+    {
+      season: "Spring",
+      months: "March — May",
+      temp: { min: 14, max: 28 },
+      humidity: 55,
+      rainDays: 1,
+      suitability: "excellent",
+      note: "Spring at its peak — nature is green",
+    },
+    {
+      season: "Summer",
+      months: "June — August",
+      temp: { min: 22, max: 36 },
+      humidity: 50,
+      rainDays: 0,
+      suitability: "fair",
+      note: "Hot — the lake cools the air",
+    },
+    {
+      season: "Autumn",
+      months: "September — November",
+      temp: { min: 18, max: 30 },
+      humidity: 55,
+      rainDays: 0,
+      suitability: "excellent",
+      note: "Ideal time — mild weather and clear skies",
+    },
+  ],
+  bahariya: [
+    {
+      season: "Winter",
+      months: "December — February",
+      temp: { min: 5, max: 22 },
+      humidity: 40,
+      rainDays: 0,
+      suitability: "excellent",
+      note: "The best season — cold nights and warm days",
+    },
+    {
+      season: "Spring",
+      months: "March — May",
+      temp: { min: 12, max: 30 },
+      humidity: 35,
+      rainDays: 0,
+      suitability: "excellent",
+      note: "Wonderful weather — perfect for safari",
+    },
+    {
+      season: "Summer",
+      months: "June — August",
+      temp: { min: 22, max: 40 },
+      humidity: 30,
+      rainDays: 0,
+      suitability: "poor",
+      note: "Extremely hot — not suitable for desert trips",
+    },
+    {
+      season: "Autumn",
+      months: "September — November",
+      temp: { min: 15, max: 32 },
+      humidity: 35,
+      rainDays: 0,
+      suitability: "excellent",
+      note: "Ideal weather — an excellent start to safari season",
+    },
+  ],
+  "wadi-degla": [
+    {
+      season: "Winter",
+      months: "December — February",
+      temp: { min: 8, max: 21 },
+      humidity: 50,
+      rainDays: 1,
+      suitability: "excellent",
+      note: "Ideal hiking weather — refreshing and comfortable",
+    },
+    {
+      season: "Spring",
+      months: "March — May",
+      temp: { min: 14, max: 30 },
+      humidity: 45,
+      rainDays: 0,
+      suitability: "excellent",
+      note: "Best time for the wadi — wildflowers in bloom",
+    },
+    {
+      season: "Summer",
+      months: "June — August",
+      temp: { min: 24, max: 40 },
+      humidity: 40,
+      rainDays: 0,
+      suitability: "poor",
+      note: "The canyon turns into a heat trap — avoid it",
+    },
+    {
+      season: "Autumn",
+      months: "September — November",
+      temp: { min: 17, max: 32 },
+      humidity: 45,
+      rainDays: 0,
+      suitability: "excellent",
+      note: "Excellent — mild weather and pure air after summer",
+    },
+  ],
+  "shagie-farms": [
+    {
+      season: "Winter",
+      months: "December — February",
+      temp: { min: 9, max: 21 },
+      humidity: 60,
+      rainDays: 1,
+      suitability: "good",
+      note: "Pleasant weather — suitable for family visits",
+    },
+    {
+      season: "Spring",
+      months: "March — May",
+      temp: { min: 15, max: 28 },
+      humidity: 55,
+      rainDays: 1,
+      suitability: "excellent",
+      note: "Spring in Ismailia — orchards at their finest",
+    },
+    {
+      season: "Summer",
+      months: "June — August",
+      temp: { min: 23, max: 35 },
+      humidity: 50,
+      rainDays: 0,
+      suitability: "excellent",
+      note: "Mango harvest season — the full experience",
+    },
+    {
+      season: "Autumn",
+      months: "September — November",
+      temp: { min: 18, max: 30 },
+      humidity: 55,
+      rainDays: 1,
+      suitability: "excellent",
+      note: "Wonderful weather + harvest season continues",
+    },
+  ],
+};
+
+// Internal canonical season key (Arabic) — used by getCurrentSeason and as
+// the lookup key into both _AR and _EN datasets (entries are index-aligned).
+type SeasonKey = "الشتاء" | "الربيع" | "الصيف" | "الخريف";
+
+function getCurrentSeasonKey(): SeasonKey {
   const month = new Date().getMonth() + 1;
   if (month >= 12 || month <= 2) return "الشتاء";
   if (month >= 3 && month <= 5) return "الربيع";
@@ -296,53 +573,73 @@ function getCurrentSeason(): string {
   return "الخريف";
 }
 
-const SUITABILITY_CONFIG = {
-  excellent: {
-    label: "مثالي للعلاج",
-    color: "#91b149",
-    bg: "bg-[#91b149]/10",
-    text: "text-[#91b149]",
-    emoji: "✨",
-  },
-  good: {
-    label: "جيد",
-    color: "#0d9488",
-    bg: "bg-[#0d9488]/10",
-    text: "text-[#0d9488]",
-    emoji: "👍",
-  },
-  fair: {
-    label: "مقبول",
-    color: "#d97706",
-    bg: "bg-[#d97706]/10",
-    text: "text-[#d97706]",
-    emoji: "⚠️",
-  },
-  poor: {
-    label: "غير مناسب",
-    color: "#dc2626",
-    bg: "bg-[#dc2626]/10",
-    text: "text-[#dc2626]",
-    emoji: "❌",
-  },
+const SEASON_LABEL_EN: Record<SeasonKey, string> = {
+  الشتاء: "Winter",
+  الربيع: "Spring",
+  الصيف: "Summer",
+  الخريف: "Autumn",
 };
 
-function getWeatherIcon(season: string) {
-  const icons: Record<string, string> = {
+function getSuitabilityConfig(locale: "en" | "ar") {
+  return {
+    excellent: {
+      label: locale === "en" ? "Ideal for treatment" : "مثالي للعلاج",
+      color: "#91b149",
+      bg: "bg-[#91b149]/10",
+      text: "text-[#91b149]",
+      emoji: "✨",
+    },
+    good: {
+      label: locale === "en" ? "Good" : "جيد",
+      color: "#0d9488",
+      bg: "bg-[#0d9488]/10",
+      text: "text-[#0d9488]",
+      emoji: "👍",
+    },
+    fair: {
+      label: locale === "en" ? "Acceptable" : "مقبول",
+      color: "#d97706",
+      bg: "bg-[#d97706]/10",
+      text: "text-[#d97706]",
+      emoji: "⚠️",
+    },
+    poor: {
+      label: locale === "en" ? "Not suitable" : "غير مناسب",
+      color: "#dc2626",
+      bg: "bg-[#dc2626]/10",
+      text: "text-[#dc2626]",
+      emoji: "❌",
+    },
+  } as const;
+}
+
+function getWeatherIconByKey(seasonKey: SeasonKey) {
+  const icons: Record<SeasonKey, string> = {
     الشتاء: "❄️",
     الربيع: "🌸",
     الصيف: "☀️",
     الخريف: "🍂",
   };
-  return icons[season] || "☀️";
+  return icons[seasonKey] || "☀️";
 }
 
 export default function WeatherWidget({ destId, destName }: Props) {
-  const data = WEATHER_DATA[destId] || WEATHER_DATA.safaga;
-  const currentSeason = getCurrentSeason();
-  const currentData =
-    data.find((s) => s.season === currentSeason) || data[0];
+  const { locale } = useTranslations();
+  const dataset = locale === "en" ? WEATHER_DATA_EN : WEATHER_DATA_AR;
+  const data = dataset[destId] || dataset.safaga;
+  const currentSeasonKey = getCurrentSeasonKey();
+  // Both _AR and _EN are index-aligned: 0=Winter, 1=Spring, 2=Summer, 3=Autumn.
+  const seasonIndex: Record<SeasonKey, number> = {
+    الشتاء: 0,
+    الربيع: 1,
+    الصيف: 2,
+    الخريف: 3,
+  };
+  const currentData = data[seasonIndex[currentSeasonKey]] || data[0];
+  const SUITABILITY_CONFIG = getSuitabilityConfig(locale);
   const config = SUITABILITY_CONFIG[currentData.suitability];
+  const currentSeasonLabel =
+    locale === "en" ? SEASON_LABEL_EN[currentSeasonKey] : currentSeasonKey;
 
   return (
     <div className="bg-white dark:bg-[#162033] rounded-2xl border border-[#d0dde4] dark:border-[#1e3a5f] overflow-hidden">
@@ -358,18 +655,20 @@ export default function WeatherWidget({ destId, destName }: Props) {
           <div className="flex items-start justify-between mb-4">
             <div>
               <div className="text-[10px] uppercase tracking-widest text-white/50 mb-1">
-                الطقس الآن في {destName}
+                {locale === "en"
+                  ? `Weather now in ${destName}`
+                  : `الطقس الآن في ${destName}`}
               </div>
               <div className="flex items-center gap-3">
                 <span className="text-5xl">
-                  {getWeatherIcon(currentSeason)}
+                  {getWeatherIconByKey(currentSeasonKey)}
                 </span>
                 <div>
                   <div className="text-3xl font-bold font-display">
                     {currentData.temp.min}° - {currentData.temp.max}°
                   </div>
                   <div className="text-xs text-white/70">
-                    {currentSeason} · {currentData.months}
+                    {currentSeasonLabel} · {currentData.months}
                   </div>
                 </div>
               </div>
@@ -390,12 +689,19 @@ export default function WeatherWidget({ destId, destName }: Props) {
           {/* Stats */}
           <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2">
-              <div className="text-white/50 text-[10px] mb-0.5">الرطوبة</div>
+              <div className="text-white/50 text-[10px] mb-0.5">
+                {locale === "en" ? "Humidity" : "الرطوبة"}
+              </div>
               <div className="font-bold">{currentData.humidity}%</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg px-3 py-2">
-              <div className="text-white/50 text-[10px] mb-0.5">أيام المطر</div>
-              <div className="font-bold">{currentData.rainDays} / شهر</div>
+              <div className="text-white/50 text-[10px] mb-0.5">
+                {locale === "en" ? "Rainy days" : "أيام المطر"}
+              </div>
+              <div className="font-bold">
+                {currentData.rainDays}{" "}
+                {locale === "en" ? "/ month" : "/ شهر"}
+              </div>
             </div>
           </div>
         </div>
@@ -404,15 +710,26 @@ export default function WeatherWidget({ destId, destName }: Props) {
       {/* Seasonal forecast */}
       <div className="p-5">
         <div className="text-[10px] uppercase tracking-widest text-[#7b7c7d] font-bold mb-3 text-center">
-          أفضل وقت للسفر على مدار السنة
+          {locale === "en"
+            ? "Best time to travel year-round"
+            : "أفضل وقت للسفر على مدار السنة"}
         </div>
         <div className="grid grid-cols-4 gap-2">
-          {data.map((s) => {
-            const isActive = s.season === currentSeason;
+          {data.map((s, idx) => {
+            // Recover the canonical key from the AR dataset's index so we can
+            // pick icons / detect the current season regardless of locale.
+            const keyByIndex: SeasonKey[] = [
+              "الشتاء",
+              "الربيع",
+              "الصيف",
+              "الخريف",
+            ];
+            const seasonKey = keyByIndex[idx];
+            const isActive = seasonKey === currentSeasonKey;
             const c = SUITABILITY_CONFIG[s.suitability];
             return (
               <motion.div
-                key={s.season}
+                key={seasonKey}
                 whileHover={{ y: -2 }}
                 className={`relative rounded-xl p-2 text-center transition-all cursor-default ${
                   isActive
@@ -420,7 +737,9 @@ export default function WeatherWidget({ destId, destName }: Props) {
                     : "bg-[#f5f8fa] dark:bg-[#0a151f]"
                 }`}
               >
-                <div className="text-xl mb-1">{getWeatherIcon(s.season)}</div>
+                <div className="text-xl mb-1">
+                  {getWeatherIconByKey(seasonKey)}
+                </div>
                 <div className="text-[10px] font-bold text-[#12394d] dark:text-white mb-0.5">
                   {s.season}
                 </div>

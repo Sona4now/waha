@@ -253,7 +253,15 @@
       "Bash(grep -v \"^about$\")",
       "Bash(grep -v \"^terms$\")",
       "Bash(grep -v \"^privacy$\")",
-      "Bash(grep -v \"^tours$\")"
+      "Bash(grep -v \"^tours$\")",
+      "Bash(awk -F: '{print $1}')",
+      "Bash(awk -F: '$1 >= 1100 && $1 <= 1290')",
+      "Bash(awk -F: '$1 < 100 || $1 > 870')",
+      "Bash(sed -i.bak 's/dir=\"rtl\"/dir={locale === \"en\" ? \"ltr\" : \"rtl\"}/g' app/blog/\\\\[slug\\\\]/page.tsx)",
+      "Bash(rm app/blog/\\\\[slug\\\\]/page.tsx.bak)",
+      "Bash(grep -v 'locale === \\\\|isEn\\\\|: \"[^\"]*[؀-ۿ]\\\\|//\\\\|^[[:space:]]*\\\\*\\\\|[[:space:]]ar:\\\\|MOTIVATIONAL_QUOTES_AR\\\\|\"[^\"]*\",[[:space:]]*$')",
+      "Bash(grep -v 'locale === \\\\|isEn\\\\|: \"[^\"]*[؀-ۿ]\\\\|//\\\\|^[[:space:]]*\\\\*\\\\|[[:space:]]ar:\\\\|\"[^\"]*\",[[:space:]]*$\\\\|\"[^\"]*\": \"[^\"]*[؀-ۿ]')",
+      "Bash(grep -v 'locale === \\\\|isEn\\\\|: \"[^\"]*[؀-ۿ]\\\\|//\\\\|^[[:space:]]*\\\\*\\\\|^[[:space:]]*\"[^\"]*[؀-ۿ][^\"]*\",[[:space:]]*$\\\\|GREETING_AR\\\\|SUGGESTED_PROMPTS_AR\\\\|KNOWN_DESTINATIONS')"
     ]
   }
 }

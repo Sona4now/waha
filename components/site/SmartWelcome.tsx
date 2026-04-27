@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { DESTINATIONS } from "@/data/siteData";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface VisitData {
   count: number;
@@ -18,6 +19,7 @@ const AUTO_DISMISS_MS = 6000;
 const HIDDEN_PATHS = ["/", "/gate", "/therapy-room", "/map"];
 
 export default function SmartWelcome() {
+  const { locale } = useTranslations();
   const pathname = usePathname();
   const [show, setShow] = useState(false);
   const [visitData, setVisitData] = useState<VisitData | null>(null);
@@ -77,12 +79,20 @@ export default function SmartWelcome() {
 
   const visitLabel =
     visitData.count === 2
-      ? "أهلاً بعودتك 👋"
+      ? locale === "en"
+        ? "Welcome back 👋"
+        : "أهلاً بعودتك 👋"
       : visitData.count === 3
-        ? "سعداء برجوعك 🌿"
+        ? locale === "en"
+          ? "Glad to see you again 🌿"
+          : "سعداء برجوعك 🌿"
         : visitData.count < 10
-          ? "مرحباً بك ✨"
-          : "زائر مُخلص 💚";
+          ? locale === "en"
+            ? "Welcome ✨"
+            : "مرحباً بك ✨"
+          : locale === "en"
+            ? "Loyal visitor 💚"
+            : "زائر مُخلص 💚";
 
   return (
     <AnimatePresence>
@@ -126,13 +136,15 @@ export default function SmartWelcome() {
                 onClick={handleDismiss}
                 className="flex-1 text-sm font-bold text-white hover:text-[#91b149] transition-colors no-underline pr-8 sm:pr-0"
               >
-                وجهتك المقترحة: {dest.name} ←
+                {locale === "en"
+                  ? `Your suggested destination: ${dest.name} →`
+                  : `وجهتك المقترحة: ${dest.name} ←`}
               </Link>
 
               <button
                 onClick={handleDismiss}
                 className="absolute top-2 left-2 sm:static flex-shrink-0 w-7 h-7 rounded-full hover:bg-white/10 text-white/50 hover:text-white flex items-center justify-center transition-colors"
-                aria-label="إغلاق"
+                aria-label={locale === "en" ? "Close" : "إغلاق"}
               >
                 ✕
               </button>

@@ -9,28 +9,31 @@ import PageHero from "@/components/site/PageHero";
 import Reveal from "@/components/site/Reveal";
 import { DESTINATIONS } from "@/data/siteData";
 import { useTranslations } from "@/components/site/LocaleProvider";
+import { localizeDestination } from "@/lib/localize";
 
 interface Symptom {
   id: string;
-  label: string;
+  ar: string;
+  en: string;
   icon: string;
+  /** Treatment keywords to match against destination data (Arabic source). */
   keywords: string[];
   severity: "low" | "medium" | "high";
 }
 
 const SYMPTOMS: Symptom[] = [
-  { id: "joints", label: "آلام المفاصل", icon: "🦴", keywords: ["مفاصل"], severity: "high" },
-  { id: "rheumatism", label: "الروماتيزم", icon: "🦴", keywords: ["مفاصل", "استرخاء"], severity: "high" },
-  { id: "psoriasis", label: "الصدفية", icon: "✨", keywords: ["جلد"], severity: "high" },
-  { id: "eczema", label: "الإكزيما", icon: "✨", keywords: ["جلد"], severity: "medium" },
-  { id: "back-pain", label: "آلام الظهر", icon: "🧍", keywords: ["مفاصل", "استرخاء"], severity: "medium" },
-  { id: "stress", label: "التوتر والضغط", icon: "😰", keywords: ["توتر", "استرخاء"], severity: "medium" },
-  { id: "insomnia", label: "صعوبة النوم", icon: "🌙", keywords: ["توتر", "استرخاء"], severity: "medium" },
-  { id: "breathing", label: "مشاكل التنفس", icon: "🫁", keywords: ["تنفس"], severity: "high" },
-  { id: "asthma", label: "الربو", icon: "🫁", keywords: ["تنفس"], severity: "high" },
-  { id: "sinus", label: "الجيوب الأنفية", icon: "👃", keywords: ["تنفس"], severity: "medium" },
-  { id: "fatigue", label: "الإرهاق المزمن", icon: "😴", keywords: ["توتر", "استرخاء"], severity: "medium" },
-  { id: "muscle-pain", label: "آلام العضلات", icon: "💪", keywords: ["مفاصل", "استرخاء"], severity: "medium" },
+  { id: "joints", ar: "آلام المفاصل", en: "Joint pain", icon: "🦴", keywords: ["مفاصل"], severity: "high" },
+  { id: "rheumatism", ar: "الروماتيزم", en: "Rheumatism", icon: "🦴", keywords: ["مفاصل", "استرخاء"], severity: "high" },
+  { id: "psoriasis", ar: "الصدفية", en: "Psoriasis", icon: "✨", keywords: ["جلد"], severity: "high" },
+  { id: "eczema", ar: "الإكزيما", en: "Eczema", icon: "✨", keywords: ["جلد"], severity: "medium" },
+  { id: "back-pain", ar: "آلام الظهر", en: "Back pain", icon: "🧍", keywords: ["مفاصل", "استرخاء"], severity: "medium" },
+  { id: "stress", ar: "التوتر والضغط", en: "Stress & anxiety", icon: "😰", keywords: ["توتر", "استرخاء"], severity: "medium" },
+  { id: "insomnia", ar: "صعوبة النوم", en: "Insomnia", icon: "🌙", keywords: ["توتر", "استرخاء"], severity: "medium" },
+  { id: "breathing", ar: "مشاكل التنفس", en: "Respiratory issues", icon: "🫁", keywords: ["تنفس"], severity: "high" },
+  { id: "asthma", ar: "الربو", en: "Asthma", icon: "🫁", keywords: ["تنفس"], severity: "high" },
+  { id: "sinus", ar: "الجيوب الأنفية", en: "Sinusitis", icon: "👃", keywords: ["تنفس"], severity: "medium" },
+  { id: "fatigue", ar: "الإرهاق المزمن", en: "Chronic fatigue", icon: "😴", keywords: ["توتر", "استرخاء"], severity: "medium" },
+  { id: "muscle-pain", ar: "آلام العضلات", en: "Muscle pain", icon: "💪", keywords: ["مفاصل", "استرخاء"], severity: "medium" },
 ];
 
 function calculateMatch(
@@ -45,7 +48,7 @@ function calculateMatch(
 }
 
 export default function SymptomsPage() {
-  const { t } = useTranslations();
+  const { t, locale } = useTranslations();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [showResults, setShowResults] = useState(false);
 
@@ -67,13 +70,16 @@ export default function SymptomsPage() {
 
   const results = useMemo(() => {
     if (selected.size === 0) return [];
-    return DESTINATIONS.map((d) => ({
-      ...d,
-      score: calculateMatch(selectedKeywords, d.treatments),
-    }))
+    return DESTINATIONS.map((d) => {
+      // Match against canonical Arabic treatment keywords from source data,
+      // then localize the destination for display.
+      const score = calculateMatch(selectedKeywords, d.treatments);
+      const localized = localizeDestination(d, locale);
+      return { ...localized, score };
+    })
       .filter((d) => d.score > 0)
       .sort((a, b) => b.score - a.score);
-  }, [selected, selectedKeywords]);
+  }, [selected, selectedKeywords, locale]);
 
   function handleAnalyze() {
     setShowResults(true);
@@ -95,12 +101,15 @@ export default function SymptomsPage() {
         title={t("symptomsPage.title")}
         subtitle={t("symptomsPage.subtitle")}
         breadcrumb={[
-          { label: "الرئيسية", href: "/home" },
-          { label: "فاحص الأعراض" },
+          { label: t("nav.home"), href: "/home" },
+          { label: t("nav.symptoms") },
         ]}
       />
 
-      <section className="max-w-4xl mx-auto px-4 md:px-6 py-12">
+      <section
+        className="max-w-4xl mx-auto px-4 md:px-6 py-12"
+        dir={locale === "en" ? "ltr" : "rtl"}
+      >
         {/* Step indicator */}
         <Reveal>
           <div className="flex items-center justify-center gap-3 mb-8">
@@ -115,7 +124,7 @@ export default function SymptomsPage() {
                 1
               </div>
               <span className="text-sm font-semibold text-[#12394d] dark:text-white">
-                اختار الأعراض
+                {locale === "en" ? "Pick symptoms" : "اختار الأعراض"}
               </span>
             </div>
             <div className="w-12 h-px bg-[#d0dde4]" />
@@ -136,7 +145,7 @@ export default function SymptomsPage() {
                     : "text-[#7b7c7d]"
                 }`}
               >
-                النتائج
+                {locale === "en" ? "Results" : "النتائج"}
               </span>
             </div>
           </div>
@@ -148,14 +157,20 @@ export default function SymptomsPage() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-lg font-bold text-[#12394d] dark:text-white font-display">
-                  ما الأعراض اللي بتحس بيها؟
+                  {locale === "en"
+                    ? "What symptoms are you experiencing?"
+                    : "ما الأعراض اللي بتحس بيها؟"}
                 </h2>
                 <p className="text-xs text-[#7b7c7d] mt-0.5">
-                  اختار كل اللي ينطبق عليك
+                  {locale === "en"
+                    ? "Select everything that applies to you"
+                    : "اختار كل اللي ينطبق عليك"}
                 </p>
               </div>
               <span className="text-xs text-[#7b7c7d]">
-                {selected.size} مختار
+                {locale === "en"
+                  ? `${selected.size} selected`
+                  : `${selected.size} مختار`}
               </span>
             </div>
 
@@ -175,7 +190,7 @@ export default function SymptomsPage() {
                   >
                     <span className="text-3xl">{symptom.icon}</span>
                     <span className="text-xs font-semibold text-[#12394d] dark:text-white text-center">
-                      {symptom.label}
+                      {locale === "en" ? symptom.en : symptom.ar}
                     </span>
                     {isSelected && (
                       <motion.div
@@ -213,14 +228,16 @@ export default function SymptomsPage() {
                     : "bg-[#d0dde4] dark:bg-[#1e3a5f] text-[#7b7c7d] cursor-not-allowed"
                 }`}
               >
-                حلل حالتي واقترح وجهة ({selected.size})
+                {locale === "en"
+                  ? `Analyze & suggest a destination (${selected.size})`
+                  : `حلل حالتي واقترح وجهة (${selected.size})`}
               </button>
               {selected.size > 0 && (
                 <button
                   onClick={handleReset}
                   className="px-5 py-3.5 rounded-full border border-[#d0dde4] dark:border-[#1e3a5f] text-[#7b7c7d] hover:text-[#1d5770] hover:border-[#1d5770] text-sm font-semibold transition-all"
                 >
-                  مسح
+                  {locale === "en" ? "Clear" : "مسح"}
                 </button>
               )}
             </div>
@@ -241,13 +258,17 @@ export default function SymptomsPage() {
               <div className="text-center mb-6">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#91b149]/10 text-[#91b149] text-xs font-bold mb-3">
                   <span className="w-2 h-2 rounded-full bg-[#91b149] animate-pulse" />
-                  تم التحليل
+                  {locale === "en" ? "Analysis complete" : "تم التحليل"}
                 </div>
                 <h2 className="text-2xl font-bold font-display text-[#12394d] dark:text-white mb-1">
-                  الوجهات المناسبة لحالتك
+                  {locale === "en"
+                    ? "Destinations that match your case"
+                    : "الوجهات المناسبة لحالتك"}
                 </h2>
                 <p className="text-sm text-[#7b7c7d]">
-                  مرتبة حسب التوافق مع أعراضك
+                  {locale === "en"
+                    ? "Ranked by match with your symptoms"
+                    : "مرتبة حسب التوافق مع أعراضك"}
                 </p>
               </div>
 
@@ -277,7 +298,9 @@ export default function SymptomsPage() {
                         />
                         {i === 0 && (
                           <div className="absolute top-3 right-3 bg-[#91b149] text-white text-[10px] font-bold px-2.5 py-1 rounded-full shadow-md">
-                            ⭐ الأفضل لحالتك
+                            {locale === "en"
+                              ? "⭐ Best match"
+                              : "⭐ الأفضل لحالتك"}
                           </div>
                         )}
                       </div>
@@ -288,7 +311,8 @@ export default function SymptomsPage() {
                               {dest.name}
                             </h3>
                             <p className="text-xs text-[#7b7c7d]">
-                              {dest.environment} · {dest.nameEn}
+                              {dest.environment}
+                              {locale === "en" ? "" : ` · ${dest.nameEn}`}
                             </p>
                           </div>
                           <div className="text-left">
@@ -296,7 +320,7 @@ export default function SymptomsPage() {
                               {dest.score}%
                             </div>
                             <div className="text-[9px] text-[#7b7c7d] uppercase">
-                              توافق
+                              {locale === "en" ? "Match" : "توافق"}
                             </div>
                           </div>
                         </div>
@@ -349,8 +373,9 @@ export default function SymptomsPage() {
                 className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 rounded-xl p-4 text-center"
               >
                 <p className="text-xs text-amber-700 dark:text-amber-400">
-                  ⚠️ هذه التوصيات إرشادية. يُنصح باستشارة طبيب مختص قبل بدء أي علاج
-                  طبيعي.
+                  {locale === "en"
+                    ? "⚠️ These recommendations are guidance only. Please consult a qualified physician before starting any natural therapy."
+                    : "⚠️ هذه التوصيات إرشادية. يُنصح باستشارة طبيب مختص قبل بدء أي علاج طبيعي."}
                 </p>
               </motion.div>
             </motion.div>

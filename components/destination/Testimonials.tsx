@@ -103,7 +103,7 @@ export default function Testimonials({ destId, destName }: Props) {
     <section
       id="testimonials"
       className="py-16 bg-white dark:bg-[#0d1b2a]"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <div className="max-w-6xl mx-auto px-4">
         {/* Header + aggregate */}

@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { TEAM_MEMBERS } from "@/data/team";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 export default function MinimalWallView() {
+  const { locale } = useTranslations();
   return (
     <div className="bg-white dark:bg-[#0a151f] py-20 md:py-32 min-h-[720px]">
       <div className="max-w-xl mx-auto px-6">
@@ -12,7 +14,7 @@ export default function MinimalWallView() {
             · Minimal ·
           </div>
           <h2 className="font-display text-3xl md:text-4xl font-black text-[#12394d] dark:text-white mb-2">
-            الفريق
+            {locale === "en" ? "The team" : "الفريق"}
           </h2>
           <div className="w-12 h-px bg-[#91b149] mx-auto" />
         </div>

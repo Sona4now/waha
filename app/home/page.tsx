@@ -19,7 +19,15 @@ import { motion, useScroll, useTransform } from "framer-motion";
 const BLUR_DATA_URL =
   "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI4IiBoZWlnaHQ9IjgiPjxyZWN0IHdpZHRoPSI4IiBoZWlnaHQ9IjgiIGZpbGw9IiMxZDU3NzAiLz48L3N2Zz4=";
 
-function Counter({ target, label }: { target: number; label: string }) {
+function Counter({
+  target,
+  label,
+  locale,
+}: {
+  target: number;
+  label: string;
+  locale: "ar" | "en";
+}) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
   const started = useRef(false);
@@ -50,42 +58,72 @@ function Counter({ target, label }: { target: number; label: string }) {
   return (
     <div ref={ref} className="text-center">
       <div className="text-4xl md:text-5xl font-black text-[#1d5770] dark:text-[#91b149] mb-2">
-        {count.toLocaleString("ar-EG")}+
+        {count.toLocaleString(locale === "en" ? "en-US" : "ar-EG")}+
       </div>
       <div className="text-[#7b7c7d] text-sm">{label}</div>
     </div>
   );
 }
 
-const HOME_FAQ: FAQItem[] = [
-  {
-    question: "ما هي السياحة الاستشفائية؟",
-    answer:
-      "السياحة الاستشفائية هي نوع من السياحة يعتمد على استخدام الموارد الطبيعية مثل المياه المعدنية، الرمال الساخنة، الهواء الجاف، والشمس لعلاج أمراض مزمنة مثل الروماتيزم، الصدفية، والتوتر النفسي.",
-  },
-  {
-    question: "لماذا مصر تحديداً للسياحة الاستشفائية؟",
-    answer:
-      "مصر تتميز بتنوع بيئي فريد يجمع بين البحر الأحمر الغني بالمعادن، الصحاري الجافة، الواحات بعيونها الكبريتية، والجبال. هذا التنوع يوفر خيارات علاجية لا تجدها في أي مكان آخر في العالم.",
-  },
-  {
-    question: "هل أحتاج استشارة طبية قبل السفر؟",
-    answer:
-      "يُنصح دائماً باستشارة طبيبك قبل أي رحلة علاجية، خاصة إذا كنت تعاني من أمراض مزمنة. بعض العلاجات مثل الدفن بالرمال الساخنة أو الحمامات الكبريتية قد لا تناسب جميع الحالات.",
-  },
-  {
-    question: "ما أفضل وقت في السنة للسياحة الاستشفائية في مصر؟",
-    answer:
-      "الموسم الأفضل هو من أكتوبر إلى أبريل عندما يكون الجو معتدلاً. لكن بعض الوجهات مثل سيوة تكون مثالية في الشتاء، بينما سفاجا ممتازة طوال العام بسبب مناخها المعتدل.",
-  },
-  {
-    question: "كيف يمكنني اختيار الوجهة المناسبة لحالتي؟",
-    answer:
-      "يمكنك استخدام تجربتنا التفاعلية أو التحدث مع مساعدنا الذكي اللي هيسألك عن حالتك واحتياجاتك ويرشحلك الوجهة الأنسب. كمان ممكن تستكشف صفحة الأماكن وتفلتر حسب نوع العلاج أو البيئة.",
-  },
-];
+const FAQ_DATA: { ar: FAQItem[]; en: FAQItem[] } = {
+  ar: [
+    {
+      question: "ما هي السياحة الاستشفائية؟",
+      answer:
+        "السياحة الاستشفائية هي نوع من السياحة يعتمد على استخدام الموارد الطبيعية مثل المياه المعدنية، الرمال الساخنة، الهواء الجاف، والشمس لعلاج أمراض مزمنة مثل الروماتيزم، الصدفية، والتوتر النفسي.",
+    },
+    {
+      question: "لماذا مصر تحديداً للسياحة الاستشفائية؟",
+      answer:
+        "مصر تتميز بتنوع بيئي فريد يجمع بين البحر الأحمر الغني بالمعادن، الصحاري الجافة، الواحات بعيونها الكبريتية، والجبال. هذا التنوع يوفر خيارات علاجية لا تجدها في أي مكان آخر في العالم.",
+    },
+    {
+      question: "هل أحتاج استشارة طبية قبل السفر؟",
+      answer:
+        "يُنصح دائماً باستشارة طبيبك قبل أي رحلة علاجية، خاصة إذا كنت تعاني من أمراض مزمنة. بعض العلاجات مثل الدفن بالرمال الساخنة أو الحمامات الكبريتية قد لا تناسب جميع الحالات.",
+    },
+    {
+      question: "ما أفضل وقت في السنة للسياحة الاستشفائية في مصر؟",
+      answer:
+        "الموسم الأفضل هو من أكتوبر إلى أبريل عندما يكون الجو معتدلاً. لكن بعض الوجهات مثل سيوة تكون مثالية في الشتاء، بينما سفاجا ممتازة طوال العام بسبب مناخها المعتدل.",
+    },
+    {
+      question: "كيف يمكنني اختيار الوجهة المناسبة لحالتي؟",
+      answer:
+        "يمكنك استخدام تجربتنا التفاعلية أو التحدث مع مساعدنا الذكي اللي هيسألك عن حالتك واحتياجاتك ويرشحلك الوجهة الأنسب. كمان ممكن تستكشف صفحة الأماكن وتفلتر حسب نوع العلاج أو البيئة.",
+    },
+  ],
+  en: [
+    {
+      question: "What is therapeutic tourism?",
+      answer:
+        "Therapeutic tourism is a kind of travel that relies on natural resources — mineral waters, hot sands, dry air, and sunshine — to help treat chronic conditions such as rheumatism, psoriasis, and stress.",
+    },
+    {
+      question: "Why is Egypt special for this kind of tourism?",
+      answer:
+        "Egypt has a rare environmental diversity: a Red Sea rich in minerals, dry deserts, oases with sulphur springs, and mountains. This mix offers therapeutic options you simply won't find anywhere else in the world.",
+    },
+    {
+      question: "Do I need medical advice before travelling?",
+      answer:
+        "Always consult your doctor before any therapeutic trip, especially if you have a chronic condition. Some treatments — like hot-sand burial or sulphur baths — may not suit every case.",
+    },
+    {
+      question: "When is the best time of year for therapeutic tourism in Egypt?",
+      answer:
+        "The best season is October to April, when the weather is mild. Some destinations like Siwa are ideal in winter, while Safaga is excellent year-round thanks to its moderate climate.",
+    },
+    {
+      question: "How do I choose the right destination for my case?",
+      answer:
+        "Use our interactive experience or chat with our AI assistant, who'll ask about your condition and needs and recommend the best fit. You can also browse the destinations page and filter by treatment type or environment.",
+    },
+  ],
+};
 
 function CTASection() {
+  const { locale } = useTranslations();
   const ref = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -102,10 +140,14 @@ function CTASection() {
       <div className="relative z-10 max-w-[1280px] mx-auto px-6">
         <Reveal>
           <h2 className="text-3xl md:text-4xl font-bold mb-4 font-display">
-            ابدأ رحلتك الاستشفائية الآن
+            {locale === "en"
+              ? "Start your therapeutic journey now"
+              : "ابدأ رحلتك الاستشفائية الآن"}
           </h2>
           <p className="text-white/70 mb-8 max-w-lg mx-auto">
-            خُذ تجربتنا التفاعلية واكتشف الوجهة المثالية لك في دقيقة واحدة
+            {locale === "en"
+              ? "Take our interactive experience and discover your perfect destination in one minute"
+              : "خُذ تجربتنا التفاعلية واكتشف الوجهة المثالية لك في دقيقة واحدة"}
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <MagneticButton strength={10}>
@@ -113,7 +155,7 @@ function CTASection() {
                 href="/"
                 className="inline-block px-8 py-3.5 bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold rounded-full transition-all duration-300 no-underline text-sm shadow-[0_8px_24px_-8px_rgba(145,177,73,0.6)]"
               >
-                ابدأ التجربة
+                {locale === "en" ? "Start the experience" : "ابدأ التجربة"}
               </Link>
             </MagneticButton>
             <MagneticButton strength={10}>
@@ -121,7 +163,7 @@ function CTASection() {
                 href="/ai-guide"
                 className="inline-block px-8 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full border border-white/20 transition-all duration-300 no-underline text-sm"
               >
-                اسأل المساعد الذكي
+                {locale === "en" ? "Ask the AI assistant" : "اسأل المساعد الذكي"}
               </Link>
             </MagneticButton>
           </div>
@@ -160,7 +202,7 @@ export default function HomePage() {
             recDest?.heroBg ||
             "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80"
           }
-          alt={recDest?.name || "البحر الأحمر"}
+          alt={recDest?.name || (locale === "en" ? "The Red Sea" : "البحر الأحمر")}
           fill
           priority
           sizes="100vw"
@@ -285,31 +327,53 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-6">
           <Reveal>
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 font-display text-[#12394d] dark:text-white">
-              لماذا السياحة الاستشفائية؟
+              {locale === "en"
+                ? "Why therapeutic tourism?"
+                : "لماذا السياحة الاستشفائية؟"}
             </h2>
             <p className="text-center text-[#7b7c7d] mb-12 max-w-lg mx-auto">
-              مصر تمتلك ثروات طبيعية فريدة تجعلها من أفضل الوجهات الاستشفائية في
-              العالم
+              {locale === "en"
+                ? "Egypt holds unique natural resources that make it one of the world's best therapeutic destinations"
+                : "مصر تمتلك ثروات طبيعية فريدة تجعلها من أفضل الوجهات الاستشفائية في العالم"}
             </p>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                icon: "🌊",
-                title: "مياه علاجية",
-                desc: "مياه البحر الأحمر والعيون الكبريتية تحتوي على معادن نادرة تعالج الأمراض الجلدية وآلام المفاصل.",
-              },
-              {
-                icon: "🏜️",
-                title: "بيئات متنوعة",
-                desc: "من البحر إلى الصحراء إلى الجبال — كل بيئة تقدم تجربة علاجية مختلفة تناسب احتياجك.",
-              },
-              {
-                icon: "🧘",
-                title: "هدوء وتجدد",
-                desc: "الابتعاد عن ضوضاء المدينة والتواصل مع الطبيعة يُعيد التوازن للجسد والروح.",
-              },
-            ].map((card, i) => (
+            {(locale === "en"
+              ? [
+                  {
+                    icon: "🌊",
+                    title: "Healing waters",
+                    desc: "Red Sea waters and sulphur springs are rich in rare minerals that help treat skin conditions and joint pain.",
+                  },
+                  {
+                    icon: "🏜️",
+                    title: "Diverse environments",
+                    desc: "From sea to desert to mountains — each environment offers a different therapeutic experience to match your needs.",
+                  },
+                  {
+                    icon: "🧘",
+                    title: "Calm and renewal",
+                    desc: "Stepping away from the city's noise and reconnecting with nature restores balance to body and soul.",
+                  },
+                ]
+              : [
+                  {
+                    icon: "🌊",
+                    title: "مياه علاجية",
+                    desc: "مياه البحر الأحمر والعيون الكبريتية تحتوي على معادن نادرة تعالج الأمراض الجلدية وآلام المفاصل.",
+                  },
+                  {
+                    icon: "🏜️",
+                    title: "بيئات متنوعة",
+                    desc: "من البحر إلى الصحراء إلى الجبال — كل بيئة تقدم تجربة علاجية مختلفة تناسب احتياجك.",
+                  },
+                  {
+                    icon: "🧘",
+                    title: "هدوء وتجدد",
+                    desc: "الابتعاد عن ضوضاء المدينة والتواصل مع الطبيعة يُعيد التوازن للجسد والروح.",
+                  },
+                ]
+            ).map((card, i) => (
               <Reveal key={card.title} delay={i * 0.1}>
                 <div className="bg-white dark:bg-[#162033] rounded-[20px] p-8 shadow-[0_2px_8px_rgba(29,87,112,0.07)] border border-[#d0dde4] dark:border-[#1e3a5f] hover:-translate-y-2 hover:shadow-[0_8px_40px_rgba(29,87,112,0.16)] dark:hover:shadow-[0_8px_40px_rgba(0,0,0,0.4)] transition-all duration-300 h-full">
                   <div className="text-4xl mb-4">{card.icon}</div>
@@ -331,10 +395,14 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-6">
           <Reveal>
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 font-display text-[#12394d] dark:text-white">
-              وجهات استشفائية مختارة
+              {locale === "en"
+                ? "Selected therapeutic destinations"
+                : "وجهات استشفائية مختارة"}
             </h2>
             <p className="text-center text-[#7b7c7d] mb-12">
-              اكتشف أفضل الأماكن العلاجية في مصر
+              {locale === "en"
+                ? "Discover Egypt's best therapeutic places"
+                : "اكتشف أفضل الأماكن العلاجية في مصر"}
             </p>
           </Reveal>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -389,7 +457,7 @@ export default function HomePage() {
                 href="/destinations"
                 className="inline-block px-8 py-3 bg-[#1d5770] hover:bg-[#174860] text-white font-bold rounded-full text-sm transition-all duration-300 no-underline"
               >
-                عرض جميع الوجهات
+                {locale === "en" ? "View all destinations" : "عرض جميع الوجهات"}
               </Link>
             </div>
           </Reveal>
@@ -401,10 +469,38 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-6">
           <Reveal>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-              <Counter target={5} label="وجهات استشفائية" />
-              <Counter target={12} label="علاج طبيعي" />
-              <Counter target={4} label="بيئات مختلفة" />
-              <Counter target={365} label="يوم شمس في السنة" />
+              <Counter
+                target={5}
+                locale={locale}
+                label={
+                  locale === "en"
+                    ? "Therapeutic destinations"
+                    : "وجهات استشفائية"
+                }
+              />
+              <Counter
+                target={12}
+                locale={locale}
+                label={locale === "en" ? "Natural treatments" : "علاج طبيعي"}
+              />
+              <Counter
+                target={4}
+                locale={locale}
+                label={
+                  locale === "en"
+                    ? "Different environments"
+                    : "بيئات مختلفة"
+                }
+              />
+              <Counter
+                target={365}
+                locale={locale}
+                label={
+                  locale === "en"
+                    ? "Days of sun a year"
+                    : "يوم شمس في السنة"
+                }
+              />
             </div>
           </Reveal>
         </div>
@@ -415,42 +511,66 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-6">
           <Reveal>
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 font-display text-[#12394d] dark:text-white">
-              كيف تبدأ رحلتك؟
+              {locale === "en" ? "How does your journey start?" : "كيف تبدأ رحلتك؟"}
             </h2>
             <p className="text-center text-[#7b7c7d] mb-14 max-w-lg mx-auto">
-              ثلاث خطوات بسيطة تفصلك عن تجربة شفاء حقيقية
+              {locale === "en"
+                ? "Three simple steps stand between you and a real healing experience"
+                : "ثلاث خطوات بسيطة تفصلك عن تجربة شفاء حقيقية"}
             </p>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
             {/* Connecting line (desktop only) */}
             <div className="hidden md:block absolute top-14 left-1/6 right-1/6 h-px border-t-2 border-dashed border-[#91b149]/30" />
-            {[
-              {
-                num: "01",
-                title: "اختر المكان",
-                desc: "استكشف وجهاتنا الاستشفائية واختر البيئة المناسبة لحالتك — بحر، صحراء، واحة، أو جبال.",
-                icon: "🗺️",
-              },
-              {
-                num: "02",
-                title: "خطّط رحلتك",
-                desc: "استخدم أدواتنا الذكية لتخطيط رحلة مخصصة مع معلومات العلاج والإقامة والطقس.",
-                icon: "📋",
-              },
-              {
-                num: "03",
-                title: "استمتع بالشفاء",
-                desc: "انطلق في رحلتك العلاجية واستمتع بقوى الطبيعة الشافية في أجمل بقاع مصر.",
-                icon: "✨",
-              },
-            ].map((step, i) => (
+            {(locale === "en"
+              ? [
+                  {
+                    num: "01",
+                    title: "Choose your place",
+                    desc: "Explore our therapeutic destinations and pick the environment that suits your case — sea, desert, oasis, or mountains.",
+                    icon: "🗺️",
+                  },
+                  {
+                    num: "02",
+                    title: "Plan your trip",
+                    desc: "Use our smart tools to plan a custom trip with treatment, accommodation, and weather information.",
+                    icon: "📋",
+                  },
+                  {
+                    num: "03",
+                    title: "Enjoy the healing",
+                    desc: "Set off on your therapeutic journey and enjoy the healing powers of nature in Egypt's most beautiful spots.",
+                    icon: "✨",
+                  },
+                ]
+              : [
+                  {
+                    num: "01",
+                    title: "اختر المكان",
+                    desc: "استكشف وجهاتنا الاستشفائية واختر البيئة المناسبة لحالتك — بحر، صحراء، واحة، أو جبال.",
+                    icon: "🗺️",
+                  },
+                  {
+                    num: "02",
+                    title: "خطّط رحلتك",
+                    desc: "استخدم أدواتنا الذكية لتخطيط رحلة مخصصة مع معلومات العلاج والإقامة والطقس.",
+                    icon: "📋",
+                  },
+                  {
+                    num: "03",
+                    title: "استمتع بالشفاء",
+                    desc: "انطلق في رحلتك العلاجية واستمتع بقوى الطبيعة الشافية في أجمل بقاع مصر.",
+                    icon: "✨",
+                  },
+                ]
+            ).map((step, i) => (
               <Reveal key={step.num} delay={i * 0.15}>
                 <div className="relative text-center">
                   <div className="relative z-10 w-28 h-28 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#1d5770] to-[#12394d] flex items-center justify-center shadow-xl border-4 border-white dark:border-[#0d1b2a]">
                     <span className="text-4xl">{step.icon}</span>
                   </div>
                   <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-                    الخطوة {step.num}
+                    {locale === "en" ? "Step" : "الخطوة"} {step.num}
                   </div>
                   <h3 className="text-xl font-bold mb-3 text-[#12394d] dark:text-white font-display">
                     {step.title}
@@ -470,43 +590,77 @@ export default function HomePage() {
         <div className="max-w-[1280px] mx-auto px-6">
           <Reveal>
             <h2 className="text-2xl md:text-3xl font-bold text-center mb-3 font-display text-[#12394d] dark:text-white">
-              تجارب حقيقية
+              {locale === "en" ? "Real experiences" : "تجارب حقيقية"}
             </h2>
             <p className="text-center text-[#7b7c7d] mb-12 max-w-lg mx-auto">
-              ماذا يقول زوارنا عن رحلاتهم الاستشفائية
+              {locale === "en"
+                ? "What our visitors say about their therapeutic trips"
+                : "ماذا يقول زوارنا عن رحلاتهم الاستشفائية"}
             </p>
           </Reveal>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                quote:
-                  "بعد أسبوعين في سفاجا، لاحظت تحسن كبير في حالة الصدفية. البحر والشمس هنا مختلفين فعلاً.",
-                name: "أحمد محمود",
-                dest: "سفاجا",
-                rating: 5,
-              },
-              {
-                quote:
-                  "سيوة غيرت حياتي. العيون الكبريتية والهدوء اللي هناك خلاني أرجع إنسان جديد.",
-                name: "نورا السيد",
-                dest: "سيوة",
-                rating: 5,
-              },
-              {
-                quote:
-                  "أول مرة أجرب العلاج بالرمال في الصحراء. تجربة مذهلة وآلام المفاصل خفّت بشكل ملحوظ.",
-                name: "خالد إبراهيم",
-                dest: "الواحات البحرية",
-                rating: 5,
-              },
-              {
-                quote:
-                  "الفيوم قريبة وسهلة الوصول. قضيت ويكند هادي وسط الطبيعة وبقيت مرتاح نفسياً جداً.",
-                name: "سارة عبدالله",
-                dest: "الفيوم",
-                rating: 4,
-              },
-            ].map((t, i) => (
+            {(locale === "en"
+              ? [
+                  {
+                    quote:
+                      "After two weeks in Safaga, I noticed a big improvement in my psoriasis. The sea and sun here really are different.",
+                    name: "Ahmed Mahmoud",
+                    dest: "Safaga",
+                    rating: 5,
+                  },
+                  {
+                    quote:
+                      "Siwa changed my life. The sulphur springs and the calm there made me come back a new person.",
+                    name: "Noura El-Sayed",
+                    dest: "Siwa",
+                    rating: 5,
+                  },
+                  {
+                    quote:
+                      "First time trying sand therapy in the desert. An amazing experience — my joint pain eased noticeably.",
+                    name: "Khaled Ibrahim",
+                    dest: "Bahariya Oasis",
+                    rating: 5,
+                  },
+                  {
+                    quote:
+                      "Fayoum is close and easy to reach. I spent a calm weekend in nature and came back feeling so relaxed.",
+                    name: "Sara Abdullah",
+                    dest: "Fayoum",
+                    rating: 4,
+                  },
+                ]
+              : [
+                  {
+                    quote:
+                      "بعد أسبوعين في سفاجا، لاحظت تحسن كبير في حالة الصدفية. البحر والشمس هنا مختلفين فعلاً.",
+                    name: "أحمد محمود",
+                    dest: "سفاجا",
+                    rating: 5,
+                  },
+                  {
+                    quote:
+                      "سيوة غيرت حياتي. العيون الكبريتية والهدوء اللي هناك خلاني أرجع إنسان جديد.",
+                    name: "نورا السيد",
+                    dest: "سيوة",
+                    rating: 5,
+                  },
+                  {
+                    quote:
+                      "أول مرة أجرب العلاج بالرمال في الصحراء. تجربة مذهلة وآلام المفاصل خفّت بشكل ملحوظ.",
+                    name: "خالد إبراهيم",
+                    dest: "الواحات البحرية",
+                    rating: 5,
+                  },
+                  {
+                    quote:
+                      "الفيوم قريبة وسهلة الوصول. قضيت ويكند هادي وسط الطبيعة وبقيت مرتاح نفسياً جداً.",
+                    name: "سارة عبدالله",
+                    dest: "الفيوم",
+                    rating: 4,
+                  },
+                ]
+            ).map((t, i) => (
               <Reveal key={i} delay={i * 0.1}>
                 <div className="bg-white dark:bg-[#162033] rounded-2xl p-6 shadow-md border border-[#d0dde4] dark:border-[#1e3a5f] h-full flex flex-col hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
                   {/* Quote icon */}
@@ -555,8 +709,12 @@ export default function HomePage() {
         <div className="max-w-3xl mx-auto px-6">
           <Reveal>
             <FAQ
-              title="أسئلة شائعة عن السياحة الاستشفائية"
-              items={HOME_FAQ}
+              title={
+                locale === "en"
+                  ? "Frequently asked questions about therapeutic tourism"
+                  : "أسئلة شائعة عن السياحة الاستشفائية"
+              }
+              items={FAQ_DATA[locale]}
             />
           </Reveal>
         </div>

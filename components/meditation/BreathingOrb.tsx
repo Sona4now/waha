@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import type { BreathPhase } from "@/hooks/meditation/useBreathCycle";
 import type { BreathTimings } from "@/lib/meditation/sessions";
 import type { EnvId } from "@/lib/meditation/environments";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 interface Props {
   phase: BreathPhase;
@@ -20,11 +21,18 @@ interface Props {
   remainingSec?: number;
 }
 
-const PHASE_LABEL: Record<BreathPhase, string> = {
+const PHASE_LABEL_AR: Record<BreathPhase, string> = {
   in: "شهيق",
   hold1: "إمسك",
   out: "زفير",
   hold2: "إمسك",
+};
+
+const PHASE_LABEL_EN: Record<BreathPhase, string> = {
+  in: "Inhale",
+  hold1: "Hold",
+  out: "Exhale",
+  hold2: "Hold",
 };
 
 /**
@@ -90,6 +98,8 @@ export default function BreathingOrb({
   env,
   remainingSec,
 }: Props) {
+  const { locale } = useTranslations();
+  const PHASE_LABEL = locale === "en" ? PHASE_LABEL_EN : PHASE_LABEL_AR;
   const palette = env ? ORB_PALETTE[env] : DEFAULT_PALETTE;
 
   // Target scale per phase: inhale grows, exhale shrinks, holds stay.
@@ -186,7 +196,7 @@ export default function BreathingOrb({
           {typeof remainingSec === "number" && remainingSec > 0 && (
             <span
               className="text-white/55 text-[10px] font-mono mt-1 tabular-nums"
-              aria-label="الوقت المتبقي"
+              aria-label={locale === "en" ? "Time remaining" : "الوقت المتبقي"}
             >
               {formatRemaining(remainingSec)}
             </span>

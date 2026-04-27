@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 const STORAGE_KEY = "waaha_newsletter_emails";
 
@@ -22,6 +23,7 @@ const STORAGE_KEY = "waaha_newsletter_emails";
  * - Success state replaces the form so the user feels closure.
  */
 export default function NewsletterForm() {
+  const { locale } = useTranslations();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
@@ -32,12 +34,12 @@ export default function NewsletterForm() {
 
     const trimmed = email.trim();
     if (!trimmed) {
-      setError("اكتب بريدك الإلكتروني");
+      setError(locale === "en" ? "Please enter your email" : "اكتب بريدك الإلكتروني");
       return;
     }
     // Pragmatic email regex — not RFC 5322, just "looks like an email".
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) {
-      setError("البريد الإلكتروني غير صحيح");
+      setError(locale === "en" ? "Invalid email address" : "البريد الإلكتروني غير صحيح");
       return;
     }
 
@@ -55,7 +57,7 @@ export default function NewsletterForm() {
   }
 
   return (
-    <div className="rounded-2xl bg-white/5 border border-white/10 p-5" dir="rtl">
+    <div className="rounded-2xl bg-white/5 border border-white/10 p-5" dir={locale === "en" ? "ltr" : "rtl"}>
       <AnimatePresence mode="wait">
         {submitted ? (
           <motion.div
@@ -66,9 +68,13 @@ export default function NewsletterForm() {
             className="text-center py-2"
           >
             <span className="text-2xl block mb-2">✨</span>
-            <p className="text-sm font-bold text-white mb-1">شكراً!</p>
+            <p className="text-sm font-bold text-white mb-1">
+              {locale === "en" ? "Thank you!" : "شكراً!"}
+            </p>
             <p className="text-xs text-white/60 leading-relaxed">
-              هتلاقي رسالة منا أول كل موسم سياحي بأفضل الأماكن للزيارة وقتها.
+              {locale === "en"
+                ? "You'll get a message from us at the start of each tourist season with the best places to visit."
+                : "هتلاقي رسالة منا أول كل موسم سياحي بأفضل الأماكن للزيارة وقتها."}
             </p>
           </motion.div>
         ) : (
@@ -82,11 +88,13 @@ export default function NewsletterForm() {
             <div className="flex items-center gap-2 mb-2">
               <span className="text-lg">📨</span>
               <h3 className="font-display font-bold text-sm text-white">
-                اشترك في النشرة الموسمية
+                {locale === "en" ? "Subscribe to our seasonal newsletter" : "اشترك في النشرة الموسمية"}
               </h3>
             </div>
             <p className="text-xs text-white/60 leading-relaxed mb-3">
-              نصايح، عروض، وأفضل وقت لكل وجهة — 4 رسائل في السنة بس.
+              {locale === "en"
+                ? "Tips, offers, and the best time for every destination — only 4 emails a year."
+                : "نصايح، عروض، وأفضل وقت لكل وجهة — 4 رسائل في السنة بس."}
             </p>
             <div className="flex gap-2">
               <input
@@ -105,7 +113,7 @@ export default function NewsletterForm() {
                 type="submit"
                 className="flex-shrink-0 px-4 py-2 rounded-lg bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-xs transition-colors"
               >
-                اشترك
+                {locale === "en" ? "Subscribe" : "اشترك"}
               </button>
             </div>
             {error && (

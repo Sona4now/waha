@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslations } from "@/components/site/LocaleProvider";
 
 type ToastType = "success" | "info" | "warning" | "error";
 
@@ -63,6 +64,7 @@ const COLORS: Record<ToastType, { bg: string; text: string; border: string }> =
   };
 
 export default function ToastContainer() {
+  const { locale } = useTranslations();
   const [toasts, setToasts] = useState<Toast[]>([]);
 
   const removeToast = useCallback((id: string) => {
@@ -84,7 +86,7 @@ export default function ToastContainer() {
   return (
     <div
       className="fixed top-20 left-1/2 -translate-x-1/2 z-[130] flex flex-col gap-2 pointer-events-none"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <AnimatePresence>
         {toasts.map((toast) => {
@@ -110,7 +112,7 @@ export default function ToastContainer() {
                 <button
                   onClick={() => removeToast(toast.id)}
                   className="w-6 h-6 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors"
-                  aria-label="إغلاق"
+                  aria-label={locale === "en" ? "Close" : "إغلاق"}
                 >
                   <svg
                     width="12"

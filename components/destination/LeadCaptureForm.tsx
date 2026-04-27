@@ -62,11 +62,18 @@ export default function LeadCaptureForm({
       // Pre-fill notes with chosen tier from PricingPackages "احجز" CTA.
       const tier = sessionStorage.getItem(TIER_KEY);
       if (tier) {
-        const labelByTier: Record<string, string> = {
-          basic: "مهتم بالباقة الأساسية",
-          standard: "مهتم بالباقة الموصى بها",
-          premium: "مهتم بالباقة المتكاملة",
-        };
+        const labelByTier: Record<string, string> =
+          locale === "en"
+            ? {
+                basic: "Interested in the basic package",
+                standard: "Interested in the recommended package",
+                premium: "Interested in the premium package",
+              }
+            : {
+                basic: "مهتم بالباقة الأساسية",
+                standard: "مهتم بالباقة الموصى بها",
+                premium: "مهتم بالباقة المتكاملة",
+              };
         if (labelByTier[tier]) setNotes(labelByTier[tier]);
         sessionStorage.removeItem(TIER_KEY);
       }
@@ -143,7 +150,7 @@ export default function LeadCaptureForm({
   return (
     <div
       className="bg-gradient-to-br from-[#12394d] to-[#1d5770] dark:from-[#0a151f] dark:to-[#162033] rounded-3xl p-6 md:p-8 text-white shadow-[0_20px_60px_-15px_rgba(18,57,77,0.4)]"
-      dir="rtl"
+      dir={locale === "en" ? "ltr" : "rtl"}
     >
       <AnimatePresence mode="wait">
         {sent ? (
