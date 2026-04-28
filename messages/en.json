@@ -24,7 +24,6 @@
     "map": "Map",
     "blog": "Blog",
     "therapyRoom": "Therapy",
-    "symptoms": "Symptoms",
     "compare": "Compare",
     "calendar": "Calendar",
     "achievements": "Awards",
@@ -164,8 +163,6 @@
     },
     "noResultsTitle": "No destinations match those filters",
     "noResultsBody": "Try adjusting or clearing the filters to see all destinations",
-    "indecisive": "Still not sure?",
-    "trySymptomChecker": "Try the symptom checker",
     "viewGrid": "Grid view",
     "viewList": "List view",
     "appliedRecommendation": "✦ We pre-filtered for {treatment} based on your trip",
@@ -302,10 +299,6 @@
   "comparePage": {
     "title": "Compare Destinations",
     "subtitle": "Pick up to three destinations and compare them side by side"
-  },
-  "symptomsPage": {
-    "title": "Symptom Checker",
-    "subtitle": "Tell us what you're treating, and we'll suggest the right destination"
   },
   "achievementsPage": {
     "title": "My Achievements",

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useTranslations } from "@/components/site/LocaleProvider";
-import { resolveIntroVo, type IntroVoId } from "@/lib/introAudio";
+import { resolveIntroVo, INTRO_VO_TEXT, type IntroVoId } from "@/lib/introAudio";
 
 /**
  * Plays an intro VO clip when `playKey` flips to a non-null value.
@@ -30,16 +30,48 @@ export function useIntroVoice(
     let cancelled = false;
     const timer = setTimeout(async () => {
       const url = await resolveIntroVo(id, locale);
-      if (cancelled || !url) return;
+      if (cancelled) return;
 
-      const audio = new Audio(url);
-      audio.volume = opts.volume ?? 0.85;
-      audio.preload = "auto";
-      audioRef.current = audio;
-
-      // Autoplay can fail if the user hasn't interacted — we silently
-      // ignore the rejection so the cinematic flow doesn't break.
-      audio.play().catch(() => {});
+      if (url) {
+        // Real MP3 exists — play it.
+        const audio = new Audio(url);
+        audio.volume = opts.volume ?? 0.85;
+        audio.preload = "auto";
+        audioRef.current = audio;
+        audio.play().catch(() => {});
+      } else if (
+        typeof window !== "undefined" &&
+        "speechSynthesis" in window
+      ) {
+        // Fall back to Web Speech using the registered text for this clip.
+        const text = INTRO_VO_TEXT[id]?.[locale];
+        if (!text) return;
+        try {
+          window.speechSynthesis.cancel();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = locale === "ar" ? "ar-EG" : "en-US";
+          u.rate = 0.82;
+          u.pitch = 0.95;
+          u.volume = opts.volume ?? 0.85;
+          // Pick the best available voice for the locale.
+          const voices = window.speechSynthesis.getVoices();
+          if (locale === "ar") {
+            u.voice =
+              voices.find((v) => /maged|laila|tarik|majed/i.test(v.name)) ||
+              voices.find((v) => /ar[-_]eg/i.test(v.lang)) ||
+              voices.find((v) => v.lang?.toLowerCase().startsWith("ar")) ||
+              null;
+          } else {
+            u.voice =
+              voices.find((v) => /en[-_]us/i.test(v.lang)) ||
+              voices.find((v) => v.lang?.toLowerCase().startsWith("en")) ||
+              null;
+          }
+          window.speechSynthesis.speak(u);
+        } catch {
+          /* browser TTS unavailable — stay silent */
+        }
+      }
     }, opts.delay ?? 0);
 
     return () => {
@@ -49,6 +81,12 @@ export function useIntroVoice(
         audioRef.current.pause();
         audioRef.current.src = "";
         audioRef.current = null;
+      }
+      // Also stop any in-flight Web Speech utterance.
+      try {
+        window.speechSynthesis?.cancel();
+      } catch {
+        /* ignore */
       }
     };
     // We intentionally re-run on id/locale changes only.

@@ -784,30 +784,6 @@ export default function DestinationsPage() {
         </section>
       )}
 
-      {/* ── Helper for the indecisive — bottom of page in either mode. */}
-      {filtered.length > 0 && (
-        <section className="bg-[#f5f8fa] dark:bg-[#0a151f] pb-16">
-          <div className="max-w-6xl mx-auto px-4" dir="rtl">
-            <Reveal delay={0.4}>
-              <div className="text-center">
-                <div className="inline-flex flex-col sm:flex-row items-center gap-3 px-5 py-4 rounded-2xl bg-white dark:bg-[#162033] border border-[#d0dde4] dark:border-[#1e3a5f]">
-                  <span className="text-2xl">🤔</span>
-                  <p className="text-sm text-[#12394d] dark:text-white">
-                    {t("destinationsPage.indecisive")}
-                  </p>
-                  <Link
-                    href="/symptoms"
-                    className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-[#91b149] hover:bg-[#a3c45a] text-[#0a0f14] font-bold text-xs transition-colors no-underline"
-                  >
-                    {t("destinationsPage.trySymptomChecker")}
-                    <span>←</span>
-                  </Link>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-      )}
     </SiteLayout>
   );
 }

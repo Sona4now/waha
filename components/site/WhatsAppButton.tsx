@@ -52,10 +52,6 @@ function buildContextualMessage(path: string): string {
   if (path.startsWith("/destinations")) {
     return "أهلاً، بتفرج في الوجهات وعايز نصيحة لاختيار الأنسب لحالتي.";
   }
-  // /symptoms → quiz user
-  if (path.startsWith("/symptoms")) {
-    return "أهلاً، عملت فاحص الأعراض وعايز نتكلم عن التوصية.";
-  }
   // /compare
   if (path.startsWith("/compare")) {
     return "أهلاً، بقارن بين وجهات على الموقع وعايز رأيكم.";
@@ -82,9 +78,6 @@ function buildContextualMessageEn(path: string): string {
   }
   if (path.startsWith("/destinations")) {
     return "Hi, I'm browsing the destinations and would like advice on which is best for my case.";
-  }
-  if (path.startsWith("/symptoms")) {
-    return "Hi, I just took the symptom checker and want to talk through the recommendation.";
   }
   if (path.startsWith("/compare")) {
     return "Hi, I'm comparing destinations on your site and would value your input.";

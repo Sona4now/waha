@@ -27,9 +27,9 @@ export interface VoClip {
   at: number;
   /** Approximate spoken duration (used to estimate end time) */
   estimatedDuration: number;
-  /** Fallback text used by Web Speech when the real MP3 is missing.
-   *  Also serves as subtitle / documentation. */
-  text: string;
+  /** Narration text in both supported locales. Used by Web Speech when
+   *  the real MP3 is missing, and as subtitle / caption text. */
+  text: { ar: string; en: string };
 }
 
 export interface Session {
@@ -87,37 +87,55 @@ export const SESSIONS: Session[] = [
         id: "quick-calm__intro",
         at: 0,
         estimatedDuration: 15,
-        text: "أهلاً بيك في أول جلسة ليك. مش محتاج تكون خبير. بس خد وضعية مريحة، وخليني أمشي معاك.",
+        text: {
+          ar: "أهلاً بيك في أول جلسة ليك. مش محتاج تكون خبير. بس خد وضعية مريحة، وخليني أمشي معاك.",
+          en: "Welcome to your first session. You don't need to be an expert. Just find a comfortable position and let me guide you.",
+        },
       },
       {
         id: "quick-calm__guide-1",
         at: 30,
         estimatedDuration: 20,
-        text: "بص حواليك. لاحظ شكل المكان. دلوقتي، غمّض عينيك لو قدرت.",
+        text: {
+          ar: "بص حواليك. لاحظ شكل المكان. دلوقتي، غمّض عينيك لو قدرت.",
+          en: "Look around you. Notice the space. Now, gently close your eyes if you can.",
+        },
       },
       {
         id: "quick-calm__guide-2",
         at: 60,
         estimatedDuration: 25,
-        text: "خد نفس عميق من أنفك. حس الهوا. ولما تزفر، خليه يطلع من فمك. اتخيل إن كل زفير بيطلع معاه ضغط اليوم.",
+        text: {
+          ar: "خد نفس عميق من أنفك. حس الهوا. ولما تزفر، خليه يطلع من فمك. اتخيل إن كل زفير بيطلع معاه ضغط اليوم.",
+          en: "Take a deep breath through your nose. Feel the air. As you exhale through your mouth, imagine every breath out carries the day's tension with it.",
+        },
       },
       {
         id: "quick-calm__guide-3",
         at: 100,
         estimatedDuration: 20,
-        text: "مفيش حاجة لازمة منك دلوقتي. بس تتنفس. بس تكون موجود.",
+        text: {
+          ar: "مفيش حاجة لازمة منك دلوقتي. بس تتنفس. بس تكون موجود.",
+          en: "Nothing is required of you right now. Just breathe. Just be here.",
+        },
       },
       {
         id: "quick-calm__guide-4",
         at: 140,
         estimatedDuration: 15,
-        text: "افتكر، التنفس ده معاك طول حياتك. تقدر ترجع له في أي لحظة.",
+        text: {
+          ar: "افتكر، التنفس ده معاك طول حياتك. تقدر ترجع له في أي لحظة.",
+          en: "Remember, this breath is always with you. You can return to it at any moment.",
+        },
       },
       {
         id: "quick-calm__outro",
         at: 170,
         estimatedDuration: 10,
-        text: "ببطء، خد نفس أخير عميق، وارجع لليوم بتاعك.",
+        text: {
+          ar: "ببطء، خد نفس أخير عميق، وارجع لليوم بتاعك.",
+          en: "Slowly, take one last deep breath, and return to your day.",
+        },
       },
     ],
   },
@@ -137,37 +155,55 @@ export const SESSIONS: Session[] = [
         id: "box-focus__intro",
         at: 0,
         estimatedDuration: 15,
-        text: "خمس دقايق، وهترجع لأي حاجة بعدها بصفاء ذهن مختلف.",
+        text: {
+          ar: "خمس دقايق، وهترجع لأي حاجة بعدها بصفاء ذهن مختلف.",
+          en: "Five minutes, and you'll return to whatever comes next with a clearer mind.",
+        },
       },
       {
         id: "box-focus__guide-1",
         at: 30,
         estimatedDuration: 30,
-        text: "شهيق 4 ثواني، إمسك 4، زفير 4، إمسك 4. 4-4-4-4.",
+        text: {
+          ar: "شهيق 4 ثواني، إمسك 4، زفير 4، إمسك 4. 4-4-4-4.",
+          en: "Inhale for 4 counts, hold for 4, exhale for 4, hold for 4. Four-four-four-four.",
+        },
       },
       {
         id: "box-focus__guide-2",
         at: 80,
         estimatedDuration: 20,
-        text: "لو ذهنك سرح، عادي. ارجّعه بهدوء للتنفس. بدون لوم.",
+        text: {
+          ar: "لو ذهنك سرح، عادي. ارجّعه بهدوء للتنفس. بدون لوم.",
+          en: "If your mind drifts, that's fine. Gently bring it back to the breath. No judgment.",
+        },
       },
       {
         id: "box-focus__guide-3",
         at: 150,
         estimatedDuration: 25,
-        text: "إنت دلوقتي بتفعّل جهاز الاسترخاء في جسمك. كل دورة بتخلّي عقلك أوضح.",
+        text: {
+          ar: "إنت دلوقتي بتفعّل جهاز الاسترخاء في جسمك. كل دورة بتخلّي عقلك أوضح.",
+          en: "You're activating your body's relaxation system right now. Each cycle makes your mind clearer.",
+        },
       },
       {
         id: "box-focus__guide-4",
         at: 210,
         estimatedDuration: 20,
-        text: "افتكر اللحظة دي. لما ترجع للشغل، كفاية نفس واحد وترجع حاضر.",
+        text: {
+          ar: "افتكر اللحظة دي. لما ترجع للشغل، كفاية نفس واحد وترجع حاضر.",
+          en: "Remember this feeling. When you're back at work, one breath is all it takes to return here.",
+        },
       },
       {
         id: "box-focus__outro",
         at: 280,
         estimatedDuration: 15,
-        text: "ببطء، خد نفس عادي، افتح عينيك، وفضّل الصفاء ده معاك.",
+        text: {
+          ar: "ببطء، خد نفس عادي، افتح عينيك، وفضّل الصفاء ده معاك.",
+          en: "Slowly, take a normal breath, open your eyes, and carry this clarity with you.",
+        },
       },
     ],
   },
@@ -187,43 +223,64 @@ export const SESSIONS: Session[] = [
         id: "sleep-478__intro",
         at: 0,
         estimatedDuration: 20,
-        text: "الليلة هادية. لو عقلك بيفكر، عادي. احنا هنقوله يستريح.",
+        text: {
+          ar: "الليلة هادية. لو عقلك بيفكر، عادي. احنا هنقوله يستريح.",
+          en: "The night is calm. If your mind is racing, that's okay. We'll ask it to rest.",
+        },
       },
       {
         id: "sleep-478__guide-1",
         at: 40,
         estimatedDuration: 30,
-        text: "شهيق من أنفك 4 ثواني، إمسك 7، زفير طويل 8. الزفير أطول من الشهيق — ده مفتاح النوم.",
+        text: {
+          ar: "شهيق من أنفك 4 ثواني، إمسك 7، زفير طويل 8. الزفير أطول من الشهيق — ده مفتاح النوم.",
+          en: "Inhale through your nose for 4 counts, hold for 7, long exhale for 8. The longer exhale is the key to sleep.",
+        },
       },
       {
         id: "sleep-478__guide-2",
         at: 120,
         estimatedDuration: 25,
-        text: "أفكار اليوم بتيجي؟ خليها تعدي زي عربيات على طريق بعيد. مش محتاج تلحقهم.",
+        text: {
+          ar: "أفكار اليوم بتيجي؟ خليها تعدي زي عربيات على طريق بعيد. مش محتاج تلحقهم.",
+          en: "Thoughts from the day arriving? Let them pass like cars on a distant road. You don't need to follow them.",
+        },
       },
       {
         id: "sleep-478__guide-3",
         at: 210,
         estimatedDuration: 30,
-        text: "جسمك بيدخل في وضع الراحة. قلبك بيبطّأ. جفونك ثقيلة.",
+        text: {
+          ar: "جسمك بيدخل في وضع الراحة. قلبك بيبطّأ. جفونك ثقيلة.",
+          en: "Your body is entering rest mode. Your heart is slowing. Your eyelids are heavy.",
+        },
       },
       {
         id: "sleep-478__guide-4",
         at: 300,
         estimatedDuration: 25,
-        text: "بكرة يوم جديد. دلوقتي دورك إنك ترتاح. بس دي.",
+        text: {
+          ar: "بكرة يوم جديد. دلوقتي دورك إنك ترتاح. بس دي.",
+          en: "Tomorrow is a new day. Right now your only job is to rest. Just this.",
+        },
       },
       {
         id: "sleep-478__guide-5",
         at: 420,
         estimatedDuration: 20,
-        text: "لو عقلك سرح، ارجعه برفق. مفيش صح وغلط.",
+        text: {
+          ar: "لو عقلك سرح، ارجعه برفق. مفيش صح وغلط.",
+          en: "If your mind wanders, bring it back gently. There's no right or wrong here.",
+        },
       },
       {
         id: "sleep-478__outro",
         at: 560,
         estimatedDuration: 25,
-        text: "هفضّلك هنا. التنفس هيكمل معاك لحد ما تنام. تصبح على خير.",
+        text: {
+          ar: "هفضّلك هنا. التنفس هيكمل معاك لحد ما تنام. تصبح على خير.",
+          en: "I'll stay with you here. The breath will carry you until you sleep. Goodnight.",
+        },
       },
     ],
   },
@@ -243,61 +300,91 @@ export const SESSIONS: Session[] = [
         id: "body-scan__intro",
         at: 0,
         estimatedDuration: 20,
-        text: "هنعمل Body Scan. هنمشي بالـ attention من فوق لتحت. بدون حكم. بس ملاحظة.",
+        text: {
+          ar: "هنعمل Body Scan. هنمشي بالـ attention من فوق لتحت. بدون حكم. بس ملاحظة.",
+          en: "We'll do a body scan. Moving our attention from top to bottom. No judgment. Just noticing.",
+        },
       },
       {
         id: "body-scan__guide-head",
         at: 30,
         estimatedDuration: 30,
-        text: "ابدأ من فوق راسك. جبينك، حوالين عينيك، فكك. سيبهم كلهم يرتخوا.",
+        text: {
+          ar: "ابدأ من فوق راسك. جبينك، حوالين عينيك، فكك. سيبهم كلهم يرتخوا.",
+          en: "Start at the top of your head. Your forehead, around your eyes, your jaw. Let them all soften.",
+        },
       },
       {
         id: "body-scan__guide-neck",
         at: 90,
         estimatedDuration: 25,
-        text: "رقبتك. دورّها ببطء. كتفيك، ارفعهم وسيبهم ينزلوا.",
+        text: {
+          ar: "رقبتك. دورّها ببطء. كتفيك، ارفعهم وسيبهم ينزلوا.",
+          en: "Your neck. Roll it slowly. Your shoulders — raise them and let them drop.",
+        },
       },
       {
         id: "body-scan__guide-chest",
         at: 150,
         estimatedDuration: 30,
-        text: "صدرك. حس القلب. الأنفاس بتدخل وتطلع. إنت مش بتتنفس — إنت بيتم تنفسك.",
+        text: {
+          ar: "صدرك. حس القلب. الأنفاس بتدخل وتطلع. إنت مش بتتنفس — إنت بيتم تنفسك.",
+          en: "Your chest. Feel the heart. Breath moving in and out. You're not breathing — you're being breathed.",
+        },
       },
       {
         id: "body-scan__guide-abdomen",
         at: 210,
         estimatedDuration: 30,
-        text: "بطنك. ترتفع مع الشهيق، تنخفض مع الزفير. إيقاع قديم موجود فيك من يوم ما اتولدت.",
+        text: {
+          ar: "بطنك. ترتفع مع الشهيق، تنخفض مع الزفير. إيقاع قديم موجود فيك من يوم ما اتولدت.",
+          en: "Your belly. Rising with the inhale, falling with the exhale. An ancient rhythm that has lived in you since birth.",
+        },
       },
       {
         id: "body-scan__guide-back",
         at: 285,
         estimatedDuration: 25,
-        text: "ظهرك. لو فيه توتر، تنفس فيه. كل زفير بيفك عقدة صغيرة.",
+        text: {
+          ar: "ظهرك. لو فيه توتر، تنفس فيه. كل زفير بيفك عقدة صغيرة.",
+          en: "Your back. If there's tension, breathe into it. Each exhale releases a small knot.",
+        },
       },
       {
         id: "body-scan__guide-arms",
         at: 345,
         estimatedDuration: 25,
-        text: "ذراعيك. من الكتف للأصابع. حس الطاقة بتسري فيهم.",
+        text: {
+          ar: "ذراعيك. من الكتف للأصابع. حس الطاقة بتسري فيهم.",
+          en: "Your arms. From shoulder to fingertips. Feel the energy flowing through them.",
+        },
       },
       {
         id: "body-scan__guide-legs",
         at: 405,
         estimatedDuration: 30,
-        text: "فخاديك، ركبك، قدمك. كل جزء، شكراً إنه شايلك طول اليوم.",
+        text: {
+          ar: "فخاديك، ركبك، قدمك. كل جزء، شكراً إنه شايلك طول اليوم.",
+          en: "Your thighs, knees, feet. Each part — thank it for carrying you through the day.",
+        },
       },
       {
         id: "body-scan__guide-whole",
         at: 480,
         estimatedDuration: 30,
-        text: "دلوقتي، حس جسمك كله مرة واحدة. خفيف، مرتخي، في أمان.",
+        text: {
+          ar: "دلوقتي، حس جسمك كله مرة واحدة. خفيف، مرتخي، في أمان.",
+          en: "Now, feel your whole body at once. Light, relaxed, safe.",
+        },
       },
       {
         id: "body-scan__outro",
         at: 560,
         estimatedDuration: 25,
-        text: "افتكر الإحساس ده. ده إنت لما بتسيب نفسك ترتاح. ببطء، ارجع.",
+        text: {
+          ar: "افتكر الإحساس ده. ده إنت لما بتسيب نفسك ترتاح. ببطء، ارجع.",
+          en: "Remember this feeling. This is you when you let yourself rest. Slowly, return.",
+        },
       },
     ],
   },
@@ -317,43 +404,64 @@ export const SESSIONS: Session[] = [
         id: "beach-visualization__intro",
         at: 0,
         estimatedDuration: 20,
-        text: "دلوقتي، هخدك لمكان. مش في خيالك — في ذاكرتك. شط سفاجا وقت الغروب.",
+        text: {
+          ar: "دلوقتي، هخدك لمكان. مش في خيالك — في ذاكرتك. شط سفاجا وقت الغروب.",
+          en: "Right now, I'll take you somewhere. Not in your imagination — in your memory. The shore of Safaga at sunset.",
+        },
       },
       {
         id: "beach-visualization__guide-1",
         at: 30,
         estimatedDuration: 30,
-        text: "إنت واقف على الرمل. الرمل الأسود دافي تحت رجليك. البحر قدامك هادي.",
+        text: {
+          ar: "إنت واقف على الرمل. الرمل الأسود دافي تحت رجليك. البحر قدامك هادي.",
+          en: "You're standing on the sand. The dark sand warm beneath your feet. The sea is calm before you.",
+        },
       },
       {
         id: "beach-visualization__guide-2",
         at: 90,
         estimatedDuration: 35,
-        text: "اسمع موجة جاية. بتقرب، بتبوس الشط، وبترجع. كل موجة بتاخد معاها شوية من اللي مضايقك.",
+        text: {
+          ar: "اسمع موجة جاية. بتقرب، بتبوس الشط، وبترجع. كل موجة بتاخد معاها شوية من اللي مضايقك.",
+          en: "Listen — a wave approaching. It draws near, kisses the shore, and retreats. Each wave carries a little of what troubles you back with it.",
+        },
       },
       {
         id: "beach-visualization__guide-3",
         at: 180,
         estimatedDuration: 30,
-        text: "الشمس بتنزل. برتقالية، وردي، بنفسجي. النور ده شافي.",
+        text: {
+          ar: "الشمس بتنزل. برتقالية، وردي، بنفسجي. النور ده شافي.",
+          en: "The sun is descending. Orange, pink, violet. This light is healing.",
+        },
       },
       {
         id: "beach-visualization__guide-4",
         at: 270,
         estimatedDuration: 40,
-        text: "اتخيل النور البرتقالي بيدخل جسمك من فوق. بينزل في كتفيك، صدرك، بطنك. بيملأ كل خلية.",
+        text: {
+          ar: "اتخيل النور البرتقالي بيدخل جسمك من فوق. بينزل في كتفيك، صدرك، بطنك. بيملأ كل خلية.",
+          en: "Imagine the golden light entering your body from above. Flowing down through your shoulders, chest, belly. Filling every cell.",
+        },
       },
       {
         id: "beach-visualization__guide-5",
         at: 390,
         estimatedDuration: 30,
-        text: "الشط ده مش بعيد عنك. في أي لحظة ضغط، ارجع هنا.",
+        text: {
+          ar: "الشط ده مش بعيد عنك. في أي لحظة ضغط، ارجع هنا.",
+          en: "This shore is never far from you. In any moment of pressure, return here.",
+        },
       },
       {
         id: "beach-visualization__outro",
         at: 540,
         estimatedDuration: 25,
-        text: "الشمس بتغطّس. الموج بيهدا. ارجع معايا لما تكون جاهز.",
+        text: {
+          ar: "الشمس بتغطّس. الموج بيهدا. ارجع معايا لما تكون جاهز.",
+          en: "The sun is sinking. The waves are quieting. Come back with me when you're ready.",
+        },
       },
     ],
   },
@@ -373,43 +481,64 @@ export const SESSIONS: Session[] = [
         id: "desert-silence__intro",
         at: 0,
         estimatedDuration: 25,
-        text: "عشرين دقيقة من الصمت. مش صمت عادي — صمت الصحراء. بعيد عن كل صوت.",
+        text: {
+          ar: "عشرين دقيقة من الصمت. مش صمت عادي — صمت الصحراء. بعيد عن كل صوت.",
+          en: "Twenty minutes of silence. Not ordinary silence — the silence of the desert. Far from every sound.",
+        },
       },
       {
         id: "desert-silence__guide-1",
         at: 60,
         estimatedDuration: 30,
-        text: "قاعد على الرمل. السما فوقك مليانة نجوم. الصمت كامل.",
+        text: {
+          ar: "قاعد على الرمل. السما فوقك مليانة نجوم. الصمت كامل.",
+          en: "Seated on the sand. The sky above you full of stars. The silence is complete.",
+        },
       },
       {
         id: "desert-silence__guide-2",
         at: 240,
         estimatedDuration: 30,
-        text: "لو أفكار جت، خليها. الصحراء بتقبل كل حاجة. ما هتحاربهاش، بس هتلاحظها.",
+        text: {
+          ar: "لو أفكار جت، خليها. الصحراء بتقبل كل حاجة. ما هتحاربهاش، بس هتلاحظها.",
+          en: "If thoughts come, let them. The desert accepts everything. Don't fight them — just observe.",
+        },
       },
       {
         id: "desert-silence__guide-3",
         at: 480,
         estimatedDuration: 15,
-        text: "كمّل. إنت بخير.",
+        text: {
+          ar: "كمّل. إنت بخير.",
+          en: "Keep going. You're doing well.",
+        },
       },
       {
         id: "desert-silence__guide-4",
         at: 720,
         estimatedDuration: 30,
-        text: "في الصحراء، مفيش حاجة عاجلة. إنت جزء من إيقاع قديم.",
+        text: {
+          ar: "في الصحراء، مفيش حاجة عاجلة. إنت جزء من إيقاع قديم.",
+          en: "In the desert, nothing is urgent. You are part of an ancient rhythm.",
+        },
       },
       {
         id: "desert-silence__guide-5",
         at: 960,
         estimatedDuration: 20,
-        text: "لحظة أخيرة. خليها تمتد. كأنها أبد.",
+        text: {
+          ar: "لحظة أخيرة. خليها تمتد. كأنها أبد.",
+          en: "One last moment. Let it stretch. As if it were forever.",
+        },
       },
       {
         id: "desert-silence__outro",
         at: 1140,
         estimatedDuration: 25,
-        text: "ببطء شديد، ارجع. حرّك أصابعك. افتح عينيك. الصحراء هتفضل معاك.",
+        text: {
+          ar: "ببطء شديد، ارجع. حرّك أصابعك. افتح عينيك. الصحراء هتفضل معاك.",
+          en: "Very slowly, return. Move your fingers. Open your eyes. The desert will stay with you.",
+        },
       },
     ],
   },
@@ -429,43 +558,64 @@ export const SESSIONS: Session[] = [
         id: "mountain-focus__intro",
         at: 0,
         estimatedDuration: 20,
-        text: "إنت على قمة جبل سيناء. الفجر. الدنيا كلها تحت رجليك، بتصحى.",
+        text: {
+          ar: "إنت على قمة جبل سيناء. الفجر. الدنيا كلها تحت رجليك، بتصحى.",
+          en: "You're at the summit of Mount Sinai. Dawn. The whole world beneath your feet, waking.",
+        },
       },
       {
         id: "mountain-focus__guide-1",
         at: 30,
         estimatedDuration: 30,
-        text: "الهوا بارد. نقي. يملأ رئتيك ويصحّي كل خلية.",
+        text: {
+          ar: "الهوا بارد. نقي. يملأ رئتيك ويصحّي كل خلية.",
+          en: "The air is cold. Pure. It fills your lungs and awakens every cell.",
+        },
       },
       {
         id: "mountain-focus__guide-2",
         at: 120,
         estimatedDuration: 35,
-        text: "هنتنفس بالنمط المربع. 4 شهيق، 4 إمسك، 4 زفير، 4 إمسك. كل دورة بتشيل ضبابة.",
+        text: {
+          ar: "هنتنفس بالنمط المربع. 4 شهيق، 4 إمسك، 4 زفير، 4 إمسك. كل دورة بتشيل ضبابة.",
+          en: "We'll breathe in the box pattern. Inhale 4, hold 4, exhale 4, hold 4. Each cycle lifts a layer of fog.",
+        },
       },
       {
         id: "mountain-focus__guide-3",
         at: 300,
         estimatedDuration: 25,
-        text: "إنت هنا. حاضر. واضح. زي الشمس لما بتطلع من وراء الجبل.",
+        text: {
+          ar: "إنت هنا. حاضر. واضح. زي الشمس لما بتطلع من وراء الجبل.",
+          en: "You are here. Present. Clear. Like the sun rising from behind the mountain.",
+        },
       },
       {
         id: "mountain-focus__guide-4",
         at: 480,
         estimatedDuration: 30,
-        text: "اليوم الجاي فيه تحديات، بس إنت هتواجههم من مكان صفاء.",
+        text: {
+          ar: "اليوم الجاي فيه تحديات، بس إنت هتواجههم من مكان صفاء.",
+          en: "The day ahead has challenges, but you'll face them from a place of clarity.",
+        },
       },
       {
         id: "mountain-focus__guide-5",
         at: 660,
         estimatedDuration: 25,
-        text: "الشمس طلعت. الضبابة راحت. إنت جاهز.",
+        text: {
+          ar: "الشمس طلعت. الضبابة راحت. إنت جاهز.",
+          en: "The sun has risen. The fog has lifted. You are ready.",
+        },
       },
       {
         id: "mountain-focus__outro",
         at: 840,
         estimatedDuration: 25,
-        text: "ببطء، إرجع من الجبل. وإبدأ يومك من قمة.",
+        text: {
+          ar: "ببطء، إرجع من الجبل. وإبدأ يومك من قمة.",
+          en: "Slowly, descend from the mountain. And begin your day from its peak.",
+        },
       },
     ],
   },
@@ -485,37 +635,55 @@ export const SESSIONS: Session[] = [
         id: "gratitude__intro",
         at: 0,
         estimatedDuration: 15,
-        text: "صباح جديد. ممكن يكون صعب، ممكن يكون عادي. بس، لسه صباح.",
+        text: {
+          ar: "صباح جديد. ممكن يكون صعب، ممكن يكون عادي. بس، لسه صباح.",
+          en: "A new morning. It might be hard, it might be ordinary. But it's still a morning.",
+        },
       },
       {
         id: "gratitude__guide-1",
         at: 30,
         estimatedDuration: 25,
-        text: "خد نفس عميق. وقول في سرّك: أنا ممتن. ما تكمّلش. سيبها مفتوحة.",
+        text: {
+          ar: "خد نفس عميق. وقول في سرّك: أنا ممتن. ما تكمّلش. سيبها مفتوحة.",
+          en: "Take a deep breath. And say to yourself: I am grateful. Don't complete it. Leave it open.",
+        },
       },
       {
         id: "gratitude__guide-2",
         at: 90,
         estimatedDuration: 30,
-        text: "فكّر في 3 حاجات صغيرة. كوباية قهوة، ضحكة، سرير دافي.",
+        text: {
+          ar: "فكّر في 3 حاجات صغيرة. كوباية قهوة، ضحكة، سرير دافي.",
+          en: "Think of 3 small things. A cup of coffee, a laugh, a warm bed.",
+        },
       },
       {
         id: "gratitude__guide-3",
         at: 180,
         estimatedDuration: 30,
-        text: "حسّ الامتنان. دفّي في صدرك؟ ده الجسم بيستقبل النعمة.",
+        text: {
+          ar: "حسّ الامتنان. دفّي في صدرك؟ ده الجسم بيستقبل النعمة.",
+          en: "Feel the gratitude. Warmth in your chest? That's the body receiving grace.",
+        },
       },
       {
         id: "gratitude__guide-4",
         at: 270,
         estimatedDuration: 25,
-        text: "الامتنان مش إنكار للصعب. ده اعتراف بإن فيه جمال موجود.",
+        text: {
+          ar: "الامتنان مش إنكار للصعب. ده اعتراف بإن فيه جمال موجود.",
+          en: "Gratitude isn't denial of difficulty. It's an acknowledgment that beauty also exists.",
+        },
       },
       {
         id: "gratitude__outro",
         at: 380,
         estimatedDuration: 20,
-        text: "امشي في يومك، وإنت حاسس النعمة دي.",
+        text: {
+          ar: "امشي في يومك، وإنت حاسس النعمة دي.",
+          en: "Move through your day carrying this sense of grace.",
+        },
       },
     ],
   },
@@ -535,43 +703,64 @@ export const SESSIONS: Session[] = [
         id: "anxiety-release__intro",
         at: 0,
         estimatedDuration: 20,
-        text: "إنت هنا. القلق ده إحساس، مش حقيقة. هييجي ويروح. خليني معاك.",
+        text: {
+          ar: "إنت هنا. القلق ده إحساس، مش حقيقة. هييجي ويروح. خليني معاك.",
+          en: "You are here. This anxiety is a feeling, not a fact. It will come and go. Let me be with you.",
+        },
       },
       {
         id: "anxiety-release__guide-1",
         at: 30,
         estimatedDuration: 30,
-        text: "أولاً، شكراً لجسمك. هو بيحاول يحميك. دلوقتي هنقوله: شكراً، بس أنا آمن.",
+        text: {
+          ar: "أولاً، شكراً لجسمك. هو بيحاول يحميك. دلوقتي هنقوله: شكراً، بس أنا آمن.",
+          en: "First, thank your body. It's trying to protect you. Now let's tell it: thank you, but I am safe.",
+        },
       },
       {
         id: "anxiety-release__guide-2",
         at: 90,
         estimatedDuration: 30,
-        text: "شهيق 4 ثواني، إمسك 7، زفير طويل 8. الزفير الطويل بيفعّل الراحة. علمياً.",
+        text: {
+          ar: "شهيق 4 ثواني، إمسك 7، زفير طويل 8. الزفير الطويل بيفعّل الراحة. علمياً.",
+          en: "Inhale for 4 counts, hold for 7, long exhale for 8. The long exhale activates calm. Scientifically.",
+        },
       },
       {
         id: "anxiety-release__guide-3",
         at: 180,
         estimatedDuration: 30,
-        text: "ركّز في 5 حاجات بتشوفهم، 4 بتحسهم، 3 بتسمعهم، 2 ريحة، 1 طعم.",
+        text: {
+          ar: "ركّز في 5 حاجات بتشوفهم، 4 بتحسهم، 3 بتسمعهم، 2 ريحة، 1 طعم.",
+          en: "Notice 5 things you can see, 4 you can feel, 3 you can hear, 2 you can smell, 1 you can taste.",
+        },
       },
       {
         id: "anxiety-release__guide-4",
         at: 330,
         estimatedDuration: 25,
-        text: "التمرين ده بيرجّع عقلك للحاضر. القلق بيعيش في المستقبل. إنت دلوقتي هنا.",
+        text: {
+          ar: "التمرين ده بيرجّع عقلك للحاضر. القلق بيعيش في المستقبل. إنت دلوقتي هنا.",
+          en: "This exercise brings your mind back to the present. Anxiety lives in the future. You are here, now.",
+        },
       },
       {
         id: "anxiety-release__guide-5",
         at: 420,
         estimatedDuration: 30,
-        text: "إنت أقوى من القلق. شفت قلق قبل كده وعدّى. ده هيعدّي برضه.",
+        text: {
+          ar: "إنت أقوى من القلق. شفت قلق قبل كده وعدّى. ده هيعدّي برضه.",
+          en: "You are stronger than this anxiety. You've faced it before and it passed. This will pass too.",
+        },
       },
       {
         id: "anxiety-release__outro",
         at: 560,
         estimatedDuration: 25,
-        text: "افتكر، التنفس ده معاك. في أي لحظة تحتاجه، ارجع له. إنت مش لوحدك.",
+        text: {
+          ar: "افتكر، التنفس ده معاك. في أي لحظة تحتاجه، ارجع له. إنت مش لوحدك.",
+          en: "Remember, this breath is with you always. Whenever you need it, return to it. You are not alone.",
+        },
       },
     ],
   },
@@ -591,49 +780,73 @@ export const SESSIONS: Session[] = [
         id: "deep-relax__intro",
         at: 0,
         estimatedDuration: 25,
-        text: "نص ساعة بالكامل ليك. مفيش حاجة أهم من اللحظة دي.",
+        text: {
+          ar: "نص ساعة بالكامل ليك. مفيش حاجة أهم من اللحظة دي.",
+          en: "A full half hour, entirely yours. Nothing is more important than this moment.",
+        },
       },
       {
         id: "deep-relax__guide-1",
         at: 60,
         estimatedDuration: 30,
-        text: "الجلسة دي مش سباق. لو سرح ذهنك، عادي. لو نمت، عادي. كل حاجة هتحصل هنا صح.",
+        text: {
+          ar: "الجلسة دي مش سباق. لو سرح ذهنك، عادي. لو نمت، عادي. كل حاجة هتحصل هنا صح.",
+          en: "This session is not a race. If your mind drifts, that's fine. If you fall asleep, that's fine. Everything that happens here is right.",
+        },
       },
       {
         id: "deep-relax__guide-2",
         at: 240,
         estimatedDuration: 30,
-        text: "جسمك بيحمل كل ضغط الأسبوع. دلوقتي بيسلمهم لك. خدهم، وخليهم يروحوا.",
+        text: {
+          ar: "جسمك بيحمل كل ضغط الأسبوع. دلوقتي بيسلمهم لك. خدهم، وخليهم يروحوا.",
+          en: "Your body has been carrying the week's weight. Now it's handing it over to you. Receive it, and let it go.",
+        },
       },
       {
         id: "deep-relax__guide-3",
         at: 480,
         estimatedDuration: 15,
-        text: "استمر. إنت بتعمل حاجة عظيمة.",
+        text: {
+          ar: "استمر. إنت بتعمل حاجة عظيمة.",
+          en: "Keep going. You're doing something remarkable.",
+        },
       },
       {
         id: "deep-relax__guide-4",
         at: 840,
         estimatedDuration: 30,
-        text: "ممكن تحس تحول داخلي صغير. مش لازم تعرفه بالظبط. بس لاحظه.",
+        text: {
+          ar: "ممكن تحس تحول داخلي صغير. مش لازم تعرفه بالظبط. بس لاحظه.",
+          en: "You may feel a small inner shift. You don't need to understand it exactly. Just notice it.",
+        },
       },
       {
         id: "deep-relax__guide-5",
         at: 1200,
         estimatedDuration: 25,
-        text: "النفس بيكمل بدون مجهود. ذهنك أهدى. جسمك أخف. قلبك أوسع.",
+        text: {
+          ar: "النفس بيكمل بدون مجهود. ذهنك أهدى. جسمك أخف. قلبك أوسع.",
+          en: "The breath continues without effort. Your mind is quieter. Your body lighter. Your heart wider.",
+        },
       },
       {
         id: "deep-relax__guide-6",
         at: 1560,
         estimatedDuration: 20,
-        text: "لحظات كمان. مع الصمت. مع نفسك.",
+        text: {
+          ar: "لحظات كمان. مع الصمت. مع نفسك.",
+          en: "A few more moments. With the silence. With yourself.",
+        },
       },
       {
         id: "deep-relax__outro",
         at: 1740,
         estimatedDuration: 30,
-        text: "ببطء شديد، ارجع. ادّي لنفسك لحظة قبل ما تقوم. إنت خلقت حاجة جميلة.",
+        text: {
+          ar: "ببطء شديد، ارجع. ادّي لنفسك لحظة قبل ما تقوم. إنت خلقت حاجة جميلة.",
+          en: "Very slowly, return. Give yourself a moment before you rise. You created something beautiful.",
+        },
       },
     ],
   },
@@ -654,10 +867,9 @@ export const SESSION_TAGS = [
   { id: "صباح", label: "صباحية", icon: "☀️" },
 ] as const;
 
-/** Helper: the flat array of narration lines — kept for backward
- *  compatibility with the old player / summary components. */
-export function narrationLinesOf(session: Session): string[] {
-  return session.voClips.map((c) => c.text);
+/** Helper: the flat array of narration lines for the given locale. */
+export function narrationLinesOf(session: Session, locale: "ar" | "en" = "ar"): string[] {
+  return session.voClips.map((c) => c.text[locale]);
 }
 
 /* ─────────────────────────────────────────────────────────

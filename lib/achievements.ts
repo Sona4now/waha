@@ -15,7 +15,6 @@ export interface UserState {
   destinationsVisited: string[];
   articlesRead: number;
   cinematicCompleted: boolean;
-  symptomCheckerUsed: boolean;
   aiChatUsed: boolean;
   favoritesCount: number;
   comparisonsMade: number;
@@ -59,15 +58,6 @@ export const ACHIEVEMENTS: Achievement[] = [
     descriptionEn: "Completed the full cinematic experience",
     icon: "🎬",
     condition: (s) => s.cinematicCompleted,
-  },
-  {
-    id: "health-conscious",
-    title: "الواعي صحياً",
-    description: "جربت فاحص الأعراض",
-    titleEn: "Health Conscious",
-    descriptionEn: "Tried the symptom checker",
-    icon: "🩺",
-    condition: (s) => s.symptomCheckerUsed,
   },
   {
     id: "curious",
@@ -125,7 +115,6 @@ export function getUserState(): UserState {
       destinationsVisited: [],
       articlesRead: 0,
       cinematicCompleted: false,
-      symptomCheckerUsed: false,
       aiChatUsed: false,
       favoritesCount: 0,
       comparisonsMade: 0,
@@ -143,7 +132,6 @@ export function getUserState(): UserState {
     destinationsVisited: [],
     articlesRead: 0,
     cinematicCompleted: false,
-    symptomCheckerUsed: false,
     aiChatUsed: false,
     favoritesCount: 0,
     comparisonsMade: 0,
@@ -183,7 +171,6 @@ export function trackAction(action: keyof UserState) {
     updateUserState({ [action]: ((state[action] as number) || 0) + 1 });
   } else if (
     action === "cinematicCompleted" ||
-    action === "symptomCheckerUsed" ||
     action === "aiChatUsed"
   ) {
     updateUserState({ [action]: true });

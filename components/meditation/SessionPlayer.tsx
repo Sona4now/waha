@@ -136,6 +136,7 @@ export default function SessionPlayer({
   // files; everything runs locally through the browser's TTS).
   const { speak, stop: stopSpeech, unlock: unlockSpeech } = useVoiceNarrator({
     enabled: voiceEnabled,
+    locale,
     volume: mixer.voice / 100,
   });
 
@@ -189,6 +190,7 @@ export default function SessionPlayer({
   // Fully-procedural 3-layer audio engine. Zero files, zero network.
   const { currentClipIdx, playStart, playEnd, skipClip } = useSessionAudio({
     session,
+    locale,
     playing,
     elapsed,
     intro,
@@ -201,7 +203,9 @@ export default function SessionPlayer({
   });
 
   const currentCaption =
-    currentClipIdx >= 0 ? session.voClips[currentClipIdx]?.text ?? "" : "";
+    currentClipIdx >= 0
+      ? (session.voClips[currentClipIdx]?.text[locale] ?? "")
+      : "";
 
   // 3-2-1 intro countdown.
   // The intro exists partly as UX (deep breath before we begin) and partly

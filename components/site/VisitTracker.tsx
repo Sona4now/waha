@@ -29,11 +29,6 @@ export default function VisitTracker() {
       if (destId) trackDestinationVisit(destId);
     }
 
-    // Track specific pages
-    if (pathname === "/symptoms") {
-      trackAction("symptomCheckerUsed");
-    }
-
     if (pathname === "/tours") {
       // Tours tracked separately when user interacts
     }
