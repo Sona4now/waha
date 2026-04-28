@@ -52,10 +52,6 @@ function buildContextualMessage(path: string): string {
   if (path.startsWith("/destinations")) {
     return "أهلاً، بتفرج في الوجهات وعايز نصيحة لاختيار الأنسب لحالتي.";
   }
-  // /compare
-  if (path.startsWith("/compare")) {
-    return "أهلاً، بقارن بين وجهات على الموقع وعايز رأيكم.";
-  }
   // /calendar
   if (path.startsWith("/calendar")) {
     return "أهلاً، بشوف التقويم وعايز أحجز رحلة في الموسم القادم.";
@@ -78,9 +74,6 @@ function buildContextualMessageEn(path: string): string {
   }
   if (path.startsWith("/destinations")) {
     return "Hi, I'm browsing the destinations and would like advice on which is best for my case.";
-  }
-  if (path.startsWith("/compare")) {
-    return "Hi, I'm comparing destinations on your site and would value your input.";
   }
   if (path.startsWith("/calendar")) {
     return "Hi, I'm looking at the calendar and want to book a trip for the upcoming season.";

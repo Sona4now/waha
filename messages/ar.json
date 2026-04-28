@@ -24,7 +24,6 @@
     "map": "الخريطة",
     "blog": "المدونة",
     "therapyRoom": "غرفة العلاج",
-    "compare": "المقارنة",
     "calendar": "التقويم",
     "achievements": "إنجازاتي",
     "about": "من نحن",
@@ -295,10 +294,6 @@
   "calendarPage": {
     "title": "التقويم الموسمي",
     "subtitle": "متى تكون كل وجهة في أفضل حالاتها على مدار السنة"
-  },
-  "comparePage": {
-    "title": "قارن الوجهات",
-    "subtitle": "اختار حتى 3 وجهات وقارنهم جنب بعض"
   },
   "achievementsPage": {
     "title": "إنجازاتي",

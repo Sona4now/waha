@@ -13,7 +13,6 @@ import dynamic from "next/dynamic";
 
 const ChatWidget = dynamic(() => import("./ChatWidget"), { ssr: false });
 const SearchCommand = dynamic(() => import("./SearchCommand"), { ssr: false });
-const ComparisonTray = dynamic(() => import("./ComparisonTray"), { ssr: false });
 const SmartWelcome = dynamic(() => import("./SmartWelcome"), { ssr: false });
 const ToastContainer = dynamic(() => import("./Toast"), { ssr: false });
 const WellnessTip = dynamic(() => import("./WellnessTip"), { ssr: false });
@@ -39,7 +38,6 @@ export default function ClientWidgets() {
     <>
       <ChatWidget />
       <SearchCommand />
-      <ComparisonTray />
       <SmartWelcome />
       <ToastContainer />
       <WellnessTip />

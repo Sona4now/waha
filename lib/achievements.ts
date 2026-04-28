@@ -17,7 +17,6 @@ export interface UserState {
   cinematicCompleted: boolean;
   aiChatUsed: boolean;
   favoritesCount: number;
-  comparisonsMade: number;
   visitCount: number;
   toursWatched: number;
 }
@@ -78,15 +77,6 @@ export const ACHIEVEMENTS: Achievement[] = [
     condition: (s) => s.favoritesCount >= 3,
   },
   {
-    id: "analyst",
-    title: "المحلل",
-    description: "قارنت بين وجهتين",
-    titleEn: "Analyst",
-    descriptionEn: "Compared two destinations",
-    icon: "⚖️",
-    condition: (s) => s.comparisonsMade >= 1,
-  },
-  {
     id: "loyal",
     title: "زائر مُخلص",
     description: "رجعت للموقع 5 مرات",
@@ -117,7 +107,6 @@ export function getUserState(): UserState {
       cinematicCompleted: false,
       aiChatUsed: false,
       favoritesCount: 0,
-      comparisonsMade: 0,
       visitCount: 0,
       toursWatched: 0,
     };
@@ -134,7 +123,6 @@ export function getUserState(): UserState {
     cinematicCompleted: false,
     aiChatUsed: false,
     favoritesCount: 0,
-    comparisonsMade: 0,
     visitCount: 0,
     toursWatched: 0,
   };
@@ -165,7 +153,6 @@ export function trackAction(action: keyof UserState) {
     action === "articlesRead" ||
     action === "visitCount" ||
     action === "favoritesCount" ||
-    action === "comparisonsMade" ||
     action === "toursWatched"
   ) {
     updateUserState({ [action]: ((state[action] as number) || 0) + 1 });

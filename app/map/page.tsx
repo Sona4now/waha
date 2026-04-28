@@ -182,7 +182,6 @@ export default function MapPage() {
       "fly-to": 783.99,
       reveal: 880.0,
       sites: 523.25,
-      compare: 493.88,
     };
     playChime(freqByAct[act], 0.15, 1.4);
   }, [act, freeExplore]);

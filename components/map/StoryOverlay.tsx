@@ -17,8 +17,7 @@ export type Act =
   | "context"
   | "fly-to"
   | "reveal"
-  | "sites"
-  | "compare";
+  | "sites";
 
 const ACT_ORDER: Act[] = [
   "welcome",
@@ -26,7 +25,6 @@ const ACT_ORDER: Act[] = [
   "fly-to",
   "reveal",
   "sites",
-  "compare",
 ];
 
 /**
@@ -300,54 +298,6 @@ export default function StoryOverlay({
                       : "لسه بنوثق المواقع الداخلية للوجهة دي — قريباً."}
                   </p>
                 )}
-                <button
-                  onClick={() => onActChange("compare")}
-                  className="w-full py-2.5 bg-white/10 hover:bg-white/20 text-white font-bold rounded-full text-sm transition-colors"
-                >
-                  {locale === "en" ? "Compare with other suitable destinations" : "قارن مع وجهات تانية مناسبة"}
-                </button>
-              </ActSlide>
-            )}
-
-            {act === "compare" && (
-              <ActSlide key="compare">
-                <div className="text-[10px] uppercase tracking-[0.3em] text-[#91b149] font-bold mb-2">
-                  {locale === "en" ? "Comparison" : "مقارنة"}
-                </div>
-                <h3 className="text-base font-display font-black text-white mb-3">
-                  {locale === "en" ? "Other destinations suitable for you" : "وجهات تانية مناسبة لحالتك"}
-                </h3>
-                <div className="space-y-2 mb-3">
-                  {compatibleDestinations.slice(0, 3).map((d) => (
-                    <Link
-                      key={d.id}
-                      href={`/destination/${d.id}`}
-                      className="flex items-center gap-3 p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/5 no-underline transition-colors"
-                    >
-                      <div
-                        className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                        style={{ background: `${d.color}25` }}
-                      >
-                        {d.envIcon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-white font-bold text-sm">
-                          {d.name}
-                        </div>
-                        <div className="text-white/50 text-[11px] line-clamp-1">
-                          {d.pitch || d.description}
-                        </div>
-                      </div>
-                      <span className="text-white/40 text-xs">←</span>
-                    </Link>
-                  ))}
-                </div>
-                <button
-                  onClick={onSkip}
-                  className="w-full py-2 text-white/60 hover:text-white text-xs font-bold transition-colors"
-                >
-                  {locale === "en" ? "Explore the map freely" : "استكشف الخريطة بحرية"}
-                </button>
               </ActSlide>
             )}
           </AnimatePresence>

@@ -16,7 +16,6 @@ const linkDefs: { href: string; key: string }[] = [
   { href: "/map", key: "nav.map" },
   { href: "/blog", key: "nav.blog" },
   { href: "/therapy-room", key: "nav.therapyRoom" },
-  { href: "/compare", key: "nav.compare" },
   { href: "/calendar", key: "nav.calendar" },
   { href: "/achievements", key: "nav.achievements" },
   { href: "/about", key: "nav.about" },
@@ -89,7 +88,7 @@ export default function Navbar() {
             <li key={l.href} className="flex-shrink-0">
               <Link
                 href={l.href}
-                className={`block px-2.5 py-2 text-[0.85rem] font-semibold rounded-[10px] transition-all duration-300 no-underline whitespace-nowrap ${
+                className={`block px-3 py-2 text-[0.9rem] font-semibold rounded-[10px] transition-all duration-300 no-underline whitespace-nowrap ${
                   pathname === l.href
                     ? "text-[#1d5770] dark:text-[#91b149] bg-[#e4edf2] dark:bg-[#162033]"
                     : "text-[#12394d] dark:text-white/80 hover:text-[#1d5770] dark:hover:text-[#91b149] hover:bg-[#e4edf2] dark:hover:bg-[#162033]"

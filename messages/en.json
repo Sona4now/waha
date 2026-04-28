@@ -24,7 +24,6 @@
     "map": "Map",
     "blog": "Blog",
     "therapyRoom": "Therapy",
-    "compare": "Compare",
     "calendar": "Calendar",
     "achievements": "Awards",
     "about": "About",
@@ -295,10 +294,6 @@
   "calendarPage": {
     "title": "Seasonal Calendar",
     "subtitle": "When each destination is at its best, throughout the year"
-  },
-  "comparePage": {
-    "title": "Compare Destinations",
-    "subtitle": "Pick up to three destinations and compare them side by side"
   },
   "achievementsPage": {
     "title": "My Achievements",
