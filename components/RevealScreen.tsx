@@ -6,16 +6,46 @@ import Particles from "./Particles";
 import { useTranslations } from "@/components/site/LocaleProvider";
 import { useIntroVoice } from "@/hooks/useIntroVoice";
 import type { IntroVoId } from "@/lib/introAudio";
+import type { Answers } from "@/utils/getRecommendation";
 
 interface Props {
   destination: Destination;
+  answers?: Partial<Answers>;
   onExplore: () => void;
   on360: () => void;
   onShare: () => void;
 }
 
-export default function RevealScreen({ destination, onExplore, on360, onShare }: Props) {
+const NEED: Record<string, { ar: string; en: string }> = {
+  body:  { ar: "جسمك يحتاج راحة",       en: "Your body needs relief"      },
+  mind:  { ar: "عقلك يحتاج صفاء",       en: "Your mind needs clarity"     },
+  relax: { ar: "روحك تحتاج استرخاء",    en: "Your soul needs relaxation"  },
+};
+const ENV: Record<string, { ar: string; en: string }> = {
+  sea:       { ar: "والبحر هو مكانك",    en: "and the sea calls you home"       },
+  desert:    { ar: "والصحراء هي مكانك", en: "and the desert calls you home"    },
+  mountains: { ar: "والجبال هي مكانك",  en: "and the mountains call you home"  },
+  oasis:     { ar: "والواحات هي مكانك", en: "and the oases call you home"      },
+};
+const STYLE: Record<string, { ar: string; en: string }> = {
+  calm:        { ar: "في رحلة هادئة ومريحة",        en: "on a calm, peaceful journey"    },
+  exploratory: { ar: "في رحلة استكشافية مثيرة",     en: "on an exploratory adventure"    },
+  deep:        { ar: "في رحلة عميقة ومؤثرة",        en: "on a deep, meaningful journey"  },
+};
+
+function buildWhy(answers: Partial<Answers> | undefined, locale: "ar" | "en"): string {
+  if (!answers) return "";
+  const sep = locale === "ar" ? "، " : " — ";
+  return [
+    answers.need        && NEED[answers.need]?.[locale],
+    answers.environment && ENV[answers.environment]?.[locale],
+    answers.journeyStyle && STYLE[answers.journeyStyle]?.[locale],
+  ].filter(Boolean).join(sep);
+}
+
+export default function RevealScreen({ destination, answers, onExplore, on360, onShare }: Props) {
   const { locale } = useTranslations();
+  const why = buildWhy(answers, locale);
 
   // Play the destination's reveal VO once the screen mounts. The
   // 1200ms delay matches the heading's animation timing — the spoken
@@ -79,11 +109,24 @@ export default function RevealScreen({ destination, onExplore, on360, onShare }:
           {destination.subtitle}
         </motion.p>
 
+        {/* Personalised why */}
+        {why && (
+          <motion.p
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2.1, duration: 0.9 }}
+            className="text-[0.8rem] sm:text-sm text-[#91b149]/75 tracking-wide"
+            dir={locale === "ar" ? "rtl" : "ltr"}
+          >
+            {why}
+          </motion.p>
+        )}
+
         {/* Poem */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 2.2, duration: 1 }}
+          transition={{ delay: 2.5, duration: 1 }}
           className="text-sm text-white/40 italic"
         >
           &ldquo;{destination.poem}&rdquo;
@@ -93,7 +136,7 @@ export default function RevealScreen({ destination, onExplore, on360, onShare }:
         <motion.div
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ delay: 2.5, duration: 0.8 }}
+          transition={{ delay: 2.9, duration: 0.8 }}
           className="w-14 h-px bg-[#91b149]/30 my-1"
         />
 
@@ -101,7 +144,7 @@ export default function RevealScreen({ destination, onExplore, on360, onShare }:
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2.8, duration: 0.8 }}
+          transition={{ delay: 3.2, duration: 0.8 }}
           className="flex flex-col sm:flex-row gap-3 w-full max-w-sm"
           dir={locale === "en" ? "ltr" : "rtl"}
         >
@@ -126,7 +169,7 @@ export default function RevealScreen({ destination, onExplore, on360, onShare }:
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 3.3, duration: 0.6 }}
+          transition={{ delay: 3.7, duration: 0.6 }}
           onClick={onShare}
           className="mt-1 text-white/30 hover:text-white/60 text-xs flex items-center gap-1.5 transition-colors duration-300"
         >

@@ -6,7 +6,7 @@ export type QuestionOption = {
 };
 
 export type Question = {
-  id: "need" | "environment" | "journeyStyle";
+  id: "need" | "journeyStyle";
   text: string;
   /** Optional English text — falls back to `text` if not provided. */
   textEn?: string;
@@ -22,17 +22,6 @@ export const questions: Question[] = [
       { id: "body", label: "راحة جسدية", labelEn: "Physical relief" },
       { id: "mind", label: "صفاء نفسي", labelEn: "Mental clarity" },
       { id: "relax", label: "استرخاء", labelEn: "Relaxation" },
-    ],
-  },
-  {
-    id: "environment",
-    text: "أين تجد راحتك؟",
-    textEn: "Where do you find peace?",
-    options: [
-      { id: "sea", label: "البحر", labelEn: "The sea" },
-      { id: "desert", label: "الصحراء", labelEn: "The desert" },
-      { id: "mountains", label: "الجبال", labelEn: "The mountains" },
-      { id: "oasis", label: "الواحات", labelEn: "The oases" },
     ],
   },
   {
