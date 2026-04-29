@@ -57,9 +57,9 @@ export default function DiscoveryScreen({ onDone }: Props) {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [flash, setFlash] = useState(false);
-
-  // Speak the environment name just after the new panel fades in.
-  useIntroVoice(panels[current].voId, { delay: 400 });
+  // Only announce the environment the user explicitly picks — not on every auto-cycle tick.
+  const [voiceId, setVoiceId] = useState<IntroVoId | null>(null);
+  useIntroVoice(voiceId, { delay: 200 });
 
   // Auto-cycle backgrounds so the user sees all options even before tapping.
   useEffect(() => {
@@ -76,6 +76,7 @@ export default function DiscoveryScreen({ onDone }: Props) {
     setSelected(id);
     setCurrent(idx);
     setFlash(true);
+    setVoiceId(panels[idx].voId);
     setTimeout(() => setFlash(false), 350);
     setTimeout(() => onDone(id), 700);
   }
