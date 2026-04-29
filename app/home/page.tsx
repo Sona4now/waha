@@ -176,17 +176,16 @@ function CTASection() {
 
 export default function HomePage() {
   const { t, locale } = useTranslations();
-  const [recommendation, setRecommendation] = useState<{
+  const [recommendation] = useState<{
     destinationId: string;
     need: string;
-  } | null>(null);
-
-  useEffect(() => {
+  } | null>(() => {
+    if (typeof window === "undefined") return null;
     try {
       const saved = localStorage.getItem("waaha_recommendation");
-      if (saved) setRecommendation(JSON.parse(saved));
-    } catch {}
-  }, []);
+      return saved ? JSON.parse(saved) : null;
+    } catch { return null; }
+  });
 
   const rawRecDest = recommendation
     ? DESTINATIONS.find((d) => d.id === recommendation.destinationId)

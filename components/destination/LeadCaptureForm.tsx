@@ -50,46 +50,46 @@ export default function LeadCaptureForm({
   // re-type their name/phone for every destination.
   useEffect(() => {
     if (typeof window === "undefined") return;
-    try {
-      const raw = localStorage.getItem(PROFILE_KEY);
-      if (raw) {
-        const saved: SavedProfile = JSON.parse(raw);
-        if (saved.name) setName(saved.name);
-        if (saved.phone) setPhone(saved.phone);
-        if (saved.people) setPeople(saved.people);
-        if (saved.name) setReturning(true);
-      }
-      // Pre-fill notes with chosen tier from PricingPackages "احجز" CTA.
-      const tier = sessionStorage.getItem(TIER_KEY);
-      if (tier) {
-        const labelByTier: Record<string, string> =
-          locale === "en"
-            ? {
-                basic: "Interested in the basic package",
-                standard: "Interested in the recommended package",
-                premium: "Interested in the premium package",
-              }
-            : {
-                basic: "مهتم بالباقة الأساسية",
-                standard: "مهتم بالباقة الموصى بها",
-                premium: "مهتم بالباقة المتكاملة",
-              };
-        if (labelByTier[tier]) setNotes(labelByTier[tier]);
-        sessionStorage.removeItem(TIER_KEY);
-      }
-      // If they submitted within the last few hours, mark "sent" so we
-      // don't double-spam the operator.
-      const cd = localStorage.getItem(COOLDOWN_KEY);
-      if (cd) {
-        const last = parseInt(cd, 10);
-        if (
-          !Number.isNaN(last) &&
-          Date.now() - last < COOLDOWN_HOURS * 60 * 60 * 1000
-        ) {
-          setSent(true);
+    const id = setTimeout(() => {
+      try {
+        const raw = localStorage.getItem(PROFILE_KEY);
+        if (raw) {
+          const saved: SavedProfile = JSON.parse(raw);
+          if (saved.name) setName(saved.name);
+          if (saved.phone) setPhone(saved.phone);
+          if (saved.people) setPeople(saved.people);
+          if (saved.name) setReturning(true);
         }
-      }
-    } catch {}
+        const tier = sessionStorage.getItem(TIER_KEY);
+        if (tier) {
+          const labelByTier: Record<string, string> =
+            locale === "en"
+              ? {
+                  basic: "Interested in the basic package",
+                  standard: "Interested in the recommended package",
+                  premium: "Interested in the premium package",
+                }
+              : {
+                  basic: "مهتم بالباقة الأساسية",
+                  standard: "مهتم بالباقة الموصى بها",
+                  premium: "مهتم بالباقة المتكاملة",
+                };
+          if (labelByTier[tier]) setNotes(labelByTier[tier]);
+          sessionStorage.removeItem(TIER_KEY);
+        }
+        const cd = localStorage.getItem(COOLDOWN_KEY);
+        if (cd) {
+          const last = parseInt(cd, 10);
+          if (
+            !Number.isNaN(last) &&
+            Date.now() - last < COOLDOWN_HOURS * 60 * 60 * 1000
+          ) {
+            setSent(true);
+          }
+        }
+      } catch {}
+    }, 0);
+    return () => clearTimeout(id);
   }, []);
 
   function handleSubmit(e: FormEvent) {

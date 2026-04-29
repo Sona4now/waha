@@ -52,14 +52,6 @@ function buildContextualMessage(path: string): string {
   if (path.startsWith("/destinations")) {
     return "أهلاً، بتفرج في الوجهات وعايز نصيحة لاختيار الأنسب لحالتي.";
   }
-  // /symptoms → quiz user
-  if (path.startsWith("/symptoms")) {
-    return "أهلاً، عملت فاحص الأعراض وعايز نتكلم عن التوصية.";
-  }
-  // /compare
-  if (path.startsWith("/compare")) {
-    return "أهلاً، بقارن بين وجهات على الموقع وعايز رأيكم.";
-  }
   // /calendar
   if (path.startsWith("/calendar")) {
     return "أهلاً، بشوف التقويم وعايز أحجز رحلة في الموسم القادم.";
@@ -83,12 +75,6 @@ function buildContextualMessageEn(path: string): string {
   if (path.startsWith("/destinations")) {
     return "Hi, I'm browsing the destinations and would like advice on which is best for my case.";
   }
-  if (path.startsWith("/symptoms")) {
-    return "Hi, I just took the symptom checker and want to talk through the recommendation.";
-  }
-  if (path.startsWith("/compare")) {
-    return "Hi, I'm comparing destinations on your site and would value your input.";
-  }
   if (path.startsWith("/calendar")) {
     return "Hi, I'm looking at the calendar and want to book a trip for the upcoming season.";
   }
@@ -108,6 +94,13 @@ export default function WhatsAppButton() {
   const { t, locale } = useTranslations();
   const [showHint, setShowHint] = useState(false);
 
+  const dismissHint = () => {
+    setShowHint(false);
+    try {
+      sessionStorage.setItem(STORAGE_KEY, "1");
+    } catch {}
+  };
+
   useEffect(() => {
     if (HIDDEN_PATHS.includes(pathname)) return;
     if (typeof window === "undefined") return;
@@ -116,21 +109,14 @@ export default function WhatsAppButton() {
     } catch {
       /* sessionStorage disabled — show hint anyway */
     }
-    // Wait a beat so the hint isn't the first thing the user sees.
     const t = setTimeout(() => setShowHint(true), 4000);
     const dismiss = setTimeout(() => dismissHint(), 12000);
     return () => {
       clearTimeout(t);
       clearTimeout(dismiss);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
-
-  function dismissHint() {
-    setShowHint(false);
-    try {
-      sessionStorage.setItem(STORAGE_KEY, "1");
-    } catch {}
-  }
 
   /**
    * Build a context-aware opening message.

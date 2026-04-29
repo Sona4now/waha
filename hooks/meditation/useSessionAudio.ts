@@ -13,6 +13,8 @@ import {
 
 interface Opts {
   session: Session;
+  /** Active locale — determines which translation of VO text is spoken. */
+  locale: "ar" | "en";
   /** Master play/pause flag — when false all layers pause. */
   playing: boolean;
   /** Current elapsed seconds into the session. */
@@ -53,6 +55,7 @@ interface Return {
  */
 export function useSessionAudio({
   session,
+  locale,
   playing,
   elapsed,
   intro,
@@ -124,11 +127,12 @@ export function useSessionAudio({
     }
     voActiveRef.current = true;
 
-    speak(clip.text);
+    const clipText = clip.text[locale];
+    speak(clipText);
 
     // Estimate speech duration from text length (~120 wpm ~= 2 words/sec ~=
-    // 10 chars/sec for Arabic). Restore ambient + unset voActive after.
-    const estMs = Math.max(3000, (clip.text.length / 10) * 1000);
+    // 10 chars/sec). Restore ambient + unset voActive after.
+    const estMs = Math.max(3000, (clipText.length / 10) * 1000);
     const restoreTimer = setTimeout(() => {
       voActiveRef.current = false;
       if (ambientRef.current) {
@@ -137,7 +141,7 @@ export function useSessionAudio({
       }
     }, estMs);
     return () => clearTimeout(restoreTimer);
-  }, [elapsed, intro, playing, voiceEnabled, session.voClips, speak, volumeAmbient]);
+  }, [elapsed, intro, playing, voiceEnabled, locale, session.voClips, speak, volumeAmbient]);
 
   // ─── Stop speech when pause/disable toggles ────────────────
   useEffect(() => {
@@ -179,8 +183,8 @@ export function useSessionAudio({
       ambientRef.current.setVolume(base * 0.4);
     }
     voActiveRef.current = true;
-    speak(clip.text);
-  }, [session.voClips, voiceEnabled, speak, stopSpeech, volumeAmbient]);
+    speak(clip.text[locale]);
+  }, [session.voClips, locale, voiceEnabled, speak, stopSpeech, volumeAmbient]);
 
   return { currentClipIdx, playStart, playEnd, skipClip };
 }

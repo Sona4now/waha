@@ -913,6 +913,11 @@ export default function DestinationDetailPage() {
     }
   };
 
+  const [activeSiteId, setActiveSiteId] = useState(SINAI_SITES[0].id);
+  const [activeSiwaId, setActiveSiwaId] = useState(SIWA_SITES[0].id);
+  const [activeFayoumId, setActiveFayoumId] = useState(FAYOUM_SITES[0].id);
+  const [activeBahariyaId, setActiveBahariyaId] = useState(BAHARIYA_SITES[0].id);
+
   if (!dest) {
     return (
       <SiteLayout>
@@ -943,13 +948,9 @@ export default function DestinationDetailPage() {
   const baseTabs = getBaseTabs(locale);
   const specialTab = getSpecialTab(id, locale);
   const TABS = specialTab ? [...baseTabs, specialTab] : baseTabs;
-  const [activeSiteId, setActiveSiteId] = useState(SINAI_SITES[0].id);
   const activeSinaiSite = SINAI_SITES.find((s) => s.id === activeSiteId)!;
-  const [activeSiwaId, setActiveSiwaId] = useState(SIWA_SITES[0].id);
   const activeSiwaSite = SIWA_SITES.find((s) => s.id === activeSiwaId)!;
-  const [activeFayoumId, setActiveFayoumId] = useState(FAYOUM_SITES[0].id);
   const activeFayoumSite = FAYOUM_SITES.find((s) => s.id === activeFayoumId)!;
-  const [activeBahariyaId, setActiveBahariyaId] = useState(BAHARIYA_SITES[0].id);
   const activeBahariyaSite = BAHARIYA_SITES.find((s) => s.id === activeBahariyaId)!;
 
   return (

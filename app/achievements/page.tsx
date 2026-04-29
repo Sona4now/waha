@@ -15,13 +15,8 @@ import { useTranslations } from "@/components/site/LocaleProvider";
 
 export default function AchievementsPage() {
   const { t, locale } = useTranslations();
-  const [unlocked, setUnlocked] = useState<string[]>([]);
-  const [state, setState] = useState<UserState | null>(null);
-
-  useEffect(() => {
-    setUnlocked(getUnlockedAchievements());
-    setState(getUserState());
-  }, []);
+  const [unlocked] = useState<string[]>(() => getUnlockedAchievements());
+  const [state] = useState<UserState | null>(() => getUserState());
 
   const unlockedSet = new Set(unlocked);
   const progress = Math.round(

@@ -15,20 +15,7 @@ interface Props {
 }
 
 /**
- * Per-destination testimonials block.
- *
- * Data lives in `data/testimonials.ts` so server-side code (sitemap,
- * JSON-LD AggregateRating) can read the same source without pulling this
- * client component into the server graph.
- *
- * Two interactive layers on top of the static data:
- * 1. Condition filter — when a user comes in from /symptoms with a
- *    specific health concern, this surfaces only the testimonials from
- *    people with that same condition. Targeted social proof converts
- *    much harder than generic.
- * 2. Aggregate rating banner — shows "X من 5 من Y تقييم" at the top so
- *    the user immediately sees the social-proof headline before reading
- *    individual quotes.
+ * Per-destination testimonials block with condition filter + aggregate rating.
  */
 export default function Testimonials({ destId, destName }: Props) {
   const { locale } = useTranslations();
@@ -51,20 +38,7 @@ export default function Testimonials({ destId, destName }: Props) {
     });
   }, [rawList, locale, destId]);
 
-  // Read the user's condition from /symptoms output if present.
-  // No useEffect — read at first render via lazy initialiser to avoid
-  // an extra paint cycle.
-  const [activeCondition, setActiveCondition] = useState<string>(() => {
-    if (typeof window === "undefined") return "all";
-    try {
-      const rec = JSON.parse(
-        localStorage.getItem("waaha_recommendation") || "{}",
-      );
-      return rec?.need || "all";
-    } catch {
-      return "all";
-    }
-  });
+  const [activeCondition, setActiveCondition] = useState<string>("all");
 
   const conditions = useMemo(() => {
     const set = new Set<string>();

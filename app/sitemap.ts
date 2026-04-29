@@ -37,17 +37,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: "/tours", priority: 0.8, changeFrequency: "monthly" as const },
     { url: "/map", priority: 0.8, changeFrequency: "monthly" as const },
     { url: "/blog", priority: 0.7, changeFrequency: "weekly" as const },
-    {
-      url: "/symptoms",
-      priority: 0.8,
-      changeFrequency: "monthly" as const,
-    },
-    {
-      url: "/compare",
-      priority: 0.6,
-      changeFrequency: "monthly" as const,
-    },
-    { url: "/about", priority: 0.7, changeFrequency: "monthly" as const },
+{ url: "/about", priority: 0.7, changeFrequency: "monthly" as const },
     { url: "/team", priority: 0.7, changeFrequency: "monthly" as const },
     {
       url: "/contact",

@@ -32,12 +32,15 @@ export default function StickyBottomBar({ destName, destId }: Props) {
   }, []);
 
   useEffect(() => {
-    try {
-      const favs: string[] = JSON.parse(
-        localStorage.getItem("waaha_favorites") || "[]",
-      );
-      setSaved(favs.includes(destId));
-    } catch {}
+    const id = setTimeout(() => {
+      try {
+        const favs: string[] = JSON.parse(
+          localStorage.getItem("waaha_favorites") || "[]",
+        );
+        setSaved(favs.includes(destId));
+      } catch {}
+    }, 0);
+    return () => clearTimeout(id);
   }, [destId]);
 
   const toggleSave = () => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useState } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import type { Session } from "@/lib/meditation/sessions";
@@ -141,13 +141,10 @@ export default function SessionSummary({
     journey && journeyDay !== undefined && journeyDay >= journey.days.length;
 
   // Pick a stable motivational quote for this mount (not on every render).
-  const quote = useMemo(
-    () => {
-      const list = isEn ? MOTIVATIONAL_QUOTES_EN : MOTIVATIONAL_QUOTES_AR;
-      return list[Math.floor(Math.random() * list.length)];
-    },
-    [isEn],
-  );
+  const [quote] = useState(() => {
+    const list = isEn ? MOTIVATIONAL_QUOTES_EN : MOTIVATIONAL_QUOTES_AR;
+    return list[Math.floor(Math.random() * list.length)];
+  });
 
   // Fire confetti when the user actually finished. Not for short-tap sessions
   // or for mid-session ends — we reserve it for a real achievement moment.

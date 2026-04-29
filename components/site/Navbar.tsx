@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -16,8 +17,6 @@ const linkDefs: { href: string; key: string }[] = [
   { href: "/map", key: "nav.map" },
   { href: "/blog", key: "nav.blog" },
   { href: "/therapy-room", key: "nav.therapyRoom" },
-  { href: "/symptoms", key: "nav.symptoms" },
-  { href: "/compare", key: "nav.compare" },
   { href: "/calendar", key: "nav.calendar" },
   { href: "/achievements", key: "nav.achievements" },
   { href: "/about", key: "nav.about" },
@@ -27,7 +26,9 @@ const linkDefs: { href: string; key: string }[] = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [platformKey, setPlatformKey] = useState("Ctrl");
+  const [platformKey] = useState(() =>
+    typeof navigator !== "undefined" && /Mac/.test(navigator.platform) ? "⌘" : "Ctrl"
+  );
   const pathname = usePathname();
   const { t, locale } = useTranslations();
   const links = linkDefs.map((l) => ({ ...l, label: t(l.key) }));
@@ -35,10 +36,6 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll);
-    // Detect Mac
-    if (typeof navigator !== "undefined" && /Mac/.test(navigator.platform)) {
-      setPlatformKey("⌘");
-    }
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -61,10 +58,13 @@ export default function Navbar() {
           href="/home"
           className="flex items-center gap-2 no-underline flex-shrink-0"
         >
-          <img
+          <Image
             src="/logo.png"
             alt={locale === "en" ? "Waaha" : "واحة"}
+            width={50}
+            height={50}
             className="h-[44px] w-[44px] md:h-[50px] md:w-[50px] object-contain"
+            priority
           />
           <div className="text-[1.4rem] md:text-[1.6rem] font-black leading-none font-display whitespace-nowrap">
             {locale === "en" ? (
@@ -90,7 +90,7 @@ export default function Navbar() {
             <li key={l.href} className="flex-shrink-0">
               <Link
                 href={l.href}
-                className={`block px-2.5 py-2 text-[0.85rem] font-semibold rounded-[10px] transition-all duration-300 no-underline whitespace-nowrap ${
+                className={`block px-3 py-2 text-[0.9rem] font-semibold rounded-[10px] transition-all duration-300 no-underline whitespace-nowrap ${
                   pathname === l.href
                     ? "text-[#1d5770] dark:text-[#91b149] bg-[#e4edf2] dark:bg-[#162033]"
                     : "text-[#12394d] dark:text-white/80 hover:text-[#1d5770] dark:hover:text-[#91b149] hover:bg-[#e4edf2] dark:hover:bg-[#162033]"

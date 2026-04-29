@@ -5,12 +5,14 @@ import { useCallback, useEffect, useRef } from "react";
 interface Opts {
   /** Whether speech is allowed (user toggle + browser support). */
   enabled: boolean;
+  /** Active locale — determines voice selection and utterance language. */
+  locale?: "ar" | "en";
   /**
    * Speech rate. Slower than normal for meditation — 0.75 is calm but still
    * understandable. 0.6 starts to feel sedated. Don't go above 0.9.
    */
   rate?: number;
-  /** 0..2 — lower feels warmer. 0.95 is a gentle default for Arabic. */
+  /** 0..2 — lower feels warmer. 0.95 is a gentle default. */
   pitch?: number;
   volume?: number;
 }
@@ -31,6 +33,7 @@ interface Opts {
  */
 export function useVoiceNarrator({
   enabled,
+  locale = "ar",
   rate = 0.75,
   pitch = 0.95,
   volume = 1,
@@ -40,32 +43,35 @@ export function useVoiceNarrator({
   const voiceRef = useRef<SpeechSynthesisVoice | null>(null);
   const queueRef = useRef<SpeechSynthesisUtterance[]>([]);
 
-  // Rank + pick the best Arabic voice the browser offers.
+  // Rank + pick the best voice for the active locale.
   useEffect(() => {
     if (!supported) return;
 
     function pick() {
       const voices = window.speechSynthesis.getVoices();
-      // Priority order:
-      //   1. Named Arabic voices known to sound good (Maged, Laila, Tarik)
-      //   2. ar-EG specifically
-      //   3. Any ar-*
-      //   4. Any voice that mentions "arab" in name
-      const arabicNamed = voices.find((v) =>
-        /maged|laila|tarik|majed|noha|hedda/i.test(v.name),
-      );
-      const arEG = voices.find((v) => /ar[-_]eg/i.test(v.lang));
-      const arAny = voices.find((v) => v.lang?.toLowerCase().startsWith("ar"));
-      const arabicNameHint = voices.find((v) => /arab/i.test(v.name));
-      voiceRef.current =
-        arabicNamed || arEG || arAny || arabicNameHint || null;
+      if (locale === "ar") {
+        // Priority: named quality Arabic voices → ar-EG → any ar-* → name hint
+        const named = voices.find((v) =>
+          /maged|laila|tarik|majed|noha|hedda/i.test(v.name),
+        );
+        const arEG = voices.find((v) => /ar[-_]eg/i.test(v.lang));
+        const arAny = voices.find((v) => v.lang?.toLowerCase().startsWith("ar"));
+        const nameHint = voices.find((v) => /arab/i.test(v.name));
+        voiceRef.current = named || arEG || arAny || nameHint || null;
+      } else {
+        // Priority: en-US → en-GB → any en-*
+        const enUS = voices.find((v) => /en[-_]us/i.test(v.lang));
+        const enGB = voices.find((v) => /en[-_]gb/i.test(v.lang));
+        const enAny = voices.find((v) => v.lang?.toLowerCase().startsWith("en"));
+        voiceRef.current = enUS || enGB || enAny || null;
+      }
     }
     pick();
     window.speechSynthesis.onvoiceschanged = pick;
     return () => {
       window.speechSynthesis.onvoiceschanged = null;
     };
-  }, [supported]);
+  }, [supported, locale]);
 
   /**
    * Split a long line into digestible chunks on sentence boundaries.
@@ -111,7 +117,7 @@ export function useVoiceNarrator({
         const chunks = splitIntoChunks(text);
         chunks.forEach((chunk, i) => {
           const u = new SpeechSynthesisUtterance(chunk);
-          u.lang = "ar-EG";
+          u.lang = locale === "ar" ? "ar-EG" : "en-US";
           u.rate = rate;
           u.pitch = pitch;
           u.volume = volume;
@@ -128,7 +134,7 @@ export function useVoiceNarrator({
         /* API flaked — silent */
       }
     },
-    [supported, enabled, rate, pitch, volume, splitIntoChunks],
+    [supported, enabled, locale, rate, pitch, volume, splitIntoChunks],
   );
 
   const stop = useCallback(() => {

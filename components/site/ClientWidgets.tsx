@@ -1,54 +1,64 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 
 /**
  * Client-only widget island.
  *
- * Server components can't use `dynamic(..., { ssr: false })`, so this
- * tiny client wrapper owns every lazy widget. Mounting cost on the
- * server: ~0 (just the wrapper boundary). On the client, each widget
- * chunk streams in after the main content is interactive.
+ * Critical widgets mount immediately (chat, search, toast, PWA).
+ * Secondary/cosmetic widgets are deferred until the browser is idle so
+ * they don't compete with first-interaction paint.
  */
 
-const ChatWidget = dynamic(() => import("./ChatWidget"), { ssr: false });
-const SearchCommand = dynamic(() => import("./SearchCommand"), { ssr: false });
-const ComparisonTray = dynamic(() => import("./ComparisonTray"), { ssr: false });
-const SmartWelcome = dynamic(() => import("./SmartWelcome"), { ssr: false });
-const ToastContainer = dynamic(() => import("./Toast"), { ssr: false });
-const WellnessTip = dynamic(() => import("./WellnessTip"), { ssr: false });
-const AchievementListener = dynamic(
-  () => import("./AchievementListener"),
-  { ssr: false },
-);
-const VisitTracker = dynamic(() => import("./VisitTracker"), { ssr: false });
-const DesktopOnlyCursor = dynamic(
-  () => import("./DesktopOnlyCursor"),
-  { ssr: false },
-);
-const WhatsAppButton = dynamic(() => import("./WhatsAppButton"), {
-  ssr: false,
-});
-const CookieConsent = dynamic(() => import("./CookieConsent"), { ssr: false });
-const PWAInstallPrompt = dynamic(() => import("./PWAInstallPrompt"), {
-  ssr: false,
-});
+const ChatWidget       = dynamic(() => import("./ChatWidget"),       { ssr: false });
+const SearchCommand    = dynamic(() => import("./SearchCommand"),    { ssr: false });
+const ToastContainer   = dynamic(() => import("./Toast"),           { ssr: false });
+const PWAInstallPrompt = dynamic(() => import("./PWAInstallPrompt"),{ ssr: false });
+const WhatsAppButton   = dynamic(() => import("./WhatsAppButton"),  { ssr: false });
+
+// Secondary — deferred until idle
+const SmartWelcome       = dynamic(() => import("./SmartWelcome"),       { ssr: false });
+const WellnessTip        = dynamic(() => import("./WellnessTip"),        { ssr: false });
+const AchievementListener = dynamic(() => import("./AchievementListener"), { ssr: false });
+const VisitTracker       = dynamic(() => import("./VisitTracker"),       { ssr: false });
+const DesktopOnlyCursor  = dynamic(() => import("./DesktopOnlyCursor"),  { ssr: false });
+
+/** Mounts children only after the browser reports an idle period (max 2 s). */
+function IdleMount({ children }: { children: React.ReactNode }) {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    if (typeof requestIdleCallback !== "undefined") {
+      const id = requestIdleCallback(() => setReady(true), { timeout: 2000 });
+      return () => cancelIdleCallback(id);
+    }
+    // Fallback for Safari < 16 which lacks requestIdleCallback
+    const id = setTimeout(() => setReady(true), 800);
+    return () => clearTimeout(id);
+  }, []);
+
+  return ready ? <>{children}</> : null;
+}
 
 export default function ClientWidgets() {
   return (
     <>
+      {/* Critical — load immediately */}
       <ChatWidget />
       <SearchCommand />
-      <ComparisonTray />
-      <SmartWelcome />
       <ToastContainer />
-      <WellnessTip />
-      <AchievementListener />
-      <VisitTracker />
-      <DesktopOnlyCursor />
       <WhatsAppButton />
-      <CookieConsent />
       <PWAInstallPrompt />
+
+      {/* Secondary — wait for idle */}
+      <IdleMount>
+        <SmartWelcome />
+        <WellnessTip />
+        <AchievementListener />
+        <VisitTracker />
+        <DesktopOnlyCursor />
+      </IdleMount>
     </>
   );
 }

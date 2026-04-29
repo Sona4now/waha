@@ -15,10 +15,8 @@ export interface UserState {
   destinationsVisited: string[];
   articlesRead: number;
   cinematicCompleted: boolean;
-  symptomCheckerUsed: boolean;
   aiChatUsed: boolean;
   favoritesCount: number;
-  comparisonsMade: number;
   visitCount: number;
   toursWatched: number;
 }
@@ -61,15 +59,6 @@ export const ACHIEVEMENTS: Achievement[] = [
     condition: (s) => s.cinematicCompleted,
   },
   {
-    id: "health-conscious",
-    title: "الواعي صحياً",
-    description: "جربت فاحص الأعراض",
-    titleEn: "Health Conscious",
-    descriptionEn: "Tried the symptom checker",
-    icon: "🩺",
-    condition: (s) => s.symptomCheckerUsed,
-  },
-  {
     id: "curious",
     title: "الفضولي",
     description: "سألت المساعد الذكي",
@@ -86,15 +75,6 @@ export const ACHIEVEMENTS: Achievement[] = [
     descriptionEn: "Added 3 destinations to favorites",
     icon: "❤️",
     condition: (s) => s.favoritesCount >= 3,
-  },
-  {
-    id: "analyst",
-    title: "المحلل",
-    description: "قارنت بين وجهتين",
-    titleEn: "Analyst",
-    descriptionEn: "Compared two destinations",
-    icon: "⚖️",
-    condition: (s) => s.comparisonsMade >= 1,
   },
   {
     id: "loyal",
@@ -125,10 +105,8 @@ export function getUserState(): UserState {
       destinationsVisited: [],
       articlesRead: 0,
       cinematicCompleted: false,
-      symptomCheckerUsed: false,
       aiChatUsed: false,
       favoritesCount: 0,
-      comparisonsMade: 0,
       visitCount: 0,
       toursWatched: 0,
     };
@@ -143,10 +121,8 @@ export function getUserState(): UserState {
     destinationsVisited: [],
     articlesRead: 0,
     cinematicCompleted: false,
-    symptomCheckerUsed: false,
     aiChatUsed: false,
     favoritesCount: 0,
-    comparisonsMade: 0,
     visitCount: 0,
     toursWatched: 0,
   };
@@ -177,13 +153,11 @@ export function trackAction(action: keyof UserState) {
     action === "articlesRead" ||
     action === "visitCount" ||
     action === "favoritesCount" ||
-    action === "comparisonsMade" ||
     action === "toursWatched"
   ) {
     updateUserState({ [action]: ((state[action] as number) || 0) + 1 });
   } else if (
     action === "cinematicCompleted" ||
-    action === "symptomCheckerUsed" ||
     action === "aiChatUsed"
   ) {
     updateUserState({ [action]: true });

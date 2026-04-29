@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { Destination } from "@/data/destinations";
 import { useTranslations } from "@/components/site/LocaleProvider";
 
@@ -111,9 +112,11 @@ export default function ShareCard({ destination, answers, onClose }: Props) {
           {/* Content */}
           <div className="relative z-10 p-8 flex flex-col items-center gap-5 text-center">
             {/* Logo */}
-            <img
+            <Image
               src="/logo.png"
               alt={locale === "en" ? "Waha" : "واحة"}
+              width={56}
+              height={56}
               className="w-14 h-14 rounded-full bg-white/90 p-0.5"
             />
 

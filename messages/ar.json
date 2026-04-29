@@ -24,8 +24,6 @@
     "map": "الخريطة",
     "blog": "المدونة",
     "therapyRoom": "غرفة العلاج",
-    "symptoms": "فاحص الأعراض",
-    "compare": "المقارنة",
     "calendar": "التقويم",
     "achievements": "إنجازاتي",
     "about": "من نحن",
@@ -164,8 +162,6 @@
     },
     "noResultsTitle": "ما لقيناش وجهات بالمواصفات دي",
     "noResultsBody": "جرّب تعديل الفلاتر أو شيلها كلها عشان تشوف كل الوجهات المتاحة",
-    "indecisive": "لسه مش متأكد؟",
-    "trySymptomChecker": "جرّب فاحص الأعراض",
     "viewGrid": "عرض شبكي",
     "viewList": "عرض قائمة",
     "appliedRecommendation": "✦ فلترنا لك على {treatment} بناء على رحلتك",
@@ -298,14 +294,6 @@
   "calendarPage": {
     "title": "التقويم الموسمي",
     "subtitle": "متى تكون كل وجهة في أفضل حالاتها على مدار السنة"
-  },
-  "comparePage": {
-    "title": "قارن الوجهات",
-    "subtitle": "اختار حتى 3 وجهات وقارنهم جنب بعض"
-  },
-  "symptomsPage": {
-    "title": "فاحص الأعراض",
-    "subtitle": "احكيلنا بتعالج إيه، وهنرشّحلك الوجهة المناسبة"
   },
   "achievementsPage": {
     "title": "إنجازاتي",

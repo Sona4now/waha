@@ -11,10 +11,7 @@ export default function ReadingProgress() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    if (HIDDEN_PATHS.includes(pathname)) {
-      setVisible(false);
-      return;
-    }
+    if (HIDDEN_PATHS.includes(pathname)) return;
 
     function updateProgress() {
       const scrollTop =

@@ -47,9 +47,14 @@ export default function TiltCard({
   const rotateX = useTransform(ySpring, [-0.5, 0.5], [maxTilt, -maxTilt]);
   const rotateY = useTransform(xSpring, [-0.5, 0.5], [-maxTilt, maxTilt]);
 
-  // Glare position
+  // Glare position — always computed (hooks must not be conditional)
   const glareX = useTransform(xSpring, [-0.5, 0.5], ["0%", "100%"]);
   const glareY = useTransform(ySpring, [-0.5, 0.5], ["0%", "100%"]);
+  const glareBackground = useTransform(
+    [glareX, glareY],
+    ([gx, gy]) =>
+      `radial-gradient(circle at ${gx} ${gy}, rgba(255,255,255,0.15), transparent 60%)`
+  );
 
   function handleMouseMove(e: MouseEvent<HTMLDivElement>) {
     if (!ref.current || prefersReducedMotion) return;
@@ -90,13 +95,7 @@ export default function TiltCard({
       {glare && (
         <motion.div
           className="absolute inset-0 pointer-events-none rounded-[inherit] overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-          style={{
-            background: useTransform(
-              [glareX, glareY],
-              ([gx, gy]) =>
-                `radial-gradient(circle at ${gx} ${gy}, rgba(255,255,255,0.15), transparent 60%)`
-            ),
-          }}
+          style={{ background: glareBackground }}
         />
       )}
     </motion.div>

@@ -41,12 +41,7 @@ export default function AdminPage() {
     }
   }, []);
 
-  useEffect(() => {
-    if (!authenticated) return;
-    loadData();
-  }, [authenticated]);
-
-  function loadData() {
+  const loadData = () => {
     try {
       const favorites = JSON.parse(
         localStorage.getItem("waaha_favorites") || "[]"
@@ -80,6 +75,12 @@ export default function AdminPage() {
       setFeedback(feedbackData.sort((a, b) => b.timestamp - a.timestamp));
     } catch {}
   }
+
+  useEffect(() => {
+    if (!authenticated) return;
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authenticated]);
 
   async function handleLogin(e: FormEvent) {
     e.preventDefault();

@@ -112,10 +112,12 @@ export default function SessionPlayer({
     };
   }, []);
 
-  const [reduceMotion, setReduceMotion] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduceMotion(mq.matches);
     const h = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
     mq.addEventListener?.("change", h);
     return () => mq.removeEventListener?.("change", h);
@@ -136,6 +138,7 @@ export default function SessionPlayer({
   // files; everything runs locally through the browser's TTS).
   const { speak, stop: stopSpeech, unlock: unlockSpeech } = useVoiceNarrator({
     enabled: voiceEnabled,
+    locale,
     volume: mixer.voice / 100,
   });
 
@@ -189,6 +192,7 @@ export default function SessionPlayer({
   // Fully-procedural 3-layer audio engine. Zero files, zero network.
   const { currentClipIdx, playStart, playEnd, skipClip } = useSessionAudio({
     session,
+    locale,
     playing,
     elapsed,
     intro,
@@ -201,7 +205,9 @@ export default function SessionPlayer({
   });
 
   const currentCaption =
-    currentClipIdx >= 0 ? session.voClips[currentClipIdx]?.text ?? "" : "";
+    currentClipIdx >= 0
+      ? (session.voClips[currentClipIdx]?.text[locale] ?? "")
+      : "";
 
   // 3-2-1 intro countdown.
   // The intro exists partly as UX (deep breath before we begin) and partly
@@ -214,7 +220,7 @@ export default function SessionPlayer({
       unlockSpeech();
     }
     if (countdown <= 0) {
-      setIntro(false);
+      setTimeout(() => setIntro(false), 0);
       if (!startChimePlayed.current) {
         startChimePlayed.current = true;
         playStart();

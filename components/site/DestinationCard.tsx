@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { CompareButton } from "./ComparisonTray";
 import { useTranslations } from "./LocaleProvider";
 import { envBadgeClasses } from "@/lib/envColors";
 import { getDestinationRating } from "@/data/testimonials";
@@ -55,8 +54,6 @@ export default function DestinationCard({
 
   return (
     <div className="relative group h-full">
-      <CompareButton id={dest.id} />
-
       {/* Hover glow ring — desktop only (mobile tap would trigger it briefly) */}
       <div
         className="hidden md:block pointer-events-none absolute -inset-px rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br from-[#91b149]/40 via-transparent to-[#1d5770]/40 blur-[2px]"

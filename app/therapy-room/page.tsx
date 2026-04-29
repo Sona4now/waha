@@ -54,7 +54,7 @@ export default function TherapyRoomPage() {
     breathCycles: number;
   } | null>(null);
   const [resumeFromSec, setResumeFromSec] = useState(0);
-  const [journeyProgress, setJourneyProgress] = useState<JourneyProgress>({});
+  const [journeyProgress, setJourneyProgress] = useState<JourneyProgress>(() => readJourneyProgress());
 
   const {
     loaded,
@@ -73,10 +73,6 @@ export default function TherapyRoomPage() {
     clear: clearResume,
   } = useSessionResume();
 
-  // Hydrate journey progress from localStorage on mount
-  useEffect(() => {
-    setJourneyProgress(readJourneyProgress());
-  }, []);
 
   const startSession = useCallback(
     (session: Session, opts?: { journey?: Journey; day?: number; resumeAt?: number }) => {

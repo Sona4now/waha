@@ -1,34 +1,39 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { motion, AnimatePresence } from "framer-motion";
 import SiteLayout from "@/components/site/SiteLayout";
 import { useTranslations } from "@/components/site/LocaleProvider";
 import TeamGate from "@/components/team/TeamGate";
+
+// First view loads eagerly (visible on initial render).
+// All others are deferred — only fetched when the user selects that tab.
 import MagazineView from "@/components/team/MagazineView";
-import HallOfFameView from "@/components/team/HallOfFameView";
-import CreditsTickerView from "@/components/team/CreditsTickerView";
-import CardDeckView from "@/components/team/CardDeckView";
-import OrbClusterView from "@/components/team/OrbClusterView";
-import MarqueeWallView from "@/components/team/MarqueeWallView";
-import PolaroidWallView from "@/components/team/PolaroidWallView";
-import TypographyGridView from "@/components/team/TypographyGridView";
-import ScrollStoryView from "@/components/team/ScrollStoryView";
-import InteractiveTreeView from "@/components/team/InteractiveTreeView";
-import MinimalWallView from "@/components/team/MinimalWallView";
+
+const HallOfFameView     = dynamic(() => import("@/components/team/HallOfFameView"));
+const CreditsTickerView  = dynamic(() => import("@/components/team/CreditsTickerView"));
+const CardDeckView       = dynamic(() => import("@/components/team/CardDeckView"));
+const OrbClusterView     = dynamic(() => import("@/components/team/OrbClusterView"));
+const MarqueeWallView    = dynamic(() => import("@/components/team/MarqueeWallView"));
+const PolaroidWallView   = dynamic(() => import("@/components/team/PolaroidWallView"));
+const TypographyGridView = dynamic(() => import("@/components/team/TypographyGridView"));
+const ScrollStoryView    = dynamic(() => import("@/components/team/ScrollStoryView"));
+const InteractiveTreeView = dynamic(() => import("@/components/team/InteractiveTreeView"));
+const MinimalWallView    = dynamic(() => import("@/components/team/MinimalWallView"));
 
 const TABS = [
-  { id: "magazine", label: "مجلة", en: "Magazine", Component: MagazineView },
-  { id: "hall", label: "قاعة المشاهير", en: "Hall of Fame", Component: HallOfFameView },
-  { id: "credits", label: "تتر النهاية", en: "Credits", Component: CreditsTickerView },
-  { id: "deck", label: "كروت", en: "Card Deck", Component: CardDeckView },
-  { id: "orb", label: "دوائر", en: "Orbs", Component: OrbClusterView },
-  { id: "marquee", label: "جدار", en: "Marquee", Component: MarqueeWallView },
-  { id: "polaroid", label: "بولارويد", en: "Polaroid", Component: PolaroidWallView },
-  { id: "typography", label: "تايبوغرافي", en: "Typography", Component: TypographyGridView },
-  { id: "scroll", label: "قصة", en: "Scroll Story", Component: ScrollStoryView },
-  { id: "tree", label: "شجرة", en: "Tree", Component: InteractiveTreeView },
-  { id: "minimal", label: "بسيط", en: "Minimal", Component: MinimalWallView },
+  { id: "magazine",   label: "مجلة",          en: "Magazine",    Component: MagazineView },
+  { id: "hall",       label: "قاعة المشاهير",  en: "Hall of Fame",Component: HallOfFameView },
+  { id: "credits",    label: "تتر النهاية",    en: "Credits",     Component: CreditsTickerView },
+  { id: "deck",       label: "كروت",           en: "Card Deck",   Component: CardDeckView },
+  { id: "orb",        label: "دوائر",          en: "Orbs",        Component: OrbClusterView },
+  { id: "marquee",    label: "جدار",           en: "Marquee",     Component: MarqueeWallView },
+  { id: "polaroid",   label: "بولارويد",       en: "Polaroid",    Component: PolaroidWallView },
+  { id: "typography", label: "تايبوغرافي",     en: "Typography",  Component: TypographyGridView },
+  { id: "scroll",     label: "قصة",            en: "Scroll Story",Component: ScrollStoryView },
+  { id: "tree",       label: "شجرة",           en: "Tree",        Component: InteractiveTreeView },
+  { id: "minimal",    label: "بسيط",           en: "Minimal",     Component: MinimalWallView },
 ];
 
 export default function TeamPage() {
@@ -112,13 +117,8 @@ export default function TeamPage() {
       </div>
 
       <style jsx global>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
     </SiteLayout>
     </TeamGate>

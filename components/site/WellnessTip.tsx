@@ -168,16 +168,17 @@ export default function WellnessTip() {
     return () => clearTimeout(showTimer);
   }, [pathname, locale]);
 
+  const handleDismiss = () => {
+    setShow(false);
+    localStorage.setItem(STORAGE_KEY, new Date().toDateString());
+  };
+
   useEffect(() => {
     if (!show) return;
     const timer = setTimeout(() => handleDismiss(), AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
-
-  function handleDismiss() {
-    setShow(false);
-    localStorage.setItem(STORAGE_KEY, new Date().toDateString());
-  }
 
   if (!tip || HIDDEN_PATHS.includes(pathname)) return null;
 
