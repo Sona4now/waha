@@ -61,16 +61,17 @@ export default function SmartWelcome() {
     }
   }, [pathname]);
 
+  const handleDismiss = () => {
+    setShow(false);
+    sessionStorage.setItem(DISMISS_KEY, "1");
+  };
+
   useEffect(() => {
     if (!show) return;
     const timer = setTimeout(() => handleDismiss(), AUTO_DISMISS_MS);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show]);
-
-  function handleDismiss() {
-    setShow(false);
-    sessionStorage.setItem(DISMISS_KEY, "1");
-  }
 
   if (HIDDEN_PATHS.includes(pathname)) return null;
   if (!visitData?.recommendationId) return null;

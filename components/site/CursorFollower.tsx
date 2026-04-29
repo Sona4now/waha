@@ -36,8 +36,8 @@ export default function CursorFollower() {
   useEffect(() => {
     // Detect touch devices
     if ("ontouchstart" in window || navigator.maxTouchPoints > 0) {
-      setIsTouch(true);
-      return;
+      const id = setTimeout(() => setIsTouch(true), 0);
+      return () => clearTimeout(id);
     }
 
     window.addEventListener("mousemove", onMouseMove);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 const STORAGE_KEY = "waaha_meditation_history";
 const SETTINGS_KEY = "waaha_meditation_settings";
@@ -109,27 +109,16 @@ function computeStats(records: SessionRecord[]): Stats {
 }
 
 export function useSessionHistory() {
-  const [records, setRecords] = useState<SessionRecord[]>([]);
-  const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    try {
-      const r = safeParse<SessionRecord[]>(
-        localStorage.getItem(STORAGE_KEY),
-        [],
-      );
-      const s = safeParse<Partial<UserSettings>>(
-        localStorage.getItem(SETTINGS_KEY),
-        {},
-      );
-      setRecords(r);
-      setSettings({ ...DEFAULT_SETTINGS, ...s });
-    } catch {
-      /* storage disabled */
-    }
-    setLoaded(true);
-  }, []);
+  const [records, setRecords] = useState<SessionRecord[]>(() => {
+    if (typeof window === "undefined") return [];
+    return safeParse<SessionRecord[]>(localStorage.getItem(STORAGE_KEY), []);
+  });
+  const [settings, setSettings] = useState<UserSettings>(() => {
+    if (typeof window === "undefined") return DEFAULT_SETTINGS;
+    const s = safeParse<Partial<UserSettings>>(localStorage.getItem(SETTINGS_KEY), {});
+    return { ...DEFAULT_SETTINGS, ...s };
+  });
+  const loaded = true;
 
   const recordSession = useCallback((rec: SessionRecord) => {
     setRecords((prev) => {
@@ -171,8 +160,12 @@ export function useSessionHistory() {
     [],
   );
 
+  const [now] = useState(() => Date.now());
   const stats = computeStats(records);
-  const meditatedToday = records.some((r) => sameDay(r.completedAt, Date.now()));
+  const meditatedToday = useMemo(
+    () => records.some((r) => sameDay(r.completedAt, now)),
+    [records, now],
+  );
 
   return {
     loaded,

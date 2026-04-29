@@ -261,8 +261,8 @@ export default function StoryMap({
 
   // Reset error state when switching styles — gives the new provider a fresh chance
   useEffect(() => {
-    setTileError(false);
-    setTilesSeen(0);
+    const id = setTimeout(() => { setTileError(false); setTilesSeen(0); }, 0);
+    return () => clearTimeout(id);
   }, [mapStyle]);
 
   // Auto-switch to dark tiles when user prefers dark mode (only on first mount)
@@ -271,7 +271,8 @@ export default function StoryMap({
     const prefersDark = window.matchMedia?.("(prefers-color-scheme: dark)").matches;
     const hasDarkClass = document.documentElement.classList.contains("dark");
     if (prefersDark || hasDarkClass) {
-      setMapStyle("dark");
+      const id = setTimeout(() => setMapStyle("dark"), 0);
+      return () => clearTimeout(id);
     }
   }, []);
 

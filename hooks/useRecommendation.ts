@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 /**
  * The recommendation persisted by the cinematic intro (app/page.tsx).
@@ -49,21 +49,18 @@ export const ENVIRONMENT_LABELS: Record<string, string> = {
 };
 
 export function useRecommendation() {
-  const [rec, setRec] = useState<Recommendation | null>(null);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
+  const [rec] = useState<Recommendation | null>(() => {
+    if (typeof window === "undefined") return null;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Recommendation;
-        if (parsed?.destinationId) setRec(parsed);
-      }
+      if (!raw) return null;
+      const parsed = JSON.parse(raw) as Recommendation;
+      return parsed?.destinationId ? parsed : null;
     } catch {
-      /* storage disabled — keep rec null */
+      return null;
     }
-    setLoaded(true);
-  }, []);
+  });
+  const loaded = true;
 
   return { recommendation: rec, loaded };
 }

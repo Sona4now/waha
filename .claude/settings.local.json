@@ -262,7 +262,11 @@
       "Bash(grep -v 'locale === \\\\|isEn\\\\|: \"[^\"]*[؀-ۿ]\\\\|//\\\\|^[[:space:]]*\\\\*\\\\|[[:space:]]ar:\\\\|MOTIVATIONAL_QUOTES_AR\\\\|\"[^\"]*\",[[:space:]]*$')",
       "Bash(grep -v 'locale === \\\\|isEn\\\\|: \"[^\"]*[؀-ۿ]\\\\|//\\\\|^[[:space:]]*\\\\*\\\\|[[:space:]]ar:\\\\|\"[^\"]*\",[[:space:]]*$\\\\|\"[^\"]*\": \"[^\"]*[؀-ۿ]')",
       "Bash(grep -v 'locale === \\\\|isEn\\\\|: \"[^\"]*[؀-ۿ]\\\\|//\\\\|^[[:space:]]*\\\\*\\\\|^[[:space:]]*\"[^\"]*[؀-ۿ][^\"]*\",[[:space:]]*$\\\\|GREETING_AR\\\\|SUGGESTED_PROMPTS_AR\\\\|KNOWN_DESTINATIONS')",
-      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(list\\(d.keys\\(\\)\\)\\)\")"
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(list\\(d.keys\\(\\)\\)\\)\")",
+      "Bash(grep -E \"\\\\.tsx$\")",
+      "Bash(grep -v \"^--$\")",
+      "Bash(npx eslint *)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }

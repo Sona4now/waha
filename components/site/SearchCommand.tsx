@@ -295,7 +295,8 @@ export default function SearchCommand() {
 
   // Reset selection when query changes
   useEffect(() => {
-    setSelectedIdx(0);
+    const id = setTimeout(() => setSelectedIdx(0), 0);
+    return () => clearTimeout(id);
   }, [query]);
 
   // Focus input on open

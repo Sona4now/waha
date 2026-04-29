@@ -13,14 +13,13 @@ const CursorFollower = dynamic(() => import("./CursorFollower"), {
  * spares the client from parsing framer-motion spring logic it can't use.
  */
 export default function DesktopOnlyCursor() {
-  const [canHover, setCanHover] = useState(false);
+  const [canHover, setCanHover] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches
+  );
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    // hover:hover → has a precise pointer (mouse/trackpad)
-    // Touch devices match (hover: none).
     const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    setCanHover(mq.matches);
     const onChange = (e: MediaQueryListEvent) => setCanHover(e.matches);
     mq.addEventListener?.("change", onChange);
     return () => mq.removeEventListener?.("change", onChange);

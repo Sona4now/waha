@@ -9,19 +9,7 @@ export default function ThemeToggle() {
   const [theme, setTheme] = useState<Theme>("light");
   const [mounted, setMounted] = useState(false);
 
-  // Initialize theme on mount
-  useEffect(() => {
-    setMounted(true);
-    const saved = (localStorage.getItem("waaha_theme") as Theme | null) || null;
-    const systemPrefersDark = window.matchMedia(
-      "(prefers-color-scheme: dark)"
-    ).matches;
-    const initial: Theme = saved ?? (systemPrefersDark ? "dark" : "light");
-    setTheme(initial);
-    applyTheme(initial);
-  }, []);
-
-  function applyTheme(t: Theme) {
+  const applyTheme = (t: Theme) => {
     if (t === "dark") {
       document.documentElement.classList.add("dark");
       document.documentElement.setAttribute("data-theme", "dark");
@@ -29,14 +17,26 @@ export default function ThemeToggle() {
       document.documentElement.classList.remove("dark");
       document.documentElement.setAttribute("data-theme", "light");
     }
-  }
+  };
 
-  function toggle() {
+  // Initialize theme on mount. applyTheme only touches the DOM (no captured
+  // state/props), so it's safe to omit from the dep array.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    setMounted(true);
+    const saved = (localStorage.getItem("waaha_theme") as Theme | null) || null;
+    const systemPrefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const initial: Theme = saved ?? (systemPrefersDark ? "dark" : "light");
+    setTheme(initial);
+    applyTheme(initial);
+  }, []);
+
+  const toggle = () => {
     const next: Theme = theme === "light" ? "dark" : "light";
     setTheme(next);
     localStorage.setItem("waaha_theme", next);
     applyTheme(next);
-  }
+  };
 
   if (!mounted) {
     return (

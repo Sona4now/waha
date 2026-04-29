@@ -14,7 +14,7 @@ export default function CustomCursor() {
     const isTouchDevice = window.matchMedia("(pointer: coarse)").matches;
     if (isTouchDevice) return;
 
-    setIsVisible(true);
+    const visId = setTimeout(() => setIsVisible(true), 0);
 
     let mouseX = 0;
     let mouseY = 0;
@@ -58,6 +58,7 @@ export default function CustomCursor() {
     animId = requestAnimationFrame(animate);
 
     return () => {
+      clearTimeout(visId);
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mousemove", checkHover);
       cancelAnimationFrame(animId);

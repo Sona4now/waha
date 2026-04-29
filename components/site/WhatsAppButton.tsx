@@ -94,6 +94,13 @@ export default function WhatsAppButton() {
   const { t, locale } = useTranslations();
   const [showHint, setShowHint] = useState(false);
 
+  const dismissHint = () => {
+    setShowHint(false);
+    try {
+      sessionStorage.setItem(STORAGE_KEY, "1");
+    } catch {}
+  };
+
   useEffect(() => {
     if (HIDDEN_PATHS.includes(pathname)) return;
     if (typeof window === "undefined") return;
@@ -102,21 +109,14 @@ export default function WhatsAppButton() {
     } catch {
       /* sessionStorage disabled — show hint anyway */
     }
-    // Wait a beat so the hint isn't the first thing the user sees.
     const t = setTimeout(() => setShowHint(true), 4000);
     const dismiss = setTimeout(() => dismissHint(), 12000);
     return () => {
       clearTimeout(t);
       clearTimeout(dismiss);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
-
-  function dismissHint() {
-    setShowHint(false);
-    try {
-      sessionStorage.setItem(STORAGE_KEY, "1");
-    } catch {}
-  }
 
   /**
    * Build a context-aware opening message.

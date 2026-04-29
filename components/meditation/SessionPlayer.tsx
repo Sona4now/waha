@@ -112,10 +112,12 @@ export default function SessionPlayer({
     };
   }, []);
 
-  const [reduceMotion, setReduceMotion] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(() =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduceMotion(mq.matches);
     const h = (e: MediaQueryListEvent) => setReduceMotion(e.matches);
     mq.addEventListener?.("change", h);
     return () => mq.removeEventListener?.("change", h);
@@ -218,7 +220,7 @@ export default function SessionPlayer({
       unlockSpeech();
     }
     if (countdown <= 0) {
-      setIntro(false);
+      setTimeout(() => setIntro(false), 0);
       if (!startChimePlayed.current) {
         startChimePlayed.current = true;
         playStart();

@@ -22,7 +22,7 @@ export default function Particles({
     if (!ctx) return;
 
     let animId: number;
-    let particles: {
+    const particles: {
       x: number;
       y: number;
       r: number;

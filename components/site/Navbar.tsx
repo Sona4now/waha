@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import ThemeToggle from "./ThemeToggle";
 import LanguageSwitcher from "./LanguageSwitcher";
@@ -25,7 +26,9 @@ const linkDefs: { href: string; key: string }[] = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [platformKey, setPlatformKey] = useState("Ctrl");
+  const [platformKey] = useState(() =>
+    typeof navigator !== "undefined" && /Mac/.test(navigator.platform) ? "⌘" : "Ctrl"
+  );
   const pathname = usePathname();
   const { t, locale } = useTranslations();
   const links = linkDefs.map((l) => ({ ...l, label: t(l.key) }));
@@ -33,10 +36,6 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
     window.addEventListener("scroll", onScroll);
-    // Detect Mac
-    if (typeof navigator !== "undefined" && /Mac/.test(navigator.platform)) {
-      setPlatformKey("⌘");
-    }
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -59,10 +58,13 @@ export default function Navbar() {
           href="/home"
           className="flex items-center gap-2 no-underline flex-shrink-0"
         >
-          <img
+          <Image
             src="/logo.png"
             alt={locale === "en" ? "Waaha" : "واحة"}
+            width={50}
+            height={50}
             className="h-[44px] w-[44px] md:h-[50px] md:w-[50px] object-contain"
+            priority
           />
           <div className="text-[1.4rem] md:text-[1.6rem] font-black leading-none font-display whitespace-nowrap">
             {locale === "en" ? (

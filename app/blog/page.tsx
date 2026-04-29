@@ -68,21 +68,21 @@ export default function BlogPage() {
   // Read per-post reading progress from localStorage. Updated on mount only;
   // we don't watch storage events because it changes only when the user
   // navigates to a post and back, at which point this page is remounted.
-  const [progress, setProgress] = useState<Record<string, number>>({});
-  useEffect(() => {
+  const [progress] = useState<Record<string, number>>(() => {
+    if (typeof window === "undefined") return {};
     const map: Record<string, number> = {};
     for (const p of BLOG_POSTS) {
       const v = getBlogProgress(p.id);
       if (typeof v === "number" && v > 5) map[p.id] = v;
     }
-    setProgress(map);
-  }, []);
+    return map;
+  });
 
   const filteredPosts = useMemo(() => {
     // Filter by category against the ORIGINAL Arabic key (canonical in
     // BLOG_POSTS), then map to localized for display. Keeps the filter
     // chip values stable across locales.
-    let baseList =
+    const baseList =
       activeCategory === "all"
         ? [...BLOG_POSTS]
         : BLOG_POSTS.filter((post) => post.category === activeCategory);

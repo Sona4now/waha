@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { useTranslations } from "./LocaleProvider";
 
 // Translate Arabic category/caption labels coming from data into English.
@@ -174,11 +175,12 @@ export default function Gallery({ images, title = "" }: Props) {
                 i % 5 === 0 ? "col-span-2 row-span-2 aspect-square" : "aspect-square"
               }`}
             >
-              <img
+              <Image
                 src={img.url}
                 alt={img.caption || ""}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                loading="lazy"
+                fill
+                className="object-cover group-hover:scale-110 transition-transform duration-500"
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               {img.caption && (

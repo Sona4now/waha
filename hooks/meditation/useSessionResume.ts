@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 
 /**
  * Tracks a session that was interrupted (user closed the tab mid-flight or
@@ -38,13 +38,8 @@ function readRaw(): ResumeState | null {
 }
 
 export function useSessionResume() {
-  const [resumable, setResumable] = useState<ResumeState | null>(null);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    setResumable(readRaw());
-    setLoaded(true);
-  }, []);
+  const [resumable, setResumable] = useState<ResumeState | null>(() => readRaw());
+  const loaded = true;
 
   const save = useCallback((state: ResumeState) => {
     try {

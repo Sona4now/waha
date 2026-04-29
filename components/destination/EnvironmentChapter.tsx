@@ -61,8 +61,6 @@ export default function EnvironmentChapter({
   });
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
 
-  if (destinations.length === 0) return null;
-
   /* ── Derived stats for the fact strip ───────────────────────── */
   const avgDistance = useMemo(() => {
     const valid = destinations.filter((d) => d.distanceKm !== undefined);
@@ -120,6 +118,8 @@ export default function EnvironmentChapter({
     }
     return best;
   }, [destinations]);
+
+  if (destinations.length === 0) return null;
 
   return (
     <section

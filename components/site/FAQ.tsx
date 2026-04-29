@@ -51,15 +51,13 @@ export default function FAQ({
   })();
 
   const [openIdx, setOpenIdx] = useState<number | null>(0);
-  const [votes, setVotes] = useState<Record<string, Vote>>({});
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+  const [votes, setVotes] = useState<Record<string, Vote>>(() => {
+    if (typeof window === "undefined") return {};
     try {
       const raw = localStorage.getItem(VOTES_KEY);
-      if (raw) setVotes(JSON.parse(raw));
-    } catch {}
-  }, []);
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  });
 
   function castVote(question: string, vote: Vote) {
     const key = buildVoteKey(question);

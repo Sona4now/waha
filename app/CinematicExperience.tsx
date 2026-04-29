@@ -84,13 +84,13 @@ export default function CinematicExperience({ showLanguageGate }: Props) {
       };
       const age = Date.now() - (rec.timestamp ?? 0);
       if (age < 7 * 24 * 60 * 60 * 1000 && destinations[rec.destinationId]) {
-        setDestination(destinations[rec.destinationId]);
-        setAnswers({
-          need: rec.need,
-          environment: rec.environment,
-          journeyStyle: rec.journeyStyle,
-        });
-        setStep("returning");
+        const dest = destinations[rec.destinationId];
+        const savedAnswers = { need: rec.need, environment: rec.environment, journeyStyle: rec.journeyStyle };
+        setTimeout(() => {
+          setDestination(dest);
+          setAnswers(savedAnswers);
+          setStep("returning");
+        }, 0);
       }
     } catch {
       // localStorage unavailable or malformed
