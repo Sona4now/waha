@@ -15,6 +15,7 @@ const linkDefs: { href: string; key: string }[] = [
   { href: "/destinations", key: "nav.destinations" },
   { href: "/tours", key: "nav.tours" },
   { href: "/map", key: "nav.map" },
+  { href: "/videos", key: "nav.videos" },
   { href: "/blog", key: "nav.blog" },
   { href: "/therapy-room", key: "nav.therapyRoom" },
   { href: "/calendar", key: "nav.calendar" },

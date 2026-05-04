@@ -61,6 +61,14 @@ export default function DiscoveryScreen({ onDone }: Props) {
   const [voiceId, setVoiceId] = useState<IntroVoId | null>(null);
   useIntroVoice(voiceId, { delay: 200 });
 
+  // Preload all images on mount so background transitions are instant (no network fetch on cycle).
+  useEffect(() => {
+    panels.forEach((p) => {
+      const img = new window.Image();
+      img.src = p.image;
+    });
+  }, []);
+
   // Auto-cycle backgrounds so the user sees all options even before tapping.
   useEffect(() => {
     if (selected) return;
@@ -91,18 +99,20 @@ export default function DiscoveryScreen({ onDone }: Props) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
     >
-      {/* Background crossfade */}
-      <AnimatePresence mode="sync">
+      {/* All backgrounds rendered simultaneously — opacity-only crossfade eliminates
+          per-cycle network fetches that caused the visible freeze. */}
+      {panels.map((p, i) => (
         <motion.div
-          key={current}
+          key={p.id}
           className="absolute inset-0 bg-cover bg-center will-change-transform"
-          style={{ backgroundImage: `url('${activePanel.image}')` }}
-          initial={{ opacity: 0, scale: 1.06 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
+          style={{ backgroundImage: `url('${p.image}')` }}
+          animate={{
+            opacity: i === current ? 1 : 0,
+            scale: i === current ? 1 : 1.06,
+          }}
           transition={{ duration: 1.5, ease: "easeInOut" }}
         />
-      </AnimatePresence>
+      ))}
 
       {/* Selection flash */}
       <AnimatePresence>

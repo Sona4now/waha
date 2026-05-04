@@ -70,9 +70,9 @@ export const DESTINATIONS: DestinationFull[] = [
       "تجربة هادئة بعيدة عن الزحام السياحي",
     ],
     image:
-      "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=800&q=80",
+      "https://res.cloudinary.com/dzfcvki9z/image/upload/c_fill,w_800,h_600,q_90,f_auto/v1777479624/Screenshot_2026-04-29_at_7.20.12_PM_rxrpej.png",
     heroBg:
-      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&q=80",
+      "https://res.cloudinary.com/dzfcvki9z/image/upload/c_fill,w_1920,h_900,q_90,f_auto/v1777479624/Screenshot_2026-04-29_at_7.20.12_PM_rxrpej.png",
     trustSignal: "معتمدة من منظمة الصحة العالمية",
     lat: 26.73,
     lng: 33.94,
