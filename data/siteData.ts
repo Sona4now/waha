@@ -115,9 +115,9 @@ export const DESTINATIONS: DestinationFull[] = [
       "مكان مثالي للعزلة والتجدد النفسي",
     ],
     image:
-      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=800&q=80",
+      "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813873/siwa_oasis_uit0zr.png",
     heroBg:
-      "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1920&q=80",
+      "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813873/siwa_oasis_uit0zr.png",
     trustSignal: "تراث طبيعي معترف به من اليونسكو",
     lat: 29.2,
     lng: 25.52,
@@ -163,9 +163,9 @@ export const DESTINATIONS: DestinationFull[] = [
       "مثالية لمن يبحث عن الهدوء والانفصال عن الضوضاء",
     ],
     image:
-      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&q=80",
+      "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813986/siinai_3am_rkznug.png",
     heroBg:
-      "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1920&q=80",
+      "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813986/siinai_3am_rkznug.png",
     trustSignal: "محمية طبيعية معترف بها دولياً",
     lat: 28.55,
     lng: 33.97,
@@ -205,9 +205,9 @@ export const DESTINATIONS: DestinationFull[] = [
       "أسعار معقولة مقارنة بالوجهات الأخرى",
     ],
     image:
-      "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=800&q=80",
+      "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813831/MAIN_FAYOUM_zainef.png",
     heroBg:
-      "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1920&q=80",
+      "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813831/MAIN_FAYOUM_zainef.png",
     trustSignal: "محمية طبيعية تابعة لوزارة البيئة",
     lat: 29.31,
     lng: 30.84,
@@ -250,9 +250,9 @@ export const DESTINATIONS: DestinationFull[] = [
       "ثقافة بدوية أصيلة وضيافة دافئة",
     ],
     image:
-      "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&q=80",
+      "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813966/WAHAT_3AM_ish8yv.png",
     heroBg:
-      "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1920&q=80",
+      "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813966/WAHAT_3AM_ish8yv.png",
     trustSignal: "من أقدم الواحات المأهولة في مصر",
     lat: 28.35,
     lng: 28.86,
@@ -293,9 +293,9 @@ export const DESTINATIONS: DestinationFull[] = [
       "انعدام إشارة الموبايل في أجزاء كبيرة — Digital Detox طبيعي",
     ],
     image:
-      "https://images.unsplash.com/photo-1547234935-80c7145ec969?w=800&q=80",
+      "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813924/wadi_degla_entrance_oemkl0.png",
     heroBg:
-      "https://images.unsplash.com/photo-1547234935-80c7145ec969?w=1920&q=80",
+      "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813924/wadi_degla_entrance_oemkl0.png",
     trustSignal: "محمية طبيعية معتمدة من EEAA ومبادرة ECO Egypt",
     lat: 29.9333,
     lng: 31.4,

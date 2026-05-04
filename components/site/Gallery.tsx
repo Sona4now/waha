@@ -386,98 +386,140 @@ export function getGalleryForDestination(destId: string): GalleryImage[] {
     ],
     sinai: [
       {
-        url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1200&q=80",
-        caption: "جبال سيناء الشاهقة",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813986/gbal_mlwna_sinai_n17osf.jpg",
+        caption: "الجبال الملونة",
         category: "الجبال",
       },
       {
-        url: "https://images.unsplash.com/photo-1506260408121-e353d10b87c7?w=1200&q=80",
-        caption: "وادي رم",
-        category: "الطبيعة",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813984/gabl_mousa_sinai_tmmhdm.png",
+        caption: "جبل موسى",
+        category: "الجبال",
       },
       {
-        url: "https://images.unsplash.com/photo-1542224566-6e85f2e6772f?w=1200&q=80",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813982/sahhel_sinai_dahhab_mgbu5h.png",
+        caption: "ساحل دهب",
+        category: "البحر",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813981/sinai_sahel_ut41rd.png",
+        caption: "الساحل",
+        category: "البحر",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813980/sant_cattren_sinai_blwf7e.png",
         caption: "سانت كاترين",
         category: "التراث",
       },
       {
-        url: "https://images.unsplash.com/photo-1519046904884-53103b34b206?w=1200&q=80",
-        caption: "البحر الأحمر من الجبل",
-        category: "البحر",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1200&q=80",
-        caption: "صخور ملونة",
-        category: "الطبيعة",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1565608438257-fac3c27beb36?w=1200&q=80",
-        caption: "الصحراء الجبلية",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813979/gbal_shaheqa_sinaii_tui0lu.png",
+        caption: "الجبل الشاهق",
         category: "الجبال",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813978/colored_canyon_sinai_cpy91m.png",
+        caption: "الكانيون الملون",
+        category: "الطبيعة",
       },
     ],
     fayoum: [
       {
-        url: "https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1200&q=80",
-        caption: "بحيرة قارون",
-        category: "البحيرات",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?w=1200&q=80",
-        caption: "الفيوم الخضراء",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813834/gabl_modwra_bywv40.png",
+        caption: "جبل المدورة",
         category: "الطبيعة",
       },
       {
-        url: "https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=1200&q=80",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813833/magic_lake_iqxyqz.png",
+        caption: "البحيرة السحرية",
+        category: "البحيرات",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813832/handmade_nrmvnb.png",
+        caption: "الحرف اليدوية",
+        category: "التراث",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813833/wadi_alhetan_edprps.png",
         caption: "وادي الحيتان",
         category: "الآثار",
       },
       {
-        url: "https://images.unsplash.com/photo-1547448415-e9f5b28e570d?w=1200&q=80",
-        caption: "شلالات وادي الريان",
-        category: "الطبيعة",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&q=80",
-        caption: "غروب الصحراء",
-        category: "الطبيعة",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1502780402662-acc01917db4a?w=1200&q=80",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813831/tunis_fayoum_o6n0d3.png",
         caption: "قرية تونس",
         category: "التراث",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813831/shlalat_fayoum_oytsds.png",
+        caption: "شلالات الفيوم",
+        category: "الطبيعة",
       },
     ],
     bahariya: [
       {
-        url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&q=80",
-        caption: "الصحراء البيضاء",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813965/wahat_night_sczhf3.png",
+        caption: "الصحراء البيضاء ليلاً",
         category: "الصحراء",
       },
       {
-        url: "https://images.unsplash.com/photo-1547448415-e9f5b28e570d?w=1200&q=80",
-        caption: "تكوينات صخرية",
-        category: "الصحراء",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1506260408121-e353d10b87c7?w=1200&q=80",
-        caption: "سماء الصحراء",
-        category: "الطبيعة",
-      },
-      {
-        url: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813964/wahat_spring_mxrrhg.png",
         caption: "العيون الحارة",
         category: "العيون",
       },
       {
-        url: "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1200&q=80",
-        caption: "واحة بين الصحاري",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813963/wahat_black_y8uysw.png",
+        caption: "الصحراء السوداء",
+        category: "الصحراء",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813962/3qbat_wahat_x5zji6.png",
+        caption: "عقبة الواحات",
         category: "الطبيعة",
       },
       {
-        url: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=1200&q=80",
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813959/jara_cave_wahat_akghyh.png",
+        caption: "كهف الجرة",
+        category: "الطبيعة",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813959/crystal_wide_pqklfs.png",
         caption: "جبل الكريستال",
         category: "الصحراء",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813957/crystal_wahat_p7jqle.png",
+        caption: "كريستال الواحات",
+        category: "الصحراء",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813956/white_desert_wahat_zfvvq4.png",
+        caption: "الصحراء البيضاء",
+        category: "الصحراء",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813954/wahat_palms_nnbljv.png",
+        caption: "النخيل",
+        category: "الطبيعة",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813955/wahat_palm_groves_oafjix.png",
+        caption: "بساتين النخيل",
+        category: "الطبيعة",
+      },
+    ],
+    "wadi-degla": [
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813927/wadi_degla_mountains_fozkrb.png",
+        caption: "جبال وادي دجلة",
+        category: "الجبال",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813924/bbq_wadi_degla_nhkvoc.png",
+        caption: "تخييم وادي دجلة",
+        category: "الطبيعة",
+      },
+      {
+        url: "https://res.cloudinary.com/dbkawwpoj/image/upload/q_auto/f_auto/v1777813923/meh_yxvo09.png",
+        caption: "وادي دجلة",
+        category: "الطبيعة",
       },
     ],
   };
